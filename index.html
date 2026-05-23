@@ -36,27 +36,68 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   justify-content: center; align-items: flex-start;
   padding: 40px 8%; position: relative; overflow: hidden;
 }
+#capa::before {
+  content: ''; position: absolute; left: -160px; top: -160px;
+  width: 480px; height: 480px; border-radius: 50%;
+  background: rgba(19,81,180,0.05);
+}
 #capa::after {
   content: ''; position: absolute; right: -100px; bottom: -100px;
   width: 500px; height: 500px; border-radius: 50%;
   background: rgba(19,81,180,0.06);
 }
-.capa-nav { position: absolute; top: 28px; right: 40px; display: flex; gap: 24px; }
+.capa-nav { position: absolute; top: 28px; right: 40px; display: flex; gap: 24px; z-index: 1; }
 .capa-nav a { color: var(--blue); text-decoration: none; font-weight: 600; font-size: 14px; }
 .capa-nav a:hover { text-decoration: underline; }
-.capa-pre { font-size: 20px; font-weight: 400; color: var(--blue); letter-spacing: 5px; margin-bottom: 8px; }
-.capa-title { font-size: clamp(36px,6vw,72px); font-weight: 400; line-height: 1.1; }
+.capa-pre { font-size: 20px; font-weight: 400; color: var(--blue); letter-spacing: 5px; margin-bottom: 8px; position: relative; z-index: 1; }
+.capa-title { font-size: clamp(32px,5vw,64px); font-weight: 400; line-height: 1.1; position: relative; z-index: 1; }
 .capa-title strong { font-weight: 800; color: var(--blue); }
-.capa-line { width: 80px; height: 4px; background: var(--blue); margin: 16px 0 40px; }
-.capa-btn {
-  display: inline-flex; align-items: center; gap: 14px;
-  background: var(--blue); color: #fff; border: none;
-  border-radius: var(--radius); padding: 18px 40px;
-  font-size: 17px; font-weight: 600; cursor: pointer;
-  transition: background .2s; font-family: inherit;
+.capa-line { width: 80px; height: 4px; background: var(--blue); margin: 16px 0 32px; position: relative; z-index: 1; }
+.capa-logos { position: absolute; bottom: 28px; left: 8%; font-size: 11px; color: #888; z-index: 1; }
+.capa-att { position: absolute; bottom: 28px; right: 40px; font-size: 11px; color: #888; z-index: 1; }
+
+/* Caixa de busca na capa */
+.capa-busca { position: relative; z-index: 1; width: 100%; max-width: 580px; margin-bottom: 16px; }
+.capa-busca-campo {
+  display: flex; align-items: center;
+  background: var(--white); border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(19,81,180,0.18);
+  overflow: hidden; border: 2px solid transparent;
+  transition: border-color .2s;
 }
-.capa-btn:hover { background: var(--blue-hover); }
-.capa-logos { position: absolute; bottom: 28px; right: 40px; font-size: 12px; color: #555; }
+.capa-busca-campo:focus-within { border-color: var(--blue); }
+.capa-busca-campo input {
+  flex: 1; border: none; outline: none;
+  padding: 18px 24px; font-size: 16px; font-family: inherit;
+  background: transparent; color: var(--text);
+}
+.capa-busca-campo input::placeholder { color: #aaa; }
+.capa-busca-btn {
+  background: var(--blue); border: none; color: #fff;
+  padding: 18px 24px; cursor: pointer; transition: background .2s;
+  font-size: 16px; font-family: inherit; font-weight: 700;
+  display: flex; align-items: center; gap: 8px; white-space: nowrap;
+}
+.capa-busca-btn:hover { background: var(--blue-hover); }
+
+/* Filtros secundários na capa */
+.capa-filtros {
+  position: relative; z-index: 1;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  align-items: center; max-width: 580px; margin-bottom: 10px;
+}
+.capa-filtros-label { font-size: 12px; color: #777; font-weight: 600; width: 100%; margin-bottom: 2px; }
+.capa-filtros select {
+  border: 1px solid rgba(19,81,180,0.2); border-radius: var(--radius);
+  padding: 8px 28px 8px 14px; font-size: 12px; font-family: inherit;
+  color: var(--text); background: rgba(255,255,255,0.85);
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  backdrop-filter: blur(4px);
+}
+.capa-filtros select:focus { outline: 2px solid var(--blue); }
+.capa-erro { font-size: 13px; color: var(--red); font-weight: 600; display: none; position: relative; z-index:1; margin-top: 4px; }
 
 /* ── PAINEL ── */
 #painel { display: none; min-height: 100vh; }
@@ -538,13 +579,35 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <div class="capa-pre">P a i n e l</div>
   <h1 class="capa-title">Novos <strong>Credenciamentos</strong> da APS</h1>
   <div class="capa-line"></div>
-  <button class="capa-btn" onclick="abrirPainel()">
-    Visualizar <strong>novos credenciamentos</strong>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/>
-    </svg>
-  </button>
+
+  <!-- Busca principal -->
+  <div class="capa-busca">
+    <div class="capa-busca-campo busca-rel">
+      <input type="text" id="buscaInput" placeholder="🔍  Digite o nome do município..."
+        autocomplete="off" oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
+      <button class="capa-busca-btn" onclick="executarConsulta()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Ver credenciamentos
+      </button>
+    </div>
+    <div class="sugestoes" id="sugestoes" style="display:none"></div>
+  </div>
+
+  <!-- Filtros secundários -->
+  <div class="capa-filtros">
+    <div class="capa-filtros-label">Ou filtre por:</div>
+    <select id="fRegiao"><option value="">Região</option></select>
+    <select id="fUF"><option value="">UF</option></select>
+    <select id="fMacro"><option value="">Macrorregião</option></select>
+    <select id="fPortaria"><option value="">Portaria</option></select>
+    <select id="fAno"><option value="">Ano</option></select>
+    <button class="btn-limpar-sm" onclick="limparConsulta()" style="position:relative;z-index:1">✕ Limpar</button>
+  </div>
+
+  <div class="capa-erro" id="consultaErro">Selecione pelo menos um município ou filtro para consultar.</div>
+
   <div class="capa-logos">MINISTÉRIO DA SAÚDE · SAPS · 2026</div>
+  <div class="capa-att" id="attTxt"></div>
 </div>
 
 <!-- ═══ PAINEL ═══ -->
@@ -558,7 +621,6 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
         <h1>Credenciamentos da Atenção Primária à Saúde</h1>
       </div>
       <div class="header-right">
-        <span class="att-txt" id="attTxt">—</span>
         <button class="btn-outline" onclick="voltarCapa()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
           Início
@@ -567,39 +629,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
     </div>
   </div>
 
-  <!-- Tela de consulta -->
-  <div id="telaConsulta">
-    <div class="consulta-wrap">
-      <div class="consulta-titulo">Consulta de Credenciamentos</div>
-      <div class="consulta-sub">Informe o município ou selecione um filtro para visualizar os credenciamentos.</div>
-
-      <!-- Campo município em destaque -->
-      <div class="consulta-mun">
-        <input type="text" id="buscaInput" placeholder="🔍  Digite o nome do município..."
-          autocomplete="off" oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
-        <div class="sugestoes" id="sugestoes" style="display:none"></div>
-      </div>
-
-      <!-- Filtros secundários -->
-      <div class="consulta-filtros-sec">
-        <div class="consulta-filtros-label">Ou filtre por:</div>
-        <select id="fRegiao"><option value="">Região</option></select>
-        <select id="fUF"><option value="">UF</option></select>
-        <select id="fMacro"><option value="">Macrorregião</option></select>
-        <select id="fPortaria"><option value="">Portaria</option></select>
-        <select id="fAno"><option value="">Ano</option></select>
-      </div>
-
-      <div class="consulta-acoes">
-        <button class="btn-consultar" onclick="executarConsulta()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          Ver credenciamentos
-        </button>
-        <button class="btn-limpar-sm" onclick="limparConsulta()">✕ Limpar</button>
-      </div>
-      <div class="consulta-erro" id="consultaErro">Selecione pelo menos um município ou filtro para consultar.</div>
-    </div>
-  </div>
+  <!-- Tela de consulta (não usada — busca agora está na capa) -->
+  <div id="telaConsulta" style="display:none"></div>
 
   <!-- Resultado -->
   <div id="resultado">
@@ -609,7 +640,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
         <div class="resultado-sub" id="resultadoSub">—</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn-limpar-sm" onclick="voltarConsulta()">← Nova consulta</button>
+        <button class="btn-limpar-sm" onclick="voltarCapa()">← Nova consulta</button>
       </div>
     </div>
 
@@ -741,20 +772,27 @@ let municipioSel = '';
 // ═══════════════════════════════════════
 // NAVEGAÇÃO
 // ═══════════════════════════════════════
-function abrirPainel() {
+function abrirPainel(aba) {
+  // Chamado pelos links de navegação (ex: Legislação)
   document.getElementById('capa').style.display = 'none';
   document.getElementById('painel').style.display = 'block';
-  document.getElementById('telaConsulta').style.display = 'block';
-  document.getElementById('resultado').style.display = 'none';
-  if (!dados.length) carregarDados();
+  document.getElementById('resultado').style.display = 'block';
+  filtrados = dados;
+  municipioSel = '';
+  abaAtiva = aba || 'ativos';
+  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
+  document.getElementById('resultadoTitulo').textContent = 'Todos os municípios';
+  document.getElementById('resultadoSub').textContent = `${filtrados.length} registro(s)`;
+  atualizarAba();
+  renderizar();
 }
 function voltarCapa() {
   document.getElementById('painel').style.display = 'none';
+  document.getElementById('resultado').style.display = 'none';
   document.getElementById('capa').style.display = 'flex';
 }
 function voltarConsulta() {
-  document.getElementById('resultado').style.display = 'none';
-  document.getElementById('telaConsulta').style.display = 'block';
+  voltarCapa();
 }
 function executarConsulta() {
   const mun = document.getElementById('buscaInput').value.trim();
@@ -766,6 +804,13 @@ function executarConsulta() {
     return;
   }
   erroEl.style.display = 'none';
+
+  // Se dados ainda não carregaram, aguarda
+  if (!dados.length) {
+    erroEl.textContent = 'Aguarde, carregando dados...';
+    erroEl.style.display = 'block';
+    return;
+  }
 
   // Aplica filtros
   if (mun) {
@@ -800,7 +845,8 @@ function executarConsulta() {
   }
 
   abaAtiva = 'ativos';
-  document.getElementById('telaConsulta').style.display = 'none';
+  document.getElementById('capa').style.display = 'none';
+  document.getElementById('painel').style.display = 'block';
   document.getElementById('resultado').style.display = 'block';
   atualizarAba();
   renderizar();
@@ -809,7 +855,9 @@ function limparConsulta() {
   municipioSel = '';
   document.getElementById('buscaInput').value = '';
   document.getElementById('sugestoes').style.display = 'none';
-  document.getElementById('consultaErro').style.display = 'none';
+  const erroEl = document.getElementById('consultaErro');
+  erroEl.style.display = 'none';
+  erroEl.textContent = 'Selecione pelo menos um município ou filtro para consultar.';
   ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value = '');
 }
 
@@ -825,8 +873,8 @@ function renderComPaginacao(el, grupos, chave, renderFn) {
   const total = grupos.length;
   const fatia = grupos.slice(0, pagina * POR_PAGINA);
 
-  // Preserva html já colocado no el (resumo), adiciona contexto + cards
-  let html = el.innerHTML + contextoBar(total);
+  // Preserva html já colocado no el (resumo + contextoBar), adiciona cards
+  let html = el.innerHTML;
   fatia.forEach(g => { html += renderFn(g); });
 
   if (total > pagina * POR_PAGINA) {
@@ -851,7 +899,9 @@ function carregarMais(chave) {
 // DADOS
 // ═══════════════════════════════════════
 async function carregarDados() {
-  document.getElementById('loadingOverlay').style.display = 'flex';
+  // Mostra loading apenas quando já está no painel (não bloqueia a capa)
+  if (document.getElementById('painel').style.display === 'block')
+    document.getElementById('loadingOverlay').style.display = 'flex';
   try {
     const resp = await fetch(`${API_URL}?action=data`);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -860,15 +910,15 @@ async function carregarDados() {
     if (!dados.length) throw new Error('Sem dados');
 
     const datas = dados.map(d => d.data_portaria).filter(d => d && d !== '0000-00-00').sort().reverse();
-    if (datas.length) document.getElementById('attTxt').textContent = 'Atualizado em ' + fmt(datas[0]);
+    const attEl = document.getElementById('attTxt');
+    if (attEl && datas.length) attEl.textContent = 'Atualizado em ' + fmt(datas[0]);
 
     popularFiltros();
     filtrados = dados;
-    atualizarAba();
-    renderizar();
   } catch(e) {
     console.error(e);
-    document.getElementById('c-ativos').innerHTML = erroHTML(e.message);
+    const erroEl = document.getElementById('consultaErro');
+    if (erroEl) { erroEl.textContent = 'Erro ao carregar dados: ' + e.message; erroEl.style.display = 'block'; }
   } finally {
     document.getElementById('loadingOverlay').style.display = 'none';
   }
@@ -923,7 +973,8 @@ function executarBusca() {
   executarConsulta();
 }
 document.addEventListener('click', e => {
-  if (!e.target.closest('.busca-rel')) document.getElementById('sugestoes').style.display='none';
+  if (!e.target.closest('.capa-busca') && !e.target.closest('.busca-rel'))
+    document.getElementById('sugestoes').style.display='none';
 });
 
 
@@ -1081,7 +1132,7 @@ function renderAtivos() {
     const gruposOut = Object.values(agrupar(ativosOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`));
     const todosGrupos = [...grupos3, ...gruposOut];
 
-    el.innerHTML = html; // resumo + contexto já montados
+    el.innerHTML = html; // resumo + contextoBar já montados
     renderComPaginacao(el, todosGrupos, 'ativos', (g) => {
       if (isTipo3Comp(g[0].tipo)) {
         return `<div class="secao-titulo" style="display:none"></div>` + card3Comp(g, hoje);
@@ -1308,8 +1359,9 @@ function renderEncerrados() {
     // Vista geral: paginação
     const grupos3   = Object.values(agrupar(enc3,  d=>`${d.municipio}||${d.uf}||${d.portaria}`));
     const gruposOut = Object.values(agrupar(encOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`));
-    el.innerHTML = html;
-    renderComPaginacao(el, [...grupos3,...gruposOut], 'encerrados', (g) =>
+    const todosEnc = [...grupos3, ...gruposOut];
+    el.innerHTML = html + contextoBar(todosEnc.length);
+    renderComPaginacao(el, todosEnc, 'encerrados', (g) =>
       isTipo3Comp(g[0].tipo) ? cardEncerrado3(g) : cardEncerradoOutros(g)
     );
   }
@@ -1440,6 +1492,7 @@ function renderHomologacoes(ativo = true) {
   if (!comCred.length) { el.innerHTML = vazioHTML('📊','Sem dados','Nenhum dado de homologação para o filtro selecionado.'); return; }
 
   const grupos = Object.values(agrupar(comCred, d=>`${d.municipio}||${d.uf}||${d.portaria}||${d.nome_completo}`));
+  el.innerHTML = contextoBar(grupos.length);
   renderComPaginacao(el, grupos, chave, cardHomol);
 }
 
@@ -1527,6 +1580,14 @@ function downloadCSV(tipo) {
   a.href = URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
   a.download = `credenciamentos_${tipo}.csv`; a.click();
 }
+
+// Carrega dados ao abrir a página (para autocomplete funcionar na capa)
+(async () => {
+  const btn = document.querySelector('.capa-busca-btn');
+  if (btn) { btn.disabled = true; btn.style.opacity = '.65'; }
+  await carregarDados();
+  if (btn) { btn.disabled = false; btn.style.opacity = ''; }
+})();
 </script>
 </body>
 </html>
