@@ -303,18 +303,27 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .tl-dot.atual   { background: var(--white); border-color: var(--green); color: var(--green); box-shadow: 0 0 0 4px var(--green-light); }
 .tl-dot.futuro  { background: var(--white); border-color: var(--gray-border); color: #bbb; }
 .tl-dot.vencido { background: var(--red-light); border-color: var(--red); color: var(--red); }
-.tl-info { text-align: center; margin-top: 8px; max-width: 90px; }
+.tl-info { text-align: center; margin-top: 8px; max-width: 100px; }
 .tl-info .tl-nome { font-size: 11px; font-weight: 700; color: var(--text); }
-.tl-info .tl-sub  { font-size: 10px; color: var(--text-mid); line-height: 1.5; margin-top: 2px; }
+.tl-info .tl-sub  { font-size: 10px; color: var(--text-mid); line-height: 1.6; margin-top: 4px; }
+.tl-info .tl-sub .tl-data-destaque {
+  font-size: 13px; font-weight: 800; color: var(--blue); display: block; line-height: 1.2;
+}
+.tl-info .tl-sub .tl-data-destaque.verde { color: var(--green); }
+.tl-info .tl-sub .tl-homol-destaque {
+  font-size: 11px; font-weight: 700; color: var(--text); display: block;
+  background: var(--yellow-light); border-radius: 4px;
+  padding: 1px 4px; margin-top: 3px; line-height: 1.4;
+}
 .tl-info .tl-atual-label {
   display: inline-block; background: var(--green); color: #fff;
   font-size: 9px; font-weight: 700; padding: 1px 6px;
-  border-radius: 10px; margin-top: 3px;
+  border-radius: 10px; margin-top: 4px;
 }
 .tl-info .tl-vencido-label {
   display: inline-block; background: var(--red); color: #fff;
   font-size: 9px; font-weight: 700; padding: 1px 6px;
-  border-radius: 10px; margin-top: 3px;
+  border-radius: 10px; margin-top: 4px;
 }
 
 /* ── CARD ESTABELECIMENTOS / ESPECÍFICOS ── */
@@ -550,8 +559,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <!-- Abas -->
   <div class="abas-bar">
     <!-- Grupo Credenciamentos -->
-    <div class="aba-grupo">
-      <button class="aba ativo" id="aba-ativos" onclick="trocarAba('ativos')">
+    <div class="aba-grupo" id="grupo-cred">
+      <button class="aba ativo" id="aba-ativos" onclick="toggleGrupo('grupo-cred')">
         Credenciamentos <span class="aba-seta">▾</span>
       </button>
       <div class="aba-dropdown">
@@ -560,8 +569,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
       </div>
     </div>
     <!-- Grupo Homologações -->
-    <div class="aba-grupo">
-      <button class="aba" id="aba-homologacoes" onclick="trocarAba('homol-ativas')">
+    <div class="aba-grupo" id="grupo-homol">
+      <button class="aba" id="aba-homologacoes" onclick="toggleGrupo('grupo-homol')">
         Homologações <span class="aba-seta">▾</span>
       </button>
       <div class="aba-dropdown">
@@ -808,16 +817,16 @@ document.addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════
-// DROPDOWN ABAS (abre/fecha por clique)
+// DROPDOWN ABAS
 // ═══════════════════════════════════════
+function toggleGrupo(id) {
+  const grupo = document.getElementById(id);
+  const aberto = grupo.classList.contains('aberto');
+  document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
+  if (!aberto) grupo.classList.add('aberto');
+}
 document.addEventListener('click', e => {
-  const grupo = e.target.closest('.aba-grupo');
-  document.querySelectorAll('.aba-grupo').forEach(g => {
-    if (g !== grupo) g.classList.remove('aberto');
-  });
-  if (grupo && e.target.closest('.aba') && !e.target.closest('.aba-dropdown-item')) {
-    grupo.classList.toggle('aberto');
-  } else if (!grupo) {
+  if (!e.target.closest('.aba-grupo')) {
     document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
   }
 });
@@ -1044,23 +1053,27 @@ function timelineHTML(rep, hoje) {
   const dp = resolveData(rep.data_portaria, rep.portaria);
   const comps = calcComps(dp, rep.portaria);
   if (!comps) return '';
+
   const steps = [
-    { nome: 'Credenciado', sub: `Portaria ${rep.portaria}`, sub2: fmt(dp), status: 'done', icon: '✓' },
+    {
+      nome: 'Credenciado',
+      subHTML: `<span style="font-size:11px;color:var(--text-mid)">Portaria ${rep.portaria}<br>${fmt(dp)}</span>`,
+      status: 'done', icon: '✓'
+    },
     ...comps.map((c,i) => ({
       nome: `${i+1}ª Competência`,
-      sub:  `CNES: ${c.label}`,
-      sub2: `Homol: parcela ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}`,
+      subHTML: `<span class="tl-data-destaque">CNES ${c.label}</span><span class="tl-homol-destaque">Homol. ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}</span>`,
       status: statusComp(c, hoje),
       icon: String(i+1)
     })),
     {
       nome: 'Cofinanciamento',
-      sub:  `A partir da parcela`,
-      sub2: `${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}`,
+      subHTML: `<span style="font-size:10px;color:var(--text-mid)">A partir da parcela</span><span class="tl-data-destaque verde">${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}</span>`,
       status: comps[0] && statusComp(comps[0],hoje)==='done' ? 'done' : 'futuro',
       icon: '💰'
     }
   ];
+
   let tl = '<div class="timeline">';
   steps.forEach((s,i) => {
     const dc = s.status==='done'?'done':s.status==='atual'?'atual':'futuro';
@@ -1069,13 +1082,14 @@ function timelineHTML(rep, hoje) {
       <div class="tl-dot ${dc}">${s.icon}</div>
       <div class="tl-info">
         <div class="tl-nome">${s.nome}</div>
-        <div class="tl-sub"><div>${s.sub}</div><div>${s.sub2}</div></div>
+        <div class="tl-sub">${s.subHTML}</div>
         ${labelExtra}
       </div>
     </div>`;
     if (i < steps.length-1) tl += `<div class="tl-conector ${s.status==='done'?'done':''}"></div>`;
   });
   tl += '</div>';
+
   return `<div class="timeline-wrap">
     <div class="timeline-titulo">Linha do tempo — prazo para cadastro no CNES e homologação</div>
     ${tl}
