@@ -1137,102 +1137,139 @@ function cardOutros(grupo) {
 }
 
 // ═══════════════════════════════════════
-// ABA ENCERRADOS
+// ABA ENCERRADOS — espelho dos ativos
 // ═══════════════════════════════════════
 function renderEncerrados() {
   const el = document.getElementById('c-encerrados');
-  if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
+  const hoje = new Date();
 
-  const isEncerrado = d => !isAtivoOutros(d) && Number(d.credenciado)>0;
-  const enc3   = filtrados.filter(d => isTipo3Comp(d.tipo)  && isEncerrado(d));
-  const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && isEncerrado(d));
+  const enc3   = filtrados.filter(d => isTipo3Comp(d.tipo)  && !isAtivoOutros(d) && Number(d.credenciado)>0);
+  const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && !isAtivoOutros(d) && Number(d.credenciado)>0);
+
+  // Resumo
+  const portarias = [...new Set([...enc3,...encOut].map(d=>d.portaria))];
+  const totalCred3   = enc3.reduce((s,d)=>s+Number(d.credenciado||0),0);
+  const totalCredOut = encOut.reduce((s,d)=>s+Number(d.credenciado||0),0);
+
+  let html = `<div class="resumo-grid">
+    <div class="resumo-card">
+      <div class="resumo-label">Portarias encerradas</div>
+      <div class="resumo-valor">${portarias.length}</div>
+      <div class="resumo-sub">${portarias.slice(0,5).join(', ')+(portarias.length>5?'…':'') || '—'}</div>
+    </div>
+    <div class="resumo-card">
+      <div class="resumo-label">Equipes (3 comp.)</div>
+      <div class="resumo-valor">${totalCred3.toLocaleString('pt-BR')}</div>
+      <div class="resumo-sub">Processo concluído</div>
+    </div>
+    <div class="resumo-card">
+      <div class="resumo-label">Estabelecimentos / Específicos</div>
+      <div class="resumo-valor">${totalCredOut.toLocaleString('pt-BR')}</div>
+      <div class="resumo-sub">Encerrados</div>
+    </div>
+  </div>`;
+
+  html += contextoBar(enc3.length + encOut.length);
 
   if (!enc3.length && !encOut.length) {
-    el.innerHTML = vazioHTML('📋','Nenhum credenciamento encerrado','Não há credenciamentos encerrados para o filtro selecionado.');
+    el.innerHTML = html + vazioHTML('📋','Nenhum credenciamento encerrado','Não há credenciamentos encerrados para o filtro selecionado.');
     return;
   }
 
-  const hoje = new Date();
-  const grupos3   = enc3.length  ? Object.values(agrupar(enc3,  d=>`${d.municipio}||${d.uf}||${d.portaria}`)) : [];
-  const gruposOut = encOut.length ? Object.values(agrupar(encOut,d=>`${d.municipio}||${d.uf}||${d.portaria}`)) : [];
-  const todosGrupos = [...grupos3, ...gruposOut];
+  if (municipioSel) {
+    // Vista município: agrupa por portaria
+    const todasPortarias = [...new Set([...enc3,...encOut].map(d=>d.portaria))].sort((a,b)=>b-a);
+    todasPortarias.forEach(port => {
+      const p3  = enc3.filter(d => d.portaria === port);
+      const pOut = encOut.filter(d => d.portaria === port);
+      const rep  = (p3[0] || pOut[0]);
+      const dp   = resolveData(rep.data_portaria, port);
 
-  renderComPaginacao(el, todosGrupos, 'encerrados', (g) => {
-    return isTipo3Comp(g[0].tipo) ? card3CompEncerrado(g, hoje) : cardEncerradoSimples(g);
-  });
+      html += `<div class="portaria-secao" style="opacity:.9">
+        <div class="portaria-secao-header" style="background:var(--text-mid)">
+          <div>
+            <div class="portaria-secao-num">Portaria ${port}</div>
+            <div class="portaria-secao-data">${fmt(dp)} · ${rep.ano||'—'} · ${rep.macrorregiao||''}</div>
+          </div>
+          <span class="badge" style="background:rgba(255,255,255,0.2);color:#fff">✓ Encerrado</span>
+        </div>`;
+
+      if (p3.length) {
+        const grupos3 = agrupar(p3, d => d.nome_completo || d.estrategia || '');
+        Object.values(grupos3).forEach(g => { html += estrategiaRow(g, false); });
+        html += timelineEncerradoHTML(p3[0]);
+      }
+      if (pOut.length) {
+        html += `<div class="port-bloco-titulo port-bloco-sep">Credenciados encerrados</div>`;
+        pOut.forEach(d => { html += estrategiaRowCredenciado([d]); });
+      }
+      html += `</div>`;
+    });
+    el.innerHTML = html;
+
+  } else {
+    // Vista geral: paginação
+    const grupos3   = Object.values(agrupar(enc3,  d=>`${d.municipio}||${d.uf}||${d.portaria}`));
+    const gruposOut = Object.values(agrupar(encOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`));
+    el.innerHTML = html;
+    renderComPaginacao(el, [...grupos3,...gruposOut], 'encerrados', (g) =>
+      isTipo3Comp(g[0].tipo) ? cardEncerrado3(g) : cardEncerradoOutros(g)
+    );
+  }
 }
 
-// Card encerrado — espelho do ativo com visual de concluído
-function card3CompEncerrado(grupo, hoje) {
-  const rep = grupo[0];
+// Timeline encerrada — todos os passos como concluídos
+function timelineEncerradoHTML(rep) {
   const dp = resolveData(rep.data_portaria, rep.portaria);
   const comps = calcComps(dp, rep.portaria);
-
-  const estr = estrategiaRow(grupo, false);
-
-  let tlHTML = '';
-  if (comps) {
-    const steps = [
-      { nome: 'Credenciado',    subHTML: `<span style="font-size:11px;color:var(--text-mid)">Portaria ${rep.portaria}<br>${fmt(dp)}</span>`, status: 'done', icon: '✓' },
-      ...comps.map((c,i) => ({
-        nome: `${i+1}ª Competência`,
-        subHTML: `<span class="tl-data-destaque">CNES ${c.label}</span><span class="tl-homol-destaque">Homol. ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}</span>`,
-        status: 'done', icon: '✓'
-      })),
-      { nome: 'Cofinanciamento', subHTML: `<span class="tl-data-destaque verde">${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}</span><span style="font-size:10px;color:var(--green)">Concluído</span>`, status: 'done', icon: '✓' }
-    ];
-    let tl = '<div class="timeline">';
-    steps.forEach((s,i) => {
-      tl += `<div class="tl-step">
-        <div class="tl-dot done">${s.icon}</div>
-        <div class="tl-info">
-          <div class="tl-nome">${s.nome}</div>
-          <div class="tl-sub">${s.subHTML}</div>
-        </div>
-      </div>`;
-      if (i < steps.length-1) tl += `<div class="tl-conector done"></div>`;
-    });
-    tl += '</div>';
-    tlHTML = `<div class="timeline-wrap">
-      <div class="timeline-titulo">Processo concluído — histórico do credenciamento</div>
-      ${tl}
+  if (!comps) return '';
+  const steps = [
+    { nome: 'Credenciado',   subHTML: `<span style="font-size:11px;color:var(--text-mid)">Portaria ${rep.portaria}<br>${fmt(dp)}</span>` },
+    ...comps.map((c,i) => ({
+      nome: `${i+1}ª Competência`,
+      subHTML: `<span class="tl-data-destaque">CNES ${c.label}</span><span class="tl-homol-destaque">Homol. ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}</span>`
+    })),
+    { nome: 'Cofinanciamento', subHTML: `<span class="tl-data-destaque verde">${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}</span>` }
+  ];
+  let tl = '<div class="timeline">';
+  steps.forEach((s,i) => {
+    tl += `<div class="tl-step">
+      <div class="tl-dot done">✓</div>
+      <div class="tl-info"><div class="tl-nome">${s.nome}</div><div class="tl-sub">${s.subHTML}</div></div>
     </div>`;
-  }
+    if (i < steps.length-1) tl += `<div class="tl-conector done"></div>`;
+  });
+  tl += '</div>';
+  return `<div class="timeline-wrap"><div class="timeline-titulo">Processo concluído</div>${tl}</div>`;
+}
 
-  return `<div class="card-3comp" style="opacity:.85;border-left:4px solid var(--gray-border)">
+// Card encerrado tipo 3 comp (vista geral)
+function cardEncerrado3(grupo) {
+  const rep = grupo[0];
+  const dp = resolveData(rep.data_portaria, rep.portaria);
+  return `<div class="card-3comp" style="opacity:.85">
     <div class="card-3comp-header">
       <div class="card-3comp-info">
         <div class="card-portaria-txt">Portaria ${rep.portaria} · ${fmt(dp)} · ${rep.ano||'—'}</div>
         <div class="card-estrategia-nome">${rep.municipio||'—'} — ${rep.uf||''}</div>
-        ${rep.macrorregiao ? `<div class="card-local">${rep.macrorregiao}</div>` : ''}
+        ${rep.macrorregiao?`<div class="card-local">${rep.macrorregiao}</div>`:''}
       </div>
       <span class="badge badge-gray">✓ Encerrado</span>
     </div>
-    <div class="card-outros-body">${estr}</div>
-    ${tlHTML}
+    <div class="card-outros-body">${estrategiaRow(grupo, false)}</div>
+    ${timelineEncerradoHTML(rep)}
   </div>`;
 }
 
-// Card encerrado para tipos sem fluxo de 3 competências
-function cardEncerradoSimples(grupo) {
+// Card encerrado outros tipos (vista geral)
+function cardEncerradoOutros(grupo) {
   const rep = grupo[0];
-  const dp = fmt(rep.data_portaria);
-  const estr = grupo.map(d => {
-    const h1 = Number(d.homologacao_1||0);
-    const h2 = Number(d.homologacao_2||0);
-    const h3 = Number(d.homologacao_3||0);
-    const homolTotal = h1+h2+h3;
-    const homolHTML = homolTotal > 0
-      ? `<div style="font-size:11px;color:var(--text-mid);margin-top:3px">
-           Homologações: <strong style="color:var(--green)">${homolTotal}</strong>
-           <span style="color:var(--gray-border)">·</span> ${[h1&&`1ª: ${h1}`,h2&&`2ª: ${h2}`,h3&&`3ª: ${h3}`].filter(Boolean).join(' · ')}
-         </div>`
-      : `<div style="font-size:11px;color:var(--text-mid);margin-top:3px">Sem homologação registrada</div>`;
-    return `<div class="estrategia-row">
+  const dp = resolveData(rep.data_portaria, rep.portaria);
+  const rows = grupo.map(d => `
+    <div class="estrategia-row">
       <div>
         <div class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</div>
         <div style="font-size:11px;color:var(--text-mid)">${d.tipo||''}</div>
-        ${homolHTML}
       </div>
       <div class="estrategia-meta">
         <div style="text-align:right">
@@ -1240,19 +1277,17 @@ function cardEncerradoSimples(grupo) {
           <div class="estrategia-qtd-label">credenciado(s)</div>
         </div>
       </div>
-    </div>`;
-  }).join('');
-
-  return `<div class="card-3comp" style="opacity:.85;border-left:4px solid var(--gray-border)">
+    </div>`).join('');
+  return `<div class="card-3comp" style="opacity:.85">
     <div class="card-3comp-header">
       <div class="card-3comp-info">
-        <div class="card-portaria-txt">Portaria ${rep.portaria} · ${dp} · ${rep.ano||'—'}</div>
+        <div class="card-portaria-txt">Portaria ${rep.portaria} · ${fmt(dp)} · ${rep.ano||'—'}</div>
         <div class="card-estrategia-nome">${rep.municipio||'—'} — ${rep.uf||''}</div>
-        ${rep.macrorregiao ? `<div class="card-local">${rep.macrorregiao}</div>` : ''}
+        ${rep.macrorregiao?`<div class="card-local">${rep.macrorregiao}</div>`:''}
       </div>
       <span class="badge badge-gray">✓ Encerrado</span>
     </div>
-    <div class="card-outros-body">${estr}</div>
+    <div class="card-outros-body">${rows}</div>
   </div>`;
 }
 
