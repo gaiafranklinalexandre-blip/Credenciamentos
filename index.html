@@ -711,6 +711,17 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <h1 class="capa-title">Novos <strong>Credenciamentos</strong> da APS</h1>
   <div class="capa-line"></div>
 
+  <!-- Filtros secundários -->
+  <div class="capa-filtros">
+    <div class="capa-filtros-label">Filtre por:</div>
+    <select id="fRegiao"   onchange="onSelectChange()"><option value="">Região</option></select>
+    <select id="fUF"       onchange="onSelectChange()"><option value="">UF</option></select>
+    <select id="fMacro"    onchange="onSelectChange()"><option value="">Macrorregião</option></select>
+    <select id="fPortaria" onchange="onSelectChange()"><option value="">Portaria</option></select>
+    <select id="fAno"      onchange="onSelectChange()"><option value="">Ano</option></select>
+    <button class="btn-limpar-sm" onclick="limparConsulta()" style="position:relative;z-index:1">✕ Limpar</button>
+  </div>
+
   <!-- Busca principal -->
   <div class="capa-busca">
     <div class="capa-busca-campo">
@@ -724,17 +735,6 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
       </button>
     </div>
     <div class="sugestoes" id="sugestoes" style="display:none"></div>
-  </div>
-
-  <!-- Filtros secundários -->
-  <div class="capa-filtros">
-    <div class="capa-filtros-label">Ou filtre por:</div>
-    <select id="fRegiao"   onchange="onSelectChange()"><option value="">Região</option></select>
-    <select id="fUF"       onchange="onSelectChange()"><option value="">UF</option></select>
-    <select id="fMacro"    onchange="onSelectChange()"><option value="">Macrorregião</option></select>
-    <select id="fPortaria" onchange="onSelectChange()"><option value="">Portaria</option></select>
-    <select id="fAno"      onchange="onSelectChange()"><option value="">Ano</option></select>
-    <button class="btn-limpar-sm" onclick="limparConsulta()" style="position:relative;z-index:1">✕ Limpar</button>
   </div>
 
   <div class="capa-erro" id="consultaErro">Selecione pelo menos um município ou filtro para consultar.</div>
@@ -1063,6 +1063,8 @@ async function carregarDados() {
 
     popularFiltros();
     filtrados = dados;
+    // Se o usuário já digitou algo enquanto carregava, atualiza o autocomplete
+    if (document.getElementById('buscaInput').value.trim().length >= 2) onBuscaInput();
   } catch(e) {
     console.error(e);
     const erroEl = document.getElementById('consultaErro');
@@ -1148,6 +1150,10 @@ function onBuscaInput() {
   const q = document.getElementById('buscaInput').value.trim().toLowerCase();
   const el = document.getElementById('sugestoes');
   if (q.length < 2) { el.style.display='none'; return; }
+  if (!dados.length) {
+    el.innerHTML = `<div class="sug-item" style="color:var(--text-mid);cursor:default">⏳ Carregando dados...</div>`;
+    el.style.display = 'block'; return;
+  }
   const muns = [...new Map(dados.map(d => [`${d.municipio}||${d.uf}`, {mun: d.municipio, uf: d.uf}]))
     .values()].filter(x => x.mun && x.mun.toLowerCase().includes(q)).slice(0, 12);
   if (!muns.length) { el.style.display='none'; return; }
