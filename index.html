@@ -1143,8 +1143,9 @@ function renderEncerrados() {
   const el = document.getElementById('c-encerrados');
   if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
-  const enc3 = filtrados.filter(d => isTipo3Comp(d.tipo) && (d.selecao_credenciamento||'').toLowerCase()==='finalizado' && Number(d.credenciado)>0);
-  const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && (d.selecao_credenciamento||'').toLowerCase()==='finalizado' && Number(d.credenciado)>0);
+  const isEncerrado = d => !isAtivoOutros(d) && Number(d.credenciado)>0;
+  const enc3   = filtrados.filter(d => isTipo3Comp(d.tipo)  && isEncerrado(d));
+  const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && isEncerrado(d));
 
   if (!enc3.length && !encOut.length) {
     el.innerHTML = vazioHTML('📋','Nenhum credenciamento encerrado','Não há credenciamentos encerrados para o filtro selecionado.');
@@ -1302,8 +1303,7 @@ function renderHomologacoes(ativo = true) {
 
   const comCred = filtrados.filter(d => {
     if (!Number(d.credenciado)) return false;
-    const status = (d.selecao_credenciamento || '').toLowerCase();
-    return ativo ? status === 'ativo' : status === 'finalizado';
+    return ativo ? isAtivoOutros(d) : !isAtivoOutros(d);
   });
   if (!comCred.length) { el.innerHTML = vazioHTML('📊','Sem dados','Nenhum dado de homologação para o filtro selecionado.'); return; }
 
