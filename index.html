@@ -365,6 +365,22 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;
 }
 
+/* Sub-bloco dentro da seção de portaria */
+.port-bloco-titulo {
+  font-size: 10px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .5px;
+  padding: 6px 20px; background: var(--gray-bg);
+  border-top: 1px solid var(--gray-border);
+  border-bottom: 1px solid var(--gray-border);
+}
+.port-bloco-sep { margin-top: 0; }
+.badge-credenciado {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--green-light); color: var(--green);
+  font-size: 11px; font-weight: 700; padding: 3px 10px;
+  border-radius: var(--radius);
+}
+
 /* Mensagem município sem credenciamento */
 .card-msg {
   background: var(--white); border-radius: var(--card-r);
@@ -953,12 +969,16 @@ function renderAtivos() {
         </div>`;
 
       if (p3.length) {
+        if (p3.length > 1) {
+          html += `<div class="port-bloco-titulo">Com prazo de implantação</div>`;
+        }
         const grupos3 = agrupar(p3, d => d.nome_completo || d.estrategia || '');
         Object.values(grupos3).forEach(g => { html += estrategiaRow(g, false); });
         html += timelineHTML(p3[0], hoje);
       }
       if (pOut.length) {
-        pOut.forEach(d => { html += estrategiaRow([d], false); });
+        html += `<div class="port-bloco-titulo port-bloco-sep">Credenciado — sem prazo de implantação</div>`;
+        pOut.forEach(d => { html += estrategiaRowCredenciado([d]); });
       }
       html += `</div>`;
     });
@@ -994,6 +1014,24 @@ function estrategiaRow(grupo, mostrarPortaria = true) {
       </div>
       <div class="estrategia-meta">
         <div style="text-align:right">
+          <div class="estrategia-qtd">${d.credenciado||0}</div>
+          <div class="estrategia-qtd-label">credenciado(s)</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Linha de estratégia sem prazo (badge "Credenciado") ──
+function estrategiaRowCredenciado(grupo) {
+  return grupo.map(d => `
+    <div class="estrategia-row">
+      <div>
+        <div class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</div>
+        <div style="font-size:11px;color:var(--text-mid);margin-top:2px">${d.tipo||''}</div>
+      </div>
+      <div class="estrategia-meta">
+        <span class="badge-credenciado">✓ Credenciado</span>
+        <div style="text-align:right;margin-left:10px">
           <div class="estrategia-qtd">${d.credenciado||0}</div>
           <div class="estrategia-qtd-label">credenciado(s)</div>
         </div>
