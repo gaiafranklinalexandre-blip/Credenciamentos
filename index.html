@@ -2003,7 +2003,40 @@ function renderPortarias() {
     }, {});
 
     const anos = Object.keys(porAno).sort((a,b) => b-a);
-    let html = '<div class="portarias-card">';
+    let html = `
+    <div class="portarias-card" style="margin-bottom:20px">
+      <div class="port-ano">📚 Referências e Documentos</div>
+
+      <div class="port-item">
+        <div class="port-data">Fluxo de Credenciamento</div>
+        <a class="port-link" href="https://sisaps.saude.gov.br/sistemas/gerenciaaps/fluxocredenciamento/" target="_blank" rel="noopener">
+          BRASIL. Ministério da Saúde. <strong>Fluxo de Credenciamento.</strong> Brasília, DF: Ministério da Saúde, [2026].
+        </a>
+      </div>
+
+      <div class="port-item">
+        <div class="port-data">Nota Técnica nº 53/2026</div>
+        <a class="port-link" href="https://www.gov.br/saude/pt-br/centrais-de-conteudo/publicacoes/notas-tecnicas/2026/nota-tecnica-no-53-2026-cohc-cgfap-deaps-saps-ms.pdf/view" target="_blank" rel="noopener">
+          BRASIL. Ministério da Saúde. SAPS/DEAPS/CGFAP/COHC. <strong>Nota Técnica nº 53/2026-COHC/CGFAP/DEAPS/SAPS/MS.</strong> Brasília, DF: Ministério da Saúde, 2026.
+        </a>
+      </div>
+
+      <div class="port-item">
+        <div class="port-data">Portaria de Consolidação GM/MS nº 2 — 28 de setembro de 2017</div>
+        <a class="port-link" href="https://bvsms.saude.gov.br/bvs/saudelegis/gm/2017/prc0002_03_10_2017.html" target="_blank" rel="noopener">
+          BRASIL. Ministério da Saúde. <strong>Portaria de Consolidação GM/MS nº 2, de 28 de setembro de 2017.</strong> Consolidação das normas sobre as políticas nacionais de saúde do Sistema Único de Saúde. Diário Oficial da União, Brasília, DF, 3 out. 2017.
+        </a>
+      </div>
+
+      <div class="port-item">
+        <div class="port-data">Portaria de Consolidação GM/MS nº 6 — 28 de setembro de 2017</div>
+        <a class="port-link" href="https://bvsms.saude.gov.br/bvs/saudelegis/gm/2017/prc0006_03_10_2017.html" target="_blank" rel="noopener">
+          BRASIL. Ministério da Saúde. <strong>Portaria de Consolidação GM/MS nº 6, de 28 de setembro de 2017.</strong> Consolidação das normas sobre o financiamento e a transferência dos recursos federais para as ações e os serviços de saúde do Sistema Único de Saúde. Diário Oficial da União, Brasília, DF, 3 out. 2017.
+        </a>
+      </div>
+    </div>
+
+    <div class="portarias-card">`;
     anos.forEach(ano => {
       html += `<div class="port-ano">📋 Portarias ${ano}</div>`;
       porAno[ano]
