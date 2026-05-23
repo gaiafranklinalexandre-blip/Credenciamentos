@@ -657,8 +657,9 @@ function isAtivoOutros(row) {
 }
 
 function isTipo3Comp(tipo) {
-  const t = (tipo || '').toLowerCase();
-  return t.includes('3') || t.includes('compet');
+  const t = (tipo || '').toLowerCase().trim();
+  // Aceita "3 competências", "3 competêcias" (typo da base) e variações
+  return t.startsWith('3') && (t.includes('compet') || t.includes('comp'));
 }
 
 function isEstabelecimento(tipo) {
