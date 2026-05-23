@@ -2353,9 +2353,6 @@ function carregarChartJs(cb) {
   document.head.appendChild(s);
 }
 
-// Filtro do dashboard (portaria ou 'todas')
-let dashFiltroPort = 'todas';
-
 function renderDashboard() {
   const el = document.getElementById('dashBody');
   if (!dados.length) {
@@ -2379,11 +2376,7 @@ function montarDashboard(el) {
   const portsUnicas = [...new Set(dados.map(d => Number(d.portaria)).filter(Boolean))].sort((a,b) => b - a);
 
   // ── Base: apenas ativos com credenciamento ──
-  const baseAtivos = dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
-
-  const base = dashFiltroPort === 'todas'
-    ? baseAtivos
-    : baseAtivos.filter(d => String(d.portaria) === String(dashFiltroPort));
+  const base = dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
 
   // ── KPIs ──
   const totalMunicipiosBrasil = 5570;
@@ -2459,14 +2452,6 @@ function montarDashboard(el) {
     porPortaria[key] = (porPortaria[key] || 0) + Number(d.credenciado || 0);
   });
 
-  // ── Botões de filtro ──
-  const filtrosBtns = ['todas', ...portsUnicas].map(p =>
-    `<button class="dash-filtro-btn ${dashFiltroPort == p || (p === 'todas' && dashFiltroPort === 'todas') ? 'ativo' : ''}"
-      onclick="dashFiltroPort='${p}';renderDashboard()">
-      ${p === 'todas' ? 'Todas as portarias' : `Portaria ${Number(p).toLocaleString('pt-BR')}`}
-    </button>`
-  ).join('');
-
   // ── Portarias ativas card HTML ──
   const portAtivasHTML = portAtivasInfo.length
     ? portAtivasInfo.map(x => {
@@ -2486,10 +2471,10 @@ function montarDashboard(el) {
 
   // ── HTML principal ──
   el.innerHTML = `
-    <!-- Filtro de portaria -->
-    <div class="dash-filtro-wrap">
-      <span class="dash-filtro-label">Filtrar por:</span>
-      ${filtrosBtns}
+    <!-- Portarias ativas — topo -->
+    <div class="dash-portarias-atv" style="margin-bottom:28px">
+      <div class="dash-section-title"><span>🟢</span> Portarias Ativas</div>
+      <div class="dash-port-grid">${portAtivasHTML}</div>
     </div>
 
     <!-- KPIs -->
@@ -2537,12 +2522,6 @@ function montarDashboard(el) {
         <div class="dash-mapa-legenda-item"><div class="dash-mapa-legenda-cor" style="background:#1e3a8a"></div> Máximo</div>
         <span style="margin-left:auto;font-style:italic">Passe o mouse sobre os estados para ver detalhes</span>
       </div>
-    </div>
-
-    <!-- Portarias ativas -->
-    <div class="dash-portarias-atv">
-      <div class="dash-section-title"><span>🟢</span> Portarias Ativas</div>
-      <div class="dash-port-grid">${portAtivasHTML}</div>
     </div>
 
     <!-- Gráficos -->
