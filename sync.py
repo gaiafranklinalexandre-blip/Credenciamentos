@@ -10,9 +10,14 @@ API_KEY = 'painel_cred_2026_key'
 
 def parse_date(val):
     if isinstance(val, datetime):
+        if val.year < 1900:
+            return None
         return val.strftime('%Y-%m-%d')
     if isinstance(val, str) and val.strip():
-        return val.strip()
+        try:
+            return datetime.strptime(val.strip(), '%Y-%m-%d').strftime('%Y-%m-%d')
+        except:
+            return None
     return None
 
 def to_int(val):
