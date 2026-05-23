@@ -177,7 +177,7 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
   min-width: 180px; z-index: 200; overflow: hidden;
 }
-.aba-grupo:hover .aba-dropdown { display: block; }
+.aba-grupo.aberto .aba-dropdown { display: block; }
 .aba-dropdown-item {
   padding: 11px 20px; font-size: 13px; font-weight: 600;
   color: var(--text-mid); cursor: pointer; border: none;
@@ -773,12 +773,28 @@ document.addEventListener('click', e => {
 });
 
 // ═══════════════════════════════════════
+// DROPDOWN ABAS (abre/fecha por clique)
+// ═══════════════════════════════════════
+document.addEventListener('click', e => {
+  const grupo = e.target.closest('.aba-grupo');
+  document.querySelectorAll('.aba-grupo').forEach(g => {
+    if (g !== grupo) g.classList.remove('aberto');
+  });
+  if (grupo && e.target.closest('.aba') && !e.target.closest('.aba-dropdown-item')) {
+    grupo.classList.toggle('aberto');
+  } else if (!grupo) {
+    document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
+  }
+});
+
+// ═══════════════════════════════════════
 // ABAS
 // ═══════════════════════════════════════
 const ABAS_CONTEUDO = ['ativos','encerrados','homol-ativas','homol-encerradas','portarias'];
 
 function trocarAba(aba) {
   abaAtiva = aba;
+  document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
   atualizarAba();
   renderizar();
 }
