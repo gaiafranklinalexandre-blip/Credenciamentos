@@ -1,4 +1,10 @@
 <?php
+// Headers CORS — permite que o painel no Render acesse esta API
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: X-Api-Key, Content-Type');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(200); exit; }
+
 // Chave de segurança - o Python deve enviar essa chave em cada requisição
 define('API_KEY', 'painel_cred_2026_key');
 
@@ -10,15 +16,17 @@ define('DB_NAME', 'u127731061_Zpe5T');
 
 header('Content-Type: application/json');
 
-// Verifica a chave de segurança
-$headers = getallheaders();
-if (!isset($headers['X-Api-Key']) || $headers['X-Api-Key'] !== API_KEY) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
-
 $action = $_GET['action'] ?? '';
+
+// Ações de escrita exigem chave — leitura é pública
+if (in_array($action, ['sync', 'append', 'sync_portarias'])) {
+    $headers = getallheaders();
+    if (!isset($headers['X-Api-Key']) || $headers['X-Api-Key'] !== API_KEY) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        exit;
+    }
+}
 
 $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 if ($conn->connect_error) {
@@ -28,7 +36,19 @@ if ($conn->connect_error) {
 }
 $conn->set_charset('utf8mb4');
 
-// Cria a tabela se não existir
+// Cria tabelas se não existirem
+$conn->query("CREATE TABLE IF NOT EXISTS portarias_aps (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    n_portaria INT,
+    data_portaria DATE,
+    ano INT,
+    tipo_ato VARCHAR(100),
+    equipe_servico VARCHAR(100),
+    link TEXT,
+    descricao TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)");
+
 $conn->query("CREATE TABLE IF NOT EXISTS credenciamentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     uf VARCHAR(5),
@@ -99,6 +119,39 @@ if ($action === 'sync' || $action === 'append') {
     }
 
     echo json_encode(['success' => true, 'inserted' => $count]);
+
+} elseif ($action === 'sync_portarias') {
+    $body = file_get_contents('php://input');
+    $data = json_decode($body, true);
+    if (!$data || !isset($data['records'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid payload']);
+        exit;
+    }
+    $conn->query("TRUNCATE TABLE portarias_aps");
+    $stmt = $conn->prepare("INSERT INTO portarias_aps
+        (n_portaria, data_portaria, ano, tipo_ato, equipe_servico, link, descricao)
+        VALUES (?,?,?,?,?,?,?)");
+    $count = 0;
+    foreach ($data['records'] as $r) {
+        $dp = $r['data_portaria'] ?: null;
+        $stmt->bind_param('isisssss',
+            $r['n_portaria'], $dp, $r['ano'],
+            $r['tipo_ato'], $r['equipe_servico'], $r['link'], $r['descricao']
+        );
+        $stmt->execute();
+        $count++;
+    }
+    echo json_encode(['success' => true, 'inserted' => $count]);
+
+} elseif ($action === 'portarias') {
+    // Retorna todas as portarias da base para o painel
+    $result = $conn->query("SELECT * FROM portarias_aps ORDER BY data_portaria DESC");
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
+    echo json_encode($rows);
 
 } elseif ($action === 'data') {
     // Retorna todos os dados para o painel HTML

@@ -562,6 +562,43 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 
 footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-mid); background: var(--white); border-top: 1px solid var(--gray-border); margin-top: 32px; }
 
+/* ── PORTARIAS LINHA DO TEMPO ── */
+.port-tl-header {
+  padding: 20px 24px 12px;
+}
+.port-tl-mun  { font-size: 20px; font-weight: 800; color: var(--blue); }
+.port-tl-sub  { font-size: 12px; color: var(--text-mid); margin-top: 2px; }
+
+.port-tl-wrap { padding: 8px 24px 24px; }
+
+.port-tl-item {
+  display: flex; gap: 0; align-items: flex-start;
+}
+.port-tl-esq {
+  display: flex; flex-direction: column; align-items: center;
+  width: 48px; flex-shrink: 0;
+}
+.port-tl-dot {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--white); border: 2px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0; z-index: 1;
+  box-shadow: 0 2px 8px rgba(19,81,180,0.15);
+}
+.port-tl-linha {
+  width: 2px; flex: 1; min-height: 24px;
+  background: var(--blue-light); margin: 4px 0;
+}
+.port-tl-corpo {
+  flex: 1; padding: 4px 0 32px 16px;
+}
+.port-tl-data  { font-size: 11px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.port-tl-num   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.port-tl-link  { font-size: 15px; font-weight: 800; color: var(--blue); text-decoration: none; }
+.port-tl-link:hover { text-decoration: underline; }
+.port-tl-equipe { font-size: 12px; font-weight: 600; color: var(--text-mid); margin-bottom: 4px; }
+.port-tl-desc  { font-size: 13px; color: var(--text); line-height: 1.6; }
+
 /* Responsivo */
 @media (max-width: 700px) {
   .content { padding: 14px 12px; }
@@ -780,6 +817,7 @@ function farolTxt(dias) {
 // ═══════════════════════════════════════
 let dados = [];
 let filtrados = [];
+let portarias = [];   // base Portarias_APS_Database
 let abaAtiva = 'ativos';
 let municipioSel = '';
 
@@ -923,11 +961,19 @@ async function carregarDados() {
   if (document.getElementById('painel').style.display === 'block')
     document.getElementById('loadingOverlay').style.display = 'flex';
   try {
-    const resp = await fetch(`${API_URL}?action=data`);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const json = await resp.json();
+    const [respDados, respPort] = await Promise.all([
+      fetch(`${API_URL}?action=data`),
+      fetch(`${API_URL}?action=portarias`)
+    ]);
+    if (!respDados.ok) throw new Error(`HTTP ${respDados.status}`);
+    const json = await respDados.json();
     dados = Array.isArray(json) ? json : [];
     if (!dados.length) throw new Error('Sem dados');
+
+    if (respPort.ok) {
+      const jp = await respPort.json();
+      portarias = Array.isArray(jp) ? jp : [];
+    }
 
     const datas = dados.map(d => d.data_portaria).filter(d => d && d !== '0000-00-00').sort().reverse();
     const attEl = document.getElementById('attTxt');
@@ -1575,41 +1621,133 @@ function renderHomologacoes(ativo = true) {
 // ═══════════════════════════════════════
 // ABA PORTARIAS
 // ═══════════════════════════════════════
+
+// Ícones por tipo de ato
+const TIPO_ICONE = {
+  'credenciamento': '✅',
+  'homologação':    '📋',
+  'habilitação':    '🏅',
+  'autorização':    '🔓',
+  'alteração':      '✏️',
+  'estabelecimento':'📌',
+};
+function tipoIcone(tipo) {
+  const t = (tipo||'').toLowerCase();
+  for (const [k,v] of Object.entries(TIPO_ICONE)) if (t.includes(k)) return v;
+  return '📄';
+}
+
+// Badge colorido por tipo
+function tipoBadgeClass(tipo) {
+  const t = (tipo||'').toLowerCase();
+  if (t.includes('credenciamento')) return 'badge-green';
+  if (t.includes('homolog'))        return 'badge-blue';
+  if (t.includes('habilit'))        return 'badge-blue';
+  return 'badge-gray';
+}
+
 function renderPortarias() {
-  document.getElementById('c-portarias').innerHTML = `<div class="portarias-card">
-    <div class="port-ano">📋 Portarias 2026</div>
-    <div class="port-item">
-      <div class="port-data">30 de Abril de 2026</div>
-      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.979" target="_blank" rel="noopener">
-        Portaria GM/MS nº 10.979 – Credencia municípios a fazerem jus à transferência dos incentivos financeiros federais de custeio, referentes aos serviços do Programa Academia da Saúde – PAS, no âmbito da Atenção Primária à Saúde – APS.
-      </a>
+  const el = document.getElementById('c-portarias');
+
+  // Portarias vinculadas ao filtro atual
+  const portariasDoFiltro = [...new Set(filtrados.map(d => Number(d.portaria)))].filter(Boolean);
+
+  if (municipioSel && portariasDoFiltro.length) {
+    // ── Vista município: linha do tempo das portarias desse município ──
+    const vinculadas = portarias
+      .filter(p => portariasDoFiltro.includes(Number(p.n_portaria)))
+      .sort((a,b) => (a.data_portaria||'') < (b.data_portaria||'') ? -1 : 1);
+
+    if (!vinculadas.length) {
+      el.innerHTML = vazioHTML('📋','Sem portarias cadastradas',
+        'As portarias deste município ainda não foram incluídas na base de legislação.');
+      return;
+    }
+
+    let html = `<div class="port-tl-header">
+      <div class="port-tl-mun">${municipioSel}</div>
+      <div class="port-tl-sub">${vinculadas.length} portaria(s) associada(s)</div>
     </div>
-    <div class="port-item">
-      <div class="port-data">13 de Março de 2026</div>
-      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.345" target="_blank" rel="noopener">
-        Portaria GM/MS nº 10.345 – Credencia e habilita municípios a fazerem jus à transferência dos incentivos financeiros federais de custeio, referentes às equipes, serviços, programas e profissionais no âmbito da Atenção Primária à Saúde – APS.
-      </a>
-    </div>
-    <div class="port-ano">📋 Portarias 2025</div>
-    <div class="port-item">
-      <div class="port-data">30 de Dezembro de 2025</div>
-      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.991" target="_blank" rel="noopener">
-        Portaria GM/MS nº 9.991 – Credencia municípios a fazerem jus à transferência do incentivo financeiro federal de custeio, referentes às equipes específicas, no âmbito da Atenção Primária à Saúde – APS.
-      </a>
-    </div>
-    <div class="port-item">
-      <div class="port-data">03 de Novembro de 2025</div>
-      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.082" target="_blank" rel="noopener">
-        Portaria GM/MS nº 9.082 – Credencia e habilita municípios a fazerem jus à transferência do incentivo financeiro federal de custeio, referentes às equipes e serviços no âmbito da Atenção Primária à Saúde – APS.
-      </a>
-    </div>
-    <div class="port-item">
-      <div class="port-data">17 de Novembro de 2025</div>
-      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-8.808" target="_blank" rel="noopener">
-        Portaria GM/MS nº 8.808 – Autoriza a migração de equipes e profissionais da Atenção Primária à Saúde – APS do Município de Sorriso para Boa Esperança do Norte, MT.
-      </a>
-    </div>
-  </div>`;
+    <div class="port-tl-wrap">`;
+
+    vinculadas.forEach((p, i) => {
+      const ico   = tipoIcone(p.tipo_ato);
+      const bCls  = tipoBadgeClass(p.tipo_ato);
+      const isLast = i === vinculadas.length - 1;
+      html += `
+      <div class="port-tl-item">
+        <div class="port-tl-esq">
+          <div class="port-tl-dot">${ico}</div>
+          ${!isLast ? '<div class="port-tl-linha"></div>' : ''}
+        </div>
+        <div class="port-tl-corpo">
+          <div class="port-tl-data">${fmtLong(p.data_portaria)}</div>
+          <div class="port-tl-num">
+            <a href="${p.link||'#'}" target="_blank" rel="noopener" class="port-tl-link">
+              Portaria GM/MS nº ${fmtPortaria(p.n_portaria)}
+            </a>
+            <span class="badge ${bCls}" style="font-size:10px">${p.tipo_ato||''}</span>
+          </div>
+          <div class="port-tl-equipe">${p.equipe_servico||''}</div>
+          <div class="port-tl-desc">${p.descricao||''}</div>
+        </div>
+      </div>`;
+    });
+
+    html += '</div>';
+    el.innerHTML = html;
+
+  } else {
+    // ── Vista geral: lista completa agrupada por ano (da base) ──
+    if (!portarias.length) {
+      el.innerHTML = vazioHTML('📋','Legislação','Base de portarias ainda não sincronizada. Execute o sync.py para carregar.');
+      return;
+    }
+
+    const porAno = portarias.reduce((acc, p) => {
+      const a = p.ano || '—';
+      if (!acc[a]) acc[a] = [];
+      acc[a].push(p);
+      return acc;
+    }, {});
+
+    const anos = Object.keys(porAno).sort((a,b) => b-a);
+    let html = '<div class="portarias-card">';
+    anos.forEach(ano => {
+      html += `<div class="port-ano">📋 Portarias ${ano}</div>`;
+      porAno[ano]
+        .sort((a,b) => (a.data_portaria||'') < (b.data_portaria||'') ? 1 : -1)
+        .forEach(p => {
+          html += `<div class="port-item">
+            <div class="port-data">${fmtLong(p.data_portaria)}
+              <span class="badge ${tipoBadgeClass(p.tipo_ato)}" style="margin-left:8px;font-size:10px">${p.tipo_ato||''}</span>
+              <span style="font-size:11px;color:var(--text-mid);margin-left:6px">${p.equipe_servico||''}</span>
+            </div>
+            <a class="port-link" href="${p.link||'#'}" target="_blank" rel="noopener">
+              Portaria GM/MS nº ${fmtPortaria(p.n_portaria)} – ${p.descricao||''}
+            </a>
+          </div>`;
+        });
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+}
+
+// Formata número da portaria: 10979 -> "10.979"
+function fmtPortaria(n) {
+  return Number(n).toLocaleString('pt-BR');
+}
+
+// Formata data por extenso: "2026-04-30" -> "30 de Abril de 2026"
+const MESES_EXT = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                   'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function fmtLong(d) {
+  if (!d || d === '0000-00-00') return '—';
+  try {
+    const [y,m,day] = d.split('-');
+    return `${parseInt(day)} de ${MESES_EXT[parseInt(m)]} de ${y}`;
+  } catch { return d; }
 }
 
 // ═══════════════════════════════════════

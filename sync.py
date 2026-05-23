@@ -4,7 +4,8 @@ import os
 from datetime import datetime
 
 # Configurações
-EXCEL_PATH = os.path.join(os.path.dirname(__file__), 'base_credenciamentos_2026.xlsx')
+EXCEL_PATH          = os.path.join(os.path.dirname(__file__), 'base_credenciamentos_2026.xlsx')
+PORTARIAS_EXCEL     = os.path.join(os.path.dirname(__file__), 'Portarias_APS_Database.xlsx')
 API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php'
 API_KEY = 'painel_cred_2026_key'
 
@@ -111,6 +112,51 @@ def sync(records):
 
     print(f'Sincronização concluída! {total} registros no banco.')
 
+def load_portarias():
+    print(f'Lendo {PORTARIAS_EXCEL}...')
+    wb = openpyxl.load_workbook(PORTARIAS_EXCEL, data_only=True)
+    ws = wb.active
+    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    print(f'Colunas portarias: {headers}')
+
+    records = []
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if all(v is None for v in row):
+            continue
+        r = dict(zip(headers, row))
+        # Normaliza N_PORTARIA: "10.979" -> 10979
+        raw = str(r.get('N_PORTARIA') or '').replace('.', '').replace(',', '').strip()
+        try:
+            n_portaria = int(raw)
+        except:
+            n_portaria = 0
+        records.append({
+            'n_portaria':    n_portaria,
+            'data_portaria': parse_date(r.get('DATA')),
+            'ano':           to_int(r.get('ANO')),
+            'tipo_ato':      to_str(r.get('TIPO_ATO')),
+            'equipe_servico':to_str(r.get('EQUIPE_SERVICO')),
+            'link':          to_str(r.get('LINK')),
+            'descricao':     to_str(r.get('DESCRICAO')),
+        })
+
+    print(f'{len(records)} portarias carregadas.')
+    return records
+
+def sync_portarias(records):
+    print('Enviando portarias para o servidor...')
+    resp = requests.post(
+        f'{API_URL}?action=sync_portarias',
+        json={'records': records},
+        headers={'X-Api-Key': API_KEY},
+        timeout=60
+    )
+    resp.raise_for_status()
+    result = resp.json()
+    print(f'Portarias sincronizadas: {result.get("inserted", 0)} registros.')
+
 if __name__ == '__main__':
     records = load_excel()
     sync(records)
+    portarias = load_portarias()
+    sync_portarias(portarias)
