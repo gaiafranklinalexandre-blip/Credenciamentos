@@ -1702,8 +1702,8 @@ function cardHomol(grupo, ativo = true) {
     let gridHTML = '<div class="homol-comp-grid">';
     parcelas.forEach(({comp, hVal, idx}) => {
       const cnesStatus  = hoje > comp.fim    ? 'fechado'  : hoje >= comp.inicio ? 'aberto' : 'futuro';
-      const homolFim    = new Date(comp.aHomol, comp.homol - 1 + 1, 0); // último dia do mês da homol
-      const homolPasta  = hoje > homolFim;
+      const homolDia20  = new Date(comp.aHomol, comp.homol - 1, 20); // dia 20 do mês da parcela
+      const homolPasta  = hoje >= homolDia20;
       const homolLabel  = `Parcela ${String(comp.homol).padStart(2,'0')}/${comp.aHomol}`;
 
       const cnesLabelCls  = cnesStatus === 'aberto' ? 'comp-cnes-aberto' : cnesStatus === 'fechado' ? 'comp-cnes-fechado' : 'comp-cnes-futuro';
@@ -1718,8 +1718,8 @@ function cardHomol(grupo, ativo = true) {
       const homolTitle = hVal > 0
         ? `${hVal} equipe(s) homologada(s) nesta parcela. Pagamento a partir de ${homolLabel}.`
         : homolPasta
-        ? `A parcela ${homolLabel} já foi processada, mas nenhuma equipe foi homologada. Isso pode indicar que o cadastro no CNES não estava completo na ${idx}ª competência.`
-        : `A ${homolLabel} ainda não foi processada. O Ministério emite esta parcela após o fechamento da ${idx}ª competência de CNES (${comp.label}). O painel está atualizado — o valor zerado é esperado até lá.`;
+        ? `A parcela ${homolLabel} foi processada e o resultado foi zero equipes homologadas. Isso pode ter ocorrido porque o cadastro no CNES não estava completo ou correto na ${idx}ª competência (${comp.label}).`
+        : `A parcela ${homolLabel} ainda não foi processada — o Ministério emite após o dia 20 do mês da parcela. O painel está atualizado; o zero é esperado até lá.`;
 
       gridHTML += `
       <div class="homol-comp-item">
