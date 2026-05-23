@@ -841,12 +841,34 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   background: var(--blue); border-color: var(--blue); color: #fff;
 }
 
+/* Mapa */
+#dashMapa { height: 420px; border-radius: 10px; z-index: 1; }
+.dash-mapa-card {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); padding: 20px 22px;
+  margin-bottom: 28px;
+}
+.dash-mapa-legenda {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; align-items: center;
+  font-size: 11px; color: var(--text-mid);
+}
+.dash-mapa-legenda-item { display: flex; align-items: center; gap: 5px; }
+.dash-mapa-legenda-cor {
+  width: 16px; height: 10px; border-radius: 3px; flex-shrink: 0;
+}
+.dash-mapa-tooltip {
+  border: none !important; box-shadow: 0 4px 16px rgba(0,0,0,0.14) !important;
+  border-radius: 10px !important; padding: 10px 14px !important;
+}
+
 @media (max-width: 700px) {
   .dash-body { padding: 14px 12px; }
   .dash-kpi-grid { grid-template-columns: 1fr 1fr; }
   .dash-kpi-valor { font-size: 28px; }
+  #dashMapa { height: 280px; }
 }
 </style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
 </head>
 <body>
 
@@ -2356,10 +2378,12 @@ function montarDashboard(el) {
   // ── Portarias disponíveis (detectadas dinamicamente dos dados) ──
   const portsUnicas = [...new Set(dados.map(d => Number(d.portaria)).filter(Boolean))].sort((a,b) => b - a);
 
-  // ── Base filtrada ──
+  // ── Base: apenas ativos com credenciamento ──
+  const baseAtivos = dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+
   const base = dashFiltroPort === 'todas'
-    ? dados
-    : dados.filter(d => String(d.portaria) === String(dashFiltroPort));
+    ? baseAtivos
+    : baseAtivos.filter(d => String(d.portaria) === String(dashFiltroPort));
 
   // ── KPIs ──
   const totalMunicipiosBrasil = 5570;
@@ -2370,12 +2394,9 @@ function montarDashboard(el) {
     return comps ? hoje <= comps[2].fim : (rep.selecao_credenciamento||'').toLowerCase() === 'ativo';
   }).length;
 
-  const credenciados = base.filter(d => Number(d.credenciado) > 0);
-  const totalCred = credenciados.reduce((s, d) => s + Number(d.credenciado || 0), 0);
-  const munsUnicas = new Set(credenciados.map(d => `${d.municipio}||${d.uf}`)).size;
-  const portAtivas3 = credenciados.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d));
-  const portAtivasOut = credenciados.filter(d => !isTipo3Comp(d.tipo) && isAtivoOutros(d));
-  const totalAtivos = portAtivas3.length + portAtivasOut.length;
+  const totalCred = base.reduce((s, d) => s + Number(d.credenciado || 0), 0);
+  const munsUnicas = new Set(base.map(d => `${d.municipio}||${d.uf}`)).size;
+  const totalAtivos = base.length;
   const totalRegistros = base.length;
 
   const pctMuns = Math.round((munsUnicas / totalMunicipiosBrasil) * 100);
@@ -2411,21 +2432,21 @@ function montarDashboard(el) {
 
   // ── Dados por região ──
   const porRegiao = {};
-  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+  base.forEach(d => {
     const r = d.regiao || 'Não informado';
     porRegiao[r] = (porRegiao[r] || 0) + Number(d.credenciado || 0);
   });
 
   // ── Dados por tipo ──
   const porTipo = {};
-  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+  base.forEach(d => {
     const t = isTipo3Comp(d.tipo) ? '3 Competências' : isEstabelecimento(d.tipo) ? 'Estabelecimentos' : 'Específicos';
     porTipo[t] = (porTipo[t] || 0) + Number(d.credenciado || 0);
   });
 
   // ── Ranking por UF ──
   const porUF = {};
-  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+  base.forEach(d => {
     porUF[d.uf] = (porUF[d.uf] || 0) + Number(d.credenciado || 0);
   });
   const rankingUF = Object.entries(porUF).sort((a, b) => b[1] - a[1]);
@@ -2500,6 +2521,21 @@ function montarDashboard(el) {
         <div class="dash-kpi-pct">Total de linhas na base</div>
         <div class="dash-kpi-sub">estratégias × municípios × portarias</div>
         <div class="dash-kpi-bg-ico">🗂️</div>
+      </div>
+    </div>
+
+    <!-- Mapa -->
+    <div class="dash-mapa-card">
+      <div class="dash-chart-title">Distribuição Geográfica — Credenciamentos Ativos por UF</div>
+      <div id="dashMapa"></div>
+      <div class="dash-mapa-legenda">
+        <span>Intensidade:</span>
+        <div class="dash-mapa-legenda-item"><div class="dash-mapa-legenda-cor" style="background:#dbeafe"></div> Baixo</div>
+        <div class="dash-mapa-legenda-item"><div class="dash-mapa-legenda-cor" style="background:#93c5fd"></div> Médio</div>
+        <div class="dash-mapa-legenda-item"><div class="dash-mapa-legenda-cor" style="background:#3b82f6"></div> Alto</div>
+        <div class="dash-mapa-legenda-item"><div class="dash-mapa-legenda-cor" style="background:#1351B4"></div> Muito alto</div>
+        <div class="dash-mapa-legenda-item"><div class="dash-mapa-legenda-cor" style="background:#1e3a8a"></div> Máximo</div>
+        <span style="margin-left:auto;font-style:italic">Passe o mouse sobre os estados para ver detalhes</span>
       </div>
     </div>
 
@@ -2668,6 +2704,91 @@ function montarDashboard(el) {
       }
     });
   }
+
+  // ── Mapa Leaflet ──
+  carregarLeaflet(() => montarMapa(porUF, base));
+}
+
+let _leafletLoaded = false;
+function carregarLeaflet(cb) {
+  if (_leafletLoaded && window.L) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  s.crossOrigin = '';
+  s.onload = () => { _leafletLoaded = true; cb(); };
+  document.head.appendChild(s);
+}
+
+let _mapaInst = null;
+let _geojsonLayer = null;
+
+function montarMapa(porUF, base) {
+  const el = document.getElementById('dashMapa');
+  if (!el) return;
+
+  // Destrói mapa anterior se existir
+  if (_mapaInst) { _mapaInst.remove(); _mapaInst = null; _geojsonLayer = null; }
+
+  _mapaInst = L.map('dashMapa', {
+    center: [-14.5, -51.9],
+    zoom: 4,
+    zoomControl: true,
+    attributionControl: false,
+    scrollWheelZoom: false,
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+    maxZoom: 10,
+  }).addTo(_mapaInst);
+
+  const maxVal = Math.max(...Object.values(porUF), 1);
+
+  function corUF(uf) {
+    const v = porUF[uf] || 0;
+    const p = v / maxVal;
+    if (p === 0) return '#f0f4ff';
+    if (p < 0.2)  return '#dbeafe';
+    if (p < 0.4)  return '#93c5fd';
+    if (p < 0.6)  return '#3b82f6';
+    if (p < 0.8)  return '#1351B4';
+    return '#1e3a8a';
+  }
+
+  // GeoJSON das UFs brasileiras (simplificado, inline)
+  fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson')
+    .then(r => r.json())
+    .then(geo => {
+      _geojsonLayer = L.geoJSON(geo, {
+        style: feat => {
+          const uf = feat.properties.sigla || feat.properties.UF_05 || feat.properties.abbrev || '';
+          return {
+            fillColor: corUF(uf),
+            weight: 1.5,
+            color: '#fff',
+            fillOpacity: 0.85,
+          };
+        },
+        onEachFeature: (feat, layer) => {
+          const uf  = feat.properties.sigla || feat.properties.UF_05 || feat.properties.abbrev || '';
+          const nome = feat.properties.name || feat.properties.Name || uf;
+          const qtd  = porUF[uf] || 0;
+          const muns = new Set(base.filter(d => d.uf === uf).map(d => d.municipio)).size;
+          layer.bindTooltip(`
+            <div style="font-family:Raleway,sans-serif;min-width:160px">
+              <div style="font-weight:800;font-size:14px;color:#1351B4">${uf} — ${nome}</div>
+              <div style="font-size:13px;margin-top:4px"><strong>${qtd.toLocaleString('pt-BR')}</strong> credenciamentos ativos</div>
+              <div style="font-size:11px;color:#666">${muns} município(s) beneficiado(s)</div>
+            </div>`, { sticky: true, className: 'dash-mapa-tooltip' });
+          layer.on({
+            mouseover(e) { e.target.setStyle({ weight: 3, color: '#1351B4', fillOpacity: 1 }); },
+            mouseout(e)  { _geojsonLayer.resetStyle(e.target); },
+          });
+        }
+      }).addTo(_mapaInst);
+    })
+    .catch(() => {
+      if (el) el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-mid);font-size:13px">Não foi possível carregar o mapa. Verifique sua conexão.</div>';
+    });
 }
 </script>
 </body>
