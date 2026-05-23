@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Novos Credenciamentos da APS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rawline:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue: #1351B4;
+  --blue-hover: #2670E8;
+  --blue-light: #D4E3FF;
+  --green: #168821;
+  --green-light: #E3F5E1;
+  --red: #E52207;
+  --red-light: #FFE8E5;
+  --yellow: #FFCD07;
+  --yellow-light: #FFF5C2;
+  --gray-bg: #F0F0F5;
+  --gray-border: #E0E0E0;
+  --text-dark: #1C1C1C;
+  --text-mid: #555770;
+  --white: #FFFFFF;
+  --radius-btn: 50px;
+  --radius-card: 8px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Raleway', 'Rawline', sans-serif;
+  background: var(--gray-bg);
+  color: var(--text-dark);
+  font-size: 14px;
+}
+
+/* ── CAPA ── */
+#capa {
+  min-height: 100vh;
+  background: #EAECF4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 8%;
+  position: relative;
+  overflow: hidden;
+}
+#capa::after {
+  content: '';
+  position: absolute;
+  right: -80px; bottom: -80px;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  background: rgba(19,81,180,0.07);
+}
+.capa-nav {
+  position: absolute;
+  top: 28px; right: 40px;
+  display: flex; gap: 24px;
+}
+.capa-nav a {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+.capa-nav a:hover { text-decoration: underline; }
+.capa-pre {
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--blue);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+.capa-title {
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 400;
+  color: var(--text-dark);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.capa-title strong { font-weight: 800; color: var(--blue); }
+.capa-underline {
+  width: 80px; height: 4px;
+  background: var(--blue);
+  margin: 16px 0 48px;
+}
+.capa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-btn);
+  padding: 18px 40px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+  text-decoration: none;
+}
+.capa-btn:hover { background: var(--blue-hover); }
+.capa-btn svg { width: 28px; height: 28px; }
+.capa-logos {
+  position: absolute;
+  bottom: 32px; right: 40px;
+  display: flex; align-items: center; gap: 20px;
+}
+.logo-sus {
+  font-weight: 800; font-size: 20px;
+  color: var(--blue);
+  border: 3px solid var(--blue);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+.logo-ms {
+  font-size: 11px;
+  color: #444;
+  text-align: center;
+  line-height: 1.4;
+}
+.logo-br {
+  font-weight: 800; font-size: 22px;
+  color: var(--blue);
+}
+
+/* ── PAINEL ── */
+#painel { display: none; }
+
+.painel-header {
+  background: var(--white);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--gray-border);
+  flex-wrap: wrap;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+.painel-titulo h2 {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue);
+  margin: 0;
+}
+.painel-titulo h1 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--blue);
+}
+.painel-header-right {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.ultima-att {
+  font-size: 12px; color: var(--text-mid);
+}
+.btn-voltar {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 2px solid var(--blue);
+  color: var(--blue);
+  background: transparent;
+  border-radius: var(--radius-btn);
+  padding: 8px 20px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+}
+.btn-voltar:hover { background: var(--blue-light); }
+
+/* Filtros */
+.filtros-wrap {
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-border);
+  padding: 12px 24px;
+}
+.filtros-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+.filtro-item {
+  display: flex; flex-direction: column; gap: 4px;
+  min-width: 120px; flex: 1;
+}
+.filtro-item label {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-mid); text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.filtro-item select {
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text-dark);
+  background: var(--white);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 28px;
+}
+.filtro-item select:focus { outline: 2px solid var(--blue); }
+.btn-limpar {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none;
+  color: var(--red); font-size: 13px; font-weight: 600;
+  cursor: pointer; padding: 8px 4px;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.btn-limpar:hover { text-decoration: underline; }
+
+/* Conteúdo */
+.painel-content { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+
+/* Abas principais */
+.abas-wrap { margin-bottom: 20px; }
+.abas-titulo {
+  text-align: center;
+  font-size: 20px; font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+}
+.abas-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.aba-btn {
+  flex: 1; min-width: 140px;
+  padding: 14px 20px;
+  border-radius: var(--radius-btn);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+  border: 2px solid var(--gray-border);
+  background: var(--white);
+  color: var(--blue);
+  text-align: center;
+}
+.aba-btn.ativo {
+  background: var(--blue);
+  color: var(--white);
+  border-color: var(--blue);
+}
+.aba-btn:hover:not(.ativo) { background: var(--blue-light); border-color: var(--blue); }
+
+/* Sub-abas */
+.sub-abas-row {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.sub-aba-btn {
+  flex: 1; min-width: 120px;
+  padding: 10px 16px;
+  border-radius: var(--radius-btn);
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: inherit;
+  border: 2px solid var(--gray-border);
+  background: var(--white);
+  color: var(--blue);
+  text-align: center;
+}
+.sub-aba-btn.ativo {
+  background: var(--blue);
+  color: var(--white);
+  border-color: var(--blue);
+}
+.sub-aba-btn:hover:not(.ativo) { background: var(--blue-light); border-color: var(--blue); }
+
+/* Info box */
+.info-box {
+  background: var(--blue-light);
+  border-left: 4px solid var(--blue);
+  border-radius: var(--radius-card);
+  padding: 12px 16px;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.info-box svg { min-width: 18px; color: var(--blue); margin-top: 1px; }
+
+/* Legenda */
+.legenda-wrap {
+  display: flex; gap: 32px; flex-wrap: wrap;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+.legenda-grupo { display: flex; flex-direction: column; gap: 4px; }
+.legenda-titulo { font-weight: 700; margin-bottom: 2px; }
+.legenda-item { display: flex; align-items: center; gap: 6px; }
+.legenda-dot {
+  width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+}
+
+/* Tabela */
+.tabela-wrap {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.tabela-header-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-border);
+  flex-wrap: wrap; gap: 10px;
+}
+.tabela-titulo-txt {
+  font-size: 16px; font-weight: 700; color: var(--blue);
+}
+.btn-download {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--blue); color: var(--white);
+  border: none; border-radius: var(--radius-btn);
+  padding: 8px 18px; font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: background .2s;
+}
+.btn-download:hover { background: var(--blue-hover); }
+
+.tabela-scroll { overflow-x: auto; }
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 12px;
+}
+th {
+  background: #F5F7FF;
+  color: var(--blue);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--gray-border);
+  white-space: nowrap;
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gray-border);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #F8F9FF; }
+
+/* Competência cell */
+.comp-cell {
+  min-width: 160px;
+  background: #f5f7fa;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.comp-cell.finalizado { background: #FFE8E5; }
+.comp-cell.atual      { background: #E3F5E1; }
+.comp-cell.aguardando { background: #FFF5C2; }
+.comp-cell.na         { background: #f0f0f5; color: #999; text-align: center; }
+
+.status-dot {
+  display: inline-block;
+  width: 10px; height: 10px; border-radius: 50%;
+  margin-right: 4px; vertical-align: middle;
+}
+.dot-finalizado { background: var(--red); }
+.dot-atual      { background: var(--green); }
+.dot-aguardando { background: var(--yellow); }
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-btn);
+  font-size: 11px; font-weight: 700;
+}
+.badge-green  { background: var(--green-light); color: var(--green); }
+.badge-red    { background: var(--red-light); color: var(--red); }
+.badge-yellow { background: var(--yellow-light); color: #7a5f00; }
+.badge-blue   { background: var(--blue-light); color: var(--blue); }
+
+/* Barra de progresso homologação */
+.barra-wrap { min-width: 100px; }
+.barra-bg {
+  background: #E0E7FF;
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.barra-fill {
+  height: 100%; border-radius: 4px;
+  transition: width .4s;
+}
+.pct-txt { font-size: 11px; font-weight: 700; margin-top: 2px; }
+
+/* Dias restantes */
+.dias-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-btn);
+  font-size: 11px; font-weight: 700;
+  white-space: nowrap;
+}
+.dias-urgente { background: var(--red-light); color: var(--red); }
+.dias-atencao { background: var(--yellow-light); color: #7a5f00; }
+.dias-ok      { background: var(--green-light); color: var(--green); }
+.dias-na      { background: #f0f0f5; color: #999; }
+
+/* Paginação */
+.paginacao {
+  display: flex; justify-content: center; align-items: center;
+  gap: 8px; padding: 16px;
+  font-size: 13px; flex-wrap: wrap;
+}
+.pag-btn {
+  background: none; border: 1px solid var(--gray-border);
+  border-radius: 6px; padding: 6px 12px;
+  cursor: pointer; font-family: inherit; font-size: 13px;
+  color: var(--blue);
+  transition: all .2s;
+}
+.pag-btn:hover:not(:disabled) { background: var(--blue-light); }
+.pag-btn.ativo { background: var(--blue); color: #fff; border-color: var(--blue); }
+.pag-btn:disabled { opacity: .4; cursor: not-allowed; }
+.pag-info { font-size: 12px; color: var(--text-mid); }
+
+/* ── ABA PORTARIAS ── */
+.portarias-lista {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+.portarias-ano {
+  font-size: 15px; font-weight: 700;
+  color: var(--blue);
+  margin: 20px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.portarias-ano:first-child { margin-top: 0; }
+.portaria-data {
+  font-size: 13px; font-weight: 700;
+  color: var(--text-dark);
+  margin: 12px 0 4px;
+}
+.portaria-link {
+  display: block;
+  color: var(--blue);
+  text-decoration: underline;
+  font-size: 13px;
+  margin-bottom: 4px;
+  padding-left: 12px;
+  line-height: 1.5;
+}
+.portaria-link::before { content: '• '; }
+.portaria-link:hover { color: var(--blue-hover); }
+
+/* ── SIMULADOR ── */
+.simulador-card {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-top: 24px;
+}
+.simulador-titulo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 16px; font-weight: 700; color: var(--blue);
+  margin-bottom: 20px;
+}
+.simulador-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 600px) { .simulador-grid { grid-template-columns: 1fr; } }
+.sim-selects { display: flex; flex-direction: column; gap: 16px; }
+.sim-label {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; color: var(--blue);
+  margin-bottom: 6px;
+}
+.sim-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.sim-select {
+  width: 100%;
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px; font-family: inherit;
+  color: var(--text-dark);
+  appearance: none;
+  background: var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
+  cursor: pointer;
+}
+.sim-select:focus { outline: 2px solid var(--blue); }
+.sim-resultado { display: flex; flex-direction: column; gap: 10px; }
+.sim-row {
+  background: var(--gray-bg);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.sim-row-label { font-size: 12px; color: var(--text-mid); font-weight: 500; }
+.sim-row-val {
+  display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
+}
+.sim-chip {
+  padding: 4px 12px;
+  border-radius: var(--radius-btn);
+  font-size: 12px; font-weight: 700;
+  background: var(--blue-light); color: var(--blue);
+}
+.sim-chip.green { background: var(--green-light); color: var(--green); }
+.sim-chip.yellow { background: var(--yellow-light); color: #7a5f00; }
+.sim-chip.red { background: var(--red-light); color: var(--red); }
+.sim-obs {
+  background: var(--blue-light);
+  border-left: 3px solid var(--blue);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--text-dark);
+}
+
+/* ── PASSO A PASSO ── */
+.passo-passo {
+  background: var(--white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-top: 24px;
+}
+.passo-titulo {
+  text-align: center;
+  font-size: 16px; font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 24px;
+}
+.passos-grid {
+  display: flex;
+  gap: 0;
+  position: relative;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.passo-item {
+  flex: 1; min-width: 140px;
+  text-align: center;
+  padding: 0 12px;
+  position: relative;
+}
+.passo-item::before {
+  content: '';
+  position: absolute;
+  top: 20px; left: 50%; right: -50%;
+  height: 2px;
+  background: var(--blue);
+  z-index: 0;
+}
+.passo-item:last-child::before { display: none; }
+.passo-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--blue);
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: var(--blue);
+  margin: 0 auto 10px;
+  position: relative; z-index: 1;
+}
+.passo-nome { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.passo-desc { font-size: 11px; color: var(--text-mid); line-height: 1.5; }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 11px;
+  color: var(--text-mid);
+  background: var(--white);
+  border-top: 1px solid var(--gray-border);
+  margin-top: 32px;
+}
+
+/* Loading */
+.loading-overlay {
+  position: fixed; inset: 0;
+  background: rgba(240,240,245,0.9);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9999;
+  gap: 16px;
+}
+.spinner {
+  width: 48px; height: 48px;
+  border: 4px solid var(--blue-light);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .painel-content { padding: 12px 12px; }
+  .filtros-wrap { padding: 10px 12px; }
+  .filtro-item { min-width: 100%; }
+  .abas-row, .sub-abas-row { flex-direction: column; }
+  .aba-btn, .sub-aba-btn { min-width: unset; }
+  .passos-grid { flex-direction: column; gap: 16px; }
+  .passo-item::before { display: none; }
+  .capa-nav { display: none; }
+  .capa-logos { right: 16px; bottom: 16px; }
+  .painel-header { padding: 12px 16px; }
+  .tabela-titulo-txt { font-size: 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loadingOverlay" style="display:none">
+  <div class="spinner"></div>
+  <div style="font-weight:600;color:var(--blue)">Carregando dados...</div>
+</div>
+
+<!-- ═══════════════ CAPA ═══════════════ -->
+<div id="capa">
+  <nav class="capa-nav">
+    <a href="#" onclick="abrirLegislacao()">Legislação</a>
+    <a href="#" onclick="abrirSobre()">Sobre o Painel</a>
+  </nav>
+
+  <div class="capa-pre">P a i n e l</div>
+  <h1 class="capa-title">Novos <strong>Credenciamentos</strong> da APS</h1>
+  <div class="capa-underline"></div>
+
+  <button class="capa-btn" onclick="abrirPainel()">
+    Visualizar <strong>novos credenciamentos</strong>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 8l4 4-4 4M8 12h8"/>
+    </svg>
+  </button>
+
+  <div class="capa-logos">
+    <div class="logo-ms">MINISTÉRIO DA<br><strong>SAÚDE</strong></div>
+    <div class="logo-br">BR</div>
+    <div class="logo-sus">SUS<br><small style="font-size:9px">35 ANOS</small></div>
+  </div>
+</div>
+
+<!-- ═══════════════ PAINEL ═══════════════ -->
+<div id="painel">
+
+  <!-- Header -->
+  <div class="painel-header">
+    <div class="painel-titulo">
+      <h2>Painel</h2>
+      <h1>Credenciamentos da Atenção Primária à Saúde</h1>
+    </div>
+    <div class="painel-header-right">
+      <span class="ultima-att" id="ultimaAtt">Última atualização: —</span>
+      <button class="btn-voltar" onclick="voltarCapa()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M15 18l-6-6 6-6"/>
+        </svg>
+        Voltar
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros-wrap">
+    <div class="filtros-grid">
+      <div class="filtro-item">
+        <label>Região</label>
+        <select id="fRegiao" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>Macrorregião</label>
+        <select id="fMacro" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>Região de Saúde</label>
+        <select id="fRegiaoSaude" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>UF</label>
+        <select id="fUF" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>Município</label>
+        <select id="fMunicipio" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>Estratégia</label>
+        <select id="fEstrategia" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>Portaria</label>
+        <select id="fPortaria" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div class="filtro-item">
+        <label>Ano</label>
+        <select id="fAno" onchange="aplicarFiltros()"><option value="">Todos</option></select>
+      </div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="btn-limpar" onclick="limparFiltros()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+          Limpar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div class="painel-content">
+
+    <!-- Abas principais -->
+    <div class="abas-wrap">
+      <div class="abas-titulo">Seleção</div>
+      <div class="abas-row">
+        <button class="aba-btn ativo" onclick="trocarAba('credenciamentos')">Credenciamentos</button>
+        <button class="aba-btn" onclick="trocarAba('homologacoes')">Homologações</button>
+        <button class="aba-btn" onclick="trocarAba('portarias')">Portarias</button>
+      </div>
+    </div>
+
+    <!-- ── ABA CREDENCIAMENTOS ── -->
+    <div id="aba-credenciamentos">
+      <!-- Sub-abas -->
+      <div class="sub-abas-row">
+        <button class="sub-aba-btn ativo" onclick="trocarSubAba('equipes')">Equipes e profissionais</button>
+        <button class="sub-aba-btn" onclick="trocarSubAba('estabelecimentos')">Estabelecimentos e serviços</button>
+        <button class="sub-aba-btn" onclick="trocarSubAba('politicas')">Políticas e Programas</button>
+      </div>
+      <!-- Sub-sub-abas status -->
+      <div class="sub-abas-row" id="status-abas">
+        <button class="sub-aba-btn ativo" onclick="trocarStatus('ativos')">Ativos</button>
+        <button class="sub-aba-btn" onclick="trocarStatus('encerrados')">Encerrados</button>
+      </div>
+
+      <!-- Info box -->
+      <div class="info-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        <span id="infoBoxTxt">Utilize os filtros acima para visualizar os dados conforme sua necessidade.</span>
+      </div>
+
+      <!-- Legenda -->
+      <div class="legenda-wrap">
+        <div class="legenda-grupo">
+          <div class="legenda-titulo">Legenda (status):</div>
+          <div class="legenda-item"><div class="legenda-dot" style="background:var(--red)"></div> Finalizado — prazo do cadastro no CNES encerrado</div>
+          <div class="legenda-item"><div class="legenda-dot" style="background:var(--green)"></div> Atual — etapa vigente (mês em curso)</div>
+          <div class="legenda-item"><div class="legenda-dot" style="background:var(--yellow)"></div> Aguardando — etapa futura</div>
+        </div>
+        <div class="legenda-grupo">
+          <div class="legenda-titulo">Legenda (etapas):</div>
+          <div class="legenda-item">Cadastro no CNES — mês em que o cadastro pode ser realizado no CNES</div>
+          <div class="legenda-item">Homologação — parcela financeira em que ocorrerá a homologação</div>
+        </div>
+      </div>
+
+      <!-- Tabela resumo por estratégia -->
+      <div class="tabela-wrap" style="margin-bottom:20px">
+        <div class="tabela-header-row">
+          <div class="tabela-titulo-txt" id="tabelaResumoTitulo">Credenciamentos por Estratégia</div>
+          <button class="btn-download" onclick="downloadCSV('resumo')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Baixar CSV
+          </button>
+        </div>
+        <div class="tabela-scroll">
+          <table id="tabelaResumo">
+            <thead>
+              <tr>
+                <th>Estratégia</th>
+                <th>Portaria</th>
+                <th>Data</th>
+                <th>Qnt. Credenciado</th>
+                <th>1ª Competência</th>
+                <th>2ª Competência</th>
+                <th>3ª Competência (final)</th>
+                <th>Dias restantes</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaResumoBody">
+              <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-mid)">Carregando dados...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tabela detalhada -->
+      <div class="tabela-wrap">
+        <div class="tabela-header-row">
+          <div class="tabela-titulo-txt">Relatório detalhado por município</div>
+          <button class="btn-download" onclick="downloadCSV('detalhe')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Baixar CSV
+          </button>
+        </div>
+        <div class="tabela-scroll">
+          <table id="tabelaDetalhe">
+            <thead>
+              <tr>
+                <th>Estratégia</th>
+                <th>Portaria</th>
+                <th>Data</th>
+                <th>Município</th>
+                <th>UF</th>
+                <th>Qnt. Credenciado</th>
+                <th>Observação</th>
+                <th>Mensagem</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaDetalheBody">
+              <tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-mid)">Utilize os filtros acima para visualizar os resultados</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="paginacao" id="paginacao"></div>
+      </div>
+    </div>
+
+    <!-- ── ABA HOMOLOGAÇÕES ── -->
+    <div id="aba-homologacoes" style="display:none">
+      <div class="sub-abas-row">
+        <button class="sub-aba-btn ativo" onclick="trocarStatusHomol('andamento')">Em andamento</button>
+        <button class="sub-aba-btn" onclick="trocarStatusHomol('encerrados')">Encerrados</button>
+      </div>
+      <div class="info-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        Utilize os filtros acima para visualizar os dados conforme sua necessidade.
+      </div>
+      <div class="tabela-wrap">
+        <div class="tabela-header-row">
+          <div class="tabela-titulo-txt">Homologações por Estratégia</div>
+          <button class="btn-download" onclick="downloadCSV('homol')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+            Baixar CSV
+          </button>
+        </div>
+        <div class="tabela-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Estratégia</th>
+                <th>Portaria</th>
+                <th>Data</th>
+                <th>Qnt. Credenciado</th>
+                <th>1º Homologação</th>
+                <th>2º Homologação</th>
+                <th>3º Homologação (final)</th>
+                <th>Total</th>
+                <th>Saldo</th>
+                <th>% Homologado</th>
+                <th>Situação</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaHomolBody">
+              <tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-mid)">Carregando dados...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ABA PORTARIAS ── -->
+    <div id="aba-portarias" style="display:none">
+      <div class="portarias-lista" id="portariasLista">
+        <div class="portarias-ano">📋 Portarias 2026</div>
+
+        <div class="portaria-data">30 de Abril de 2026</div>
+        <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.979" target="_blank" rel="noopener">
+          Portaria GM/MS nº 10.979 – Credencia municípios a fazerem jus à transferência dos incentivos financeiros federais de custeio, referentes aos serviços do Programa Academia da Saúde – PAS, no âmbito da Atenção Primária à Saúde – APS.
+        </a>
+
+        <div class="portaria-data">13 de Março de 2026</div>
+        <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.345" target="_blank" rel="noopener">
+          Portaria GM/MS nº 10.345 – Credencia e habilita municípios a fazerem jus à transferência dos incentivos financeiros federais de custeio aos Municípios e ao Distrito Federal, referentes às equipes, serviços, programas e profissionais no âmbito da Atenção Primária à Saúde – APS.
+        </a>
+
+        <div class="portarias-ano" style="margin-top:24px">📋 Portarias 2025</div>
+
+        <div class="portaria-data">30 de Dezembro de 2025</div>
+        <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.991" target="_blank" rel="noopener">
+          Portaria GM/MS nº 9.991 – Credencia municípios a fazerem jus à transferência do incentivo financeiro federal de custeio, referentes às equipes específicas, no âmbito da Atenção Primária à Saúde – APS.
+        </a>
+
+        <div class="portaria-data">17 de Novembro de 2025</div>
+        <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-8.808" target="_blank" rel="noopener">
+          Portaria GM/MS nº 8.808 – Autoriza a migração de equipes e profissionais da Atenção Primária à Saúde – APS do Município de Sorriso para Boa Esperança do Norte, ambos localizados no Estado do Mato Grosso/MT.
+        </a>
+
+        <div class="portaria-data">03 de Novembro de 2025</div>
+        <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.082" target="_blank" rel="noopener">
+          Portaria GM/MS nº 9.082 – Credencia e habilita municípios a fazerem jus à transferência do incentivo financeiro federal de custeio, referentes às equipes e serviços no âmbito da Atenção Primária à Saúde – APS.
+        </a>
+
+        <div class="portaria-data">02 de Outubro de 2025</div>
+        <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-8.314" target="_blank" rel="noopener">
+          Portaria GM/MS nº 8.314 – Homologa a adesão para recebimento do incentivo financeiro de custeio adicional mensal aos municípios com equipes de saúde integradas a programas de residência uniprofissional ou multiprofissional na Atenção Primária à Saúde.
+        </a>
+      </div>
+    </div>
+
+    <!-- ── SIMULADOR ── -->
+    <div class="simulador-card" id="simuladorCard">
+      <div class="simulador-titulo">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/>
+        </svg>
+        Simulador de prazo para cadastro no CNES
+      </div>
+      <div class="simulador-grid">
+        <div class="sim-selects">
+          <div>
+            <div class="sim-label"><div class="sim-num">1</div> Selecione uma estratégia</div>
+            <select class="sim-select" id="simEstrategia" onchange="calcularSimulador()">
+              <option value="">Todos</option>
+            </select>
+          </div>
+          <div>
+            <div class="sim-label"><div class="sim-num">2</div> Selecione o mês de publicação da portaria</div>
+            <select class="sim-select" id="simMes" onchange="calcularSimulador()">
+              <option value="">Selecione</option>
+              <option value="01">Janeiro</option>
+              <option value="02">Fevereiro</option>
+              <option value="03">Março</option>
+              <option value="04">Abril</option>
+              <option value="05">Maio</option>
+              <option value="06">Junho</option>
+              <option value="07">Julho</option>
+              <option value="08">Agosto</option>
+              <option value="09">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+          <button class="btn-limpar" onclick="limparSimulador()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            Limpar simulador
+          </button>
+        </div>
+        <div class="sim-resultado" id="simResultado">
+          <div class="sim-row">
+            <span class="sim-row-label">Prazo para cadastro no CNES</span>
+            <div class="sim-row-val"><span class="sim-chip" id="simPrazo">—</span></div>
+          </div>
+          <div class="sim-row">
+            <span class="sim-row-label">Competência CNES para cadastro</span>
+            <div class="sim-row-val" id="simCnes">
+              <span class="sim-chip green">—</span>
+              <span class="sim-chip yellow">—</span>
+              <span class="sim-chip red">—</span>
+            </div>
+          </div>
+          <div class="sim-row">
+            <span class="sim-row-label">Parcela em que ocorre a homologação</span>
+            <div class="sim-row-val" id="simHomol">
+              <span class="sim-chip">—</span>
+              <span class="sim-chip">—</span>
+              <span class="sim-chip">—</span>
+            </div>
+          </div>
+          <div class="sim-row">
+            <span class="sim-row-label">Parcela de início do pagamento</span>
+            <div class="sim-row-val"><span class="sim-chip green" id="simPagamento">—</span></div>
+          </div>
+          <div class="sim-obs" id="simObs" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Passo a passo -->
+    <div class="passo-passo">
+      <div class="passo-titulo">Passo a passo para o cofinanciamento federal de equipes, serviços e programas da APS</div>
+      <div class="passos-grid">
+        <div class="passo-item">
+          <div class="passo-num">1</div>
+          <div class="passo-nome">Solicitação de Credenciamento</div>
+          <div class="passo-desc">O gestor municipal solicita credenciamento ao Ministério da Saúde via plataforma Gerencia APS</div>
+        </div>
+        <div class="passo-item">
+          <div class="passo-num">2</div>
+          <div class="passo-nome">Portaria de Credenciamento</div>
+          <div class="passo-desc">O Ministério da Saúde publica Portaria credenciando novas equipes e serviços e programas da APS</div>
+        </div>
+        <div class="passo-item">
+          <div class="passo-num">3</div>
+          <div class="passo-nome">Cadastro no CNES</div>
+          <div class="passo-desc">A gestão municipal e distrital deverá cadastrar as estratégias credenciadas no CNES no prazo estabelecido</div>
+        </div>
+        <div class="passo-item">
+          <div class="passo-num">4</div>
+          <div class="passo-nome">Cofinanciamento Federal</div>
+          <div class="passo-desc">As estratégias cadastradas no CNES no prazo estabelecido passam a receber os incentivos federais</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /painel-content -->
+
+  <footer>Ministério da Saúde | SAPS &copy; 2026</footer>
+</div><!-- /painel -->
+
+<script>
+// ═══════════════════════════════════════════
+// CONFIGURAÇÃO
+// ═══════════════════════════════════════════
+const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php';
+const API_KEY = 'painel_cred_2026_key';
+
+// Dados do simulador (Quadros 1 e 2)
+const MESES_NOME = ['', 'Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// Quadro 1: mês portaria (1-12) → mês máximo CNES (offset +2)
+function prazoMaxCnes(mesPortaria) {
+  return ((mesPortaria + 1) % 12) + 1; // +2 meses
+}
+
+// Quadro 2: mês CNES → parcela homologação (+2)
+function parcelaHomol(mesCnes) {
+  return ((mesCnes + 1) % 12) + 1;
+}
+
+const SIMULADOR_DATA = {};
+
+// ═══════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════
+let dadosOriginais = [];
+let dadosFiltrados = [];
+let abaAtiva = 'credenciamentos';
+let subAbaAtiva = 'equipes';
+let statusAtivo = 'ativos';
+let statusHomolAtivo = 'andamento';
+let paginaAtual = 1;
+const POR_PAGINA = 50;
+
+// ═══════════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════════
+function abrirPainel() {
+  document.getElementById('capa').style.display = 'none';
+  document.getElementById('painel').style.display = 'block';
+  if (!dadosOriginais.length) carregarDados();
+}
+
+function voltarCapa() {
+  document.getElementById('painel').style.display = 'none';
+  document.getElementById('capa').style.display = 'flex';
+}
+
+function abrirLegislacao() {
+  document.getElementById('aba-portarias') && trocarAba('portarias');
+  abrirPainel();
+}
+
+function abrirSobre() {
+  alert('Painel de Novos Credenciamentos da APS\n\nDesenvolvido pela Secretaria de Atenção Primária à Saúde (SAPS)\nMinistério da Saúde — 2026');
+}
+
+// ═══════════════════════════════════════════
+// ABAS
+// ═══════════════════════════════════════════
+function trocarAba(aba) {
+  abaAtiva = aba;
+  document.querySelectorAll('.aba-btn').forEach((b,i) => {
+    const abas = ['credenciamentos','homologacoes','portarias'];
+    b.classList.toggle('ativo', abas[i] === aba);
+  });
+  document.getElementById('aba-credenciamentos').style.display = aba === 'credenciamentos' ? 'block' : 'none';
+  document.getElementById('aba-homologacoes').style.display   = aba === 'homologacoes'   ? 'block' : 'none';
+  document.getElementById('aba-portarias').style.display      = aba === 'portarias'      ? 'block' : 'none';
+  document.getElementById('simuladorCard').style.display      = aba === 'portarias'      ? 'none'  : 'block';
+  if (aba !== 'portarias') renderTabelas();
+}
+
+function trocarSubAba(sub) {
+  subAbaAtiva = sub;
+  document.querySelectorAll('.sub-abas-row:first-of-type .sub-aba-btn').forEach((b,i) => {
+    const subs = ['equipes','estabelecimentos','politicas'];
+    b.classList.toggle('ativo', subs[i] === sub);
+  });
+  aplicarFiltros();
+}
+
+function trocarStatus(st) {
+  statusAtivo = st;
+  document.querySelectorAll('#status-abas .sub-aba-btn').forEach((b,i) => {
+    b.classList.toggle('ativo', i === (st === 'ativos' ? 0 : 1));
+  });
+  aplicarFiltros();
+}
+
+function trocarStatusHomol(st) {
+  statusHomolAtivo = st;
+  document.querySelectorAll('#aba-homologacoes .sub-aba-btn').forEach((b,i) => {
+    b.classList.toggle('ativo', i === (st === 'andamento' ? 0 : 1));
+  });
+  renderHomologacoes();
+}
+
+// ═══════════════════════════════════════════
+// CARREGAR DADOS
+// ═══════════════════════════════════════════
+async function carregarDados() {
+  document.getElementById('loadingOverlay').style.display = 'flex';
+  try {
+    const resp = await fetch(`${API_URL}?action=data`, {
+      headers: { 'X-Api-Key': API_KEY }
+    });
+    dadosOriginais = await resp.json();
+
+    // Data de atualização
+    if (dadosOriginais.length) {
+      const datas = dadosOriginais
+        .map(d => d.data_portaria)
+        .filter(Boolean)
+        .sort()
+        .reverse();
+      document.getElementById('ultimaAtt').textContent = 'Última atualização: ' + formatarData(datas[0] || '');
+    }
+
+    popularFiltros();
+    popularSimulador();
+    aplicarFiltros();
+  } catch(e) {
+    console.error(e);
+    document.getElementById('tabelaResumoBody').innerHTML =
+      '<tr><td colspan="8" style="text-align:center;color:var(--red);padding:24px">Erro ao carregar dados. Tente novamente.</td></tr>';
+  } finally {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════
+// FILTROS
+// ═══════════════════════════════════════════
+function popularFiltros() {
+  const campos = {
+    fRegiao:      'regiao',
+    fMacro:       'macrorregiao',
+    fRegiaoSaude: 'regiao_saude',
+    fUF:          'uf',
+    fMunicipio:   'municipio',
+    fEstrategia:  'nome_completo',
+    fPortaria:    'portaria',
+    fAno:         'ano',
+  };
+  Object.entries(campos).forEach(([id, campo]) => {
+    const sel = document.getElementById(id);
+    const vals = [...new Set(dadosOriginais.map(d => d[campo]).filter(Boolean))].sort();
+    vals.forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+  });
+}
+
+function aplicarFiltros() {
+  const v = {
+    regiao:      document.getElementById('fRegiao').value,
+    macro:       document.getElementById('fMacro').value,
+    regSaude:    document.getElementById('fRegiaoSaude').value,
+    uf:          document.getElementById('fUF').value,
+    municipio:   document.getElementById('fMunicipio').value,
+    estrategia:  document.getElementById('fEstrategia').value,
+    portaria:    document.getElementById('fPortaria').value,
+    ano:         document.getElementById('fAno').value,
+  };
+
+  // Mapeamento de sub-aba → tipos na base
+  const tipoMap = {
+    equipes:          ['3 competências', '1 competência', 'Equipe'],
+    estabelecimentos: ['Estabelecimento', 'Específico'],
+    politicas:        ['Política', 'Programa'],
+  };
+
+  dadosFiltrados = dadosOriginais.filter(d => {
+    if (v.regiao    && d.regiao      !== v.regiao)    return false;
+    if (v.macro     && d.macrorregiao !== v.macro)    return false;
+    if (v.regSaude  && d.regiao_saude !== v.regSaude) return false;
+    if (v.uf        && d.uf           !== v.uf)       return false;
+    if (v.municipio && d.municipio    !== v.municipio)return false;
+    if (v.estrategia&& d.nome_completo!== v.estrategia)return false;
+    if (v.portaria  && String(d.portaria)!== v.portaria)return false;
+    if (v.ano       && String(d.ano)     !== v.ano)   return false;
+
+    // status (ativos/encerrados via selecao_credenciamento)
+    if (abaAtiva === 'credenciamentos') {
+      if (statusAtivo === 'ativos')    return d.selecao_credenciamento !== 'Descredenciado';
+      if (statusAtivo === 'encerrados')return d.selecao_credenciamento === 'Descredenciado';
+    }
+    return true;
+  });
+
+  paginaAtual = 1;
+  renderTabelas();
+}
+
+function limparFiltros() {
+  ['fRegiao','fMacro','fRegiaoSaude','fUF','fMunicipio','fEstrategia','fPortaria','fAno']
+    .forEach(id => document.getElementById(id).value = '');
+  aplicarFiltros();
+}
+
+// ═══════════════════════════════════════════
+// RENDER TABELAS
+// ═══════════════════════════════════════════
+function renderTabelas() {
+  if (abaAtiva === 'credenciamentos') {
+    renderResumo();
+    renderDetalhe();
+  } else if (abaAtiva === 'homologacoes') {
+    renderHomologacoes();
+  }
+}
+
+function getStatusComp(selCred, comp) {
+  // Retorna: 'finalizado', 'atual', 'aguardando', 'na'
+  if (!selCred) return 'na';
+  const s = (selCred || '').toLowerCase();
+  if (comp === 1) {
+    if (s === 'finalizado') return 'finalizado';
+    if (s === 'em andamento') return 'atual';
+    return 'aguardando';
+  }
+  return 'na';
+}
+
+function compCell(cnes, homol, status) {
+  if (!cnes || cnes === '-') return '<td><div class="comp-cell na">—</div></td>';
+  const cls = status === 'finalizado' ? 'finalizado' : status === 'atual' ? 'atual' : 'aguardando';
+  const dotCls = `dot-${cls}`;
+  const statusTxt = status === 'finalizado' ? 'Finalizado' : status === 'atual' ? 'Atual' : 'Aguardando';
+  return `<td><div class="comp-cell ${cls}">
+    Cadastro no CNES: ${cnes}<br>
+    Homologação: Parcela ${homol}<br>
+    <span class="status-dot ${dotCls}"></span>Status: ${statusTxt}
+  </div></td>`;
+}
+
+function diasRestantesChip(selCred, dataPortaria) {
+  if (!dataPortaria) return '<span class="dias-chip dias-na">—</span>';
+  const hoje = new Date();
+  const dp = new Date(dataPortaria);
+  // Prazo: data portaria + 3 meses (simplificado)
+  const prazo = new Date(dp);
+  prazo.setMonth(prazo.getMonth() + 3);
+  const diff = Math.ceil((prazo - hoje) / (1000*60*60*24));
+  if (diff < 0) return `<span class="dias-chip dias-na">Encerrado</span>`;
+  if (diff <= 30) return `<span class="dias-chip dias-urgente">${diff} dias restantes</span>`;
+  if (diff <= 60) return `<span class="dias-chip dias-atencao">${diff} dias restantes</span>`;
+  return `<span class="dias-chip dias-ok">${diff} dias restantes</span>`;
+}
+
+function renderResumo() {
+  // Agrupa por estratégia+portaria
+  const grupos = {};
+  dadosFiltrados.forEach(d => {
+    const key = `${d.nome_completo}||${d.portaria}||${d.data_portaria}`;
+    if (!grupos[key]) grupos[key] = { ...d, total: 0 };
+    grupos[key].total += Number(d.credenciado) || 0;
+  });
+
+  const tbody = document.getElementById('tabelaResumoBody');
+  const rows = Object.values(grupos);
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-mid)">Nenhum resultado encontrado</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(d => {
+    // Calcula competências com base no mês da portaria
+    const dp = d.data_portaria ? new Date(d.data_portaria) : null;
+    const mesPort = dp ? dp.getMonth() + 1 : null;
+    let c1='—', c2='—', c3='—', h1='—', h2='—', h3='—';
+    if (mesPort) {
+      const m1 = mesPort;
+      const m2 = (mesPort % 12) + 1;
+      const m3 = ((mesPort + 1) % 12) + 1;
+      c1 = MESES_NOME[m1] + '/' + String(dp.getFullYear()).slice(2);
+      c2 = MESES_NOME[m2] + '/' + String(m2 < m1 ? dp.getFullYear()+1 : dp.getFullYear()).slice(2);
+      c3 = MESES_NOME[m3] + '/' + String(m3 < m1 ? dp.getFullYear()+1 : dp.getFullYear()).slice(2);
+      h1 = String(parcelaHomol(m1)).padStart(2,'0');
+      h2 = String(parcelaHomol(m2)).padStart(2,'0');
+      h3 = String(parcelaHomol(m3)).padStart(2,'0');
+    }
+
+    const hoje = new Date();
+    const s1 = dp && hoje >= dp ? (hoje.getMonth() === dp.getMonth() && hoje.getFullYear() === dp.getFullYear() ? 'atual' : 'finalizado') : 'aguardando';
+
+    return `<tr>
+      <td>${d.nome_completo || '—'}</td>
+      <td>${d.portaria || '—'}</td>
+      <td>${formatarData(d.data_portaria)}</td>
+      <td style="text-align:center;font-weight:700">${d.total}</td>
+      ${compCell(c1, h1, s1)}
+      ${compCell(c2, h2, s1==='finalizado'?'finalizado':'aguardando')}
+      ${compCell(c3, h3, s1==='finalizado'?'finalizado':'aguardando')}
+      <td>${diasRestantesChip(d.selecao_credenciamento, d.data_portaria)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDetalhe() {
+  const tbody = document.getElementById('tabelaDetalheBody');
+  const total = dadosFiltrados.length;
+  const inicio = (paginaAtual - 1) * POR_PAGINA;
+  const fim = inicio + POR_PAGINA;
+  const pagina = dadosFiltrados.slice(inicio, fim);
+
+  if (!total) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-mid)">Utilize os filtros acima para visualizar os resultados</td></tr>';
+    document.getElementById('paginacao').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = pagina.map(d => `<tr>
+    <td>${d.nome_completo || '—'}</td>
+    <td>${d.portaria || '—'}</td>
+    <td>${formatarData(d.data_portaria)}</td>
+    <td>${d.municipio || '—'}</td>
+    <td>${d.uf || '—'}</td>
+    <td style="text-align:center;font-weight:700">${d.credenciado || 0}</td>
+    <td>${d.observacao || '—'}</td>
+    <td style="max-width:200px;font-size:11px">${d.mensagem_painel || '—'}</td>
+  </tr>`).join('');
+
+  renderPaginacao(total);
+}
+
+function renderPaginacao(total) {
+  const totalPags = Math.ceil(total / POR_PAGINA);
+  const el = document.getElementById('paginacao');
+  if (totalPags <= 1) { el.innerHTML = `<span class="pag-info">Exibindo ${total} resultado(s)</span>`; return; }
+
+  let html = `<span class="pag-info">Exibindo ${((paginaAtual-1)*POR_PAGINA)+1}–${Math.min(paginaAtual*POR_PAGINA,total)} de ${total}</span>`;
+  html += `<button class="pag-btn" onclick="irPagina(1)" ${paginaAtual===1?'disabled':''}>«</button>`;
+  html += `<button class="pag-btn" onclick="irPagina(${paginaAtual-1})" ${paginaAtual===1?'disabled':''}>‹</button>`;
+
+  for (let i = Math.max(1,paginaAtual-2); i <= Math.min(totalPags,paginaAtual+2); i++) {
+    html += `<button class="pag-btn ${i===paginaAtual?'ativo':''}" onclick="irPagina(${i})">${i}</button>`;
+  }
+
+  html += `<button class="pag-btn" onclick="irPagina(${paginaAtual+1})" ${paginaAtual===totalPags?'disabled':''}>›</button>`;
+  html += `<button class="pag-btn" onclick="irPagina(${totalPags})" ${paginaAtual===totalPags?'disabled':''}>»</button>`;
+  el.innerHTML = html;
+}
+
+function irPagina(p) {
+  paginaAtual = p;
+  renderDetalhe();
+  document.getElementById('tabelaDetalhe').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderHomologacoes() {
+  const tbody = document.getElementById('tabelaHomolBody');
+  const dados = dadosFiltrados.length ? dadosFiltrados : dadosOriginais;
+
+  const grupos = {};
+  dados.forEach(d => {
+    const key = `${d.nome_completo}||${d.portaria}`;
+    if (!grupos[key]) grupos[key] = { ...d, cred: 0, h1: 0, h2: 0, h3: 0 };
+    grupos[key].cred += Number(d.credenciado) || 0;
+    grupos[key].h1   += Number(d.homologacao_1) || 0;
+    grupos[key].h2   += Number(d.homologacao_2) || 0;
+    grupos[key].h3   += Number(d.homologacao_3) || 0;
+  });
+
+  const rows = Object.values(grupos).filter(d => {
+    const total = d.h1 + d.h2 + d.h3;
+    if (statusHomolAtivo === 'andamento') return total < d.cred;
+    return total >= d.cred;
+  });
+
+  if (!rows.length) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:32px;color:var(--text-mid)">Nenhum resultado encontrado</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = rows.map(d => {
+    const total = d.h1 + d.h2 + d.h3;
+    const saldo = d.cred - total;
+    const pct = d.cred > 0 ? Math.round((total / d.cred) * 100) : 0;
+    const cor = pct >= 80 ? 'var(--green)' : pct >= 40 ? 'var(--yellow)' : 'var(--red)';
+    const faltam = 3 - [d.h1 > 0, d.h2 > 0, d.h3 > 0].filter(Boolean).length;
+
+    return `<tr>
+      <td>${d.nome_completo || '—'}</td>
+      <td>${d.portaria || '—'}</td>
+      <td>${formatarData(d.data_portaria)}</td>
+      <td style="text-align:center;font-weight:700">${d.cred}</td>
+      <td style="text-align:center">${d.h1}</td>
+      <td style="text-align:center">${d.h2}</td>
+      <td style="text-align:center">${d.h3}</td>
+      <td style="text-align:center;font-weight:700">${total}</td>
+      <td style="text-align:center">${saldo}</td>
+      <td>
+        <div class="barra-wrap">
+          <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
+          <div class="pct-txt" style="color:${cor}">${pct}%</div>
+        </div>
+      </td>
+      <td style="font-size:11px">${faltam > 0 ? `Falta(m) ${faltam} parcela(s)` : 'Concluído'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+// SIMULADOR
+// ═══════════════════════════════════════════
+function popularSimulador() {
+  const estrategias = [...new Set(dadosOriginais.map(d => d.nome_completo).filter(Boolean))].sort();
+  const sel = document.getElementById('simEstrategia');
+  estrategias.forEach(e => {
+    const o = document.createElement('option');
+    o.value = e; o.textContent = e;
+    sel.appendChild(o);
+  });
+}
+
+function calcularSimulador() {
+  const mes = parseInt(document.getElementById('simMes').value);
+  if (!mes) return;
+
+  const m1 = mes;
+  const m2 = (mes % 12) + 1;
+  const m3 = ((mes + 1) % 12) + 1;
+  const prazoMes = m3;
+
+  const h1 = String(parcelaHomol(m1)).padStart(2,'0');
+  const h2 = String(parcelaHomol(m2)).padStart(2,'0');
+  const h3 = String(parcelaHomol(m3)).padStart(2,'0');
+
+  document.getElementById('simPrazo').textContent = MESES_NOME[prazoMes];
+
+  document.getElementById('simCnes').innerHTML = `
+    <span class="sim-chip green">${MESES_NOME[m1]}</span>
+    <span class="sim-chip yellow">${MESES_NOME[m2]}</span>
+    <span class="sim-chip red">${MESES_NOME[m3]}</span>`;
+
+  document.getElementById('simHomol').innerHTML = `
+    <span class="sim-chip">Parcela ${h1}</span>
+    <span class="sim-chip">Parcela ${h2}</span>
+    <span class="sim-chip">Parcela ${h3}</span>`;
+
+  document.getElementById('simPagamento').textContent = `Parcela ${h1}`;
+
+  const obs = document.getElementById('simObs');
+  obs.style.display = 'block';
+  obs.textContent = `Equipes cadastradas em ${MESES_NOME[m1]} têm homologação na parcela ${h1}. Cadastradas em ${MESES_NOME[m2]}, parcela ${h2}. Cadastradas em ${MESES_NOME[m3]} (prazo final), parcela ${h3}. Equipes não cadastradas até ${MESES_NOME[m3]} serão descredenciadas.`;
+}
+
+function limparSimulador() {
+  document.getElementById('simEstrategia').value = '';
+  document.getElementById('simMes').value = '';
+  document.getElementById('simPrazo').textContent = '—';
+  document.getElementById('simCnes').innerHTML = '<span class="sim-chip green">—</span><span class="sim-chip yellow">—</span><span class="sim-chip red">—</span>';
+  document.getElementById('simHomol').innerHTML = '<span class="sim-chip">—</span><span class="sim-chip">—</span><span class="sim-chip">—</span>';
+  document.getElementById('simPagamento').textContent = '—';
+  document.getElementById('simObs').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════
+// DOWNLOAD CSV
+// ═══════════════════════════════════════════
+function downloadCSV(tipo) {
+  let dados, headers, filename;
+
+  if (tipo === 'detalhe') {
+    headers = ['Estratégia','Portaria','Data','Município','UF','Qnt. Credenciado','Observação','Mensagem'];
+    dados = dadosFiltrados.map(d => [
+      d.nome_completo, d.portaria, formatarData(d.data_portaria),
+      d.municipio, d.uf, d.credenciado, d.observacao, d.mensagem_painel
+    ]);
+    filename = 'credenciamentos_detalhe.csv';
+  } else if (tipo === 'resumo') {
+    headers = ['Estratégia','Portaria','Data','Qnt. Credenciado','Seleção'];
+    const grupos = {};
+    dadosFiltrados.forEach(d => {
+      const key = `${d.nome_completo}||${d.portaria}`;
+      if (!grupos[key]) grupos[key] = { ...d, total: 0 };
+      grupos[key].total += Number(d.credenciado) || 0;
+    });
+    dados = Object.values(grupos).map(d => [
+      d.nome_completo, d.portaria, formatarData(d.data_portaria),
+      d.total, d.selecao_credenciamento
+    ]);
+    filename = 'credenciamentos_resumo.csv';
+  } else {
+    headers = ['Estratégia','Portaria','Data','Credenciado','Homol1','Homol2','Homol3','Total','Saldo'];
+    const grupos = {};
+    dadosOriginais.forEach(d => {
+      const key = `${d.nome_completo}||${d.portaria}`;
+      if (!grupos[key]) grupos[key] = { ...d, cred: 0, h1: 0, h2: 0, h3: 0 };
+      grupos[key].cred += Number(d.credenciado) || 0;
+      grupos[key].h1   += Number(d.homologacao_1) || 0;
+      grupos[key].h2   += Number(d.homologacao_2) || 0;
+      grupos[key].h3   += Number(d.homologacao_3) || 0;
+    });
+    dados = Object.values(grupos).map(d => {
+      const total = d.h1+d.h2+d.h3;
+      return [d.nome_completo, d.portaria, formatarData(d.data_portaria), d.cred, d.h1, d.h2, d.h3, total, d.cred-total];
+    });
+    filename = 'homologacoes.csv';
+  }
+
+  const csv = [headers, ...dados].map(r =>
+    r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(',')
+  ).join('\n');
+
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function formatarData(d) {
+  if (!d) return '—';
+  try {
+    const dt = new Date(d);
+    if (isNaN(dt)) return d;
+    return dt.toLocaleDateString('pt-BR');
+  } catch { return d; }
+}
+</script>
+</body>
+</html>
