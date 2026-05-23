@@ -1656,7 +1656,7 @@ function renderPortarias() {
     // ── Vista município: linha do tempo das portarias desse município ──
     const vinculadas = portarias
       .filter(p => portariasDoFiltro.includes(Number(p.n_portaria)))
-      .sort((a,b) => (a.data_portaria||'') < (b.data_portaria||'') ? -1 : 1);
+      .sort((a,b) => (a.data_portaria||'') < (b.data_portaria||'') ? 1 : -1);
 
     if (!vinculadas.length) {
       el.innerHTML = vazioHTML('📋','Sem portarias cadastradas',
