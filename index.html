@@ -522,7 +522,7 @@ const MESES_CURTO = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','O
 // → prazo máximo: último dia de M+2
 // → homologação de cada comp: mês da comp +2 (parcela)
 function calcComps(dataPortaria) {
-  const dp = new Date(dataPortaria);
+  const dp = new Date((dataPortaria || '').slice(0,10));
   const ano = dp.getFullYear();
   const mes = dp.getMonth() + 1; // 1-12
   return [0,1,2].map(i => {
@@ -554,7 +554,8 @@ function isAtivoOutros(row) {
 }
 
 function isTipo3Comp(tipo) {
-  return (tipo || '').toLowerCase().includes('3') || (tipo || '').toLowerCase().includes('compet');
+  const t = (tipo || '').toLowerCase();
+  return t.includes('3') || t.includes('compet');
 }
 
 function isEstabelecimento(tipo) {
@@ -742,8 +743,8 @@ function renderAtivos() {
   const el = document.getElementById('c-ativos');
   const hoje = new Date();
 
-  // Filtra ativos
-  const ativos3 = filtrados.filter(d => isTipo3Comp(d.tipo) && isAtivo3Comp(d.data_portaria) && Number(d.credenciado)>0);
+  // Filtra ativos — usa Seleção Credenciamento = 'Ativo' como fonte da verdade
+  const ativos3 = filtrados.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
   const ativosOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
   const msgs = filtrados.filter(d => d.mensagem_painel && !Number(d.credenciado));
 
@@ -946,7 +947,7 @@ function renderEncerrados() {
   const el = document.getElementById('c-encerrados');
   if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
-  const enc3 = filtrados.filter(d => isTipo3Comp(d.tipo) && !isAtivo3Comp(d.data_portaria) && Number(d.credenciado)>0);
+  const enc3 = filtrados.filter(d => isTipo3Comp(d.tipo) && (d.selecao_credenciamento||'').toLowerCase()==='finalizado' && Number(d.credenciado)>0);
   const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && (d.selecao_credenciamento||'').toLowerCase()==='finalizado' && Number(d.credenciado)>0);
 
   if (!enc3.length && !encOut.length) {
