@@ -356,6 +356,11 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   display: inline-block; background: var(--green); color: #fff;
   font-size: 9px; font-weight: 700; padding: 1px 6px;
   border-radius: 10px; margin-top: 4px;
+  animation: pulso-agora 2s ease-in-out infinite;
+}
+@keyframes pulso-agora {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
 }
 .tl-info .tl-vencido-label {
   display: inline-block; background: var(--red); color: #fff;
