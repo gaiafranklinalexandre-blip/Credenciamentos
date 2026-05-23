@@ -1139,25 +1139,34 @@ async function carregarDados() {
     const resp = await fetch(`${API_URL}?action=data`, {
       headers: { 'X-Api-Key': API_KEY }
     });
-    dadosOriginais = await resp.json();
+
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const json = await resp.json();
+    dadosOriginais = Array.isArray(json) ? json : [];
+
+    if (!dadosOriginais.length) throw new Error('Nenhum dado retornado');
 
     // Data de atualização
-    if (dadosOriginais.length) {
-      const datas = dadosOriginais
-        .map(d => d.data_portaria)
-        .filter(Boolean)
-        .sort()
-        .reverse();
-      document.getElementById('ultimaAtt').textContent = 'Última atualização: ' + formatarData(datas[0] || '');
-    }
+    const datas = dadosOriginais
+      .map(d => d.data_portaria)
+      .filter(Boolean)
+      .sort()
+      .reverse();
+    document.getElementById('ultimaAtt').textContent = 'Última atualização: ' + formatarData(datas[0] || '');
 
     popularFiltros();
     popularSimulador();
     aplicarFiltros();
   } catch(e) {
-    console.error(e);
+    console.error('Erro ao carregar dados:', e);
     document.getElementById('tabelaResumoBody').innerHTML =
-      '<tr><td colspan="8" style="text-align:center;color:var(--red);padding:24px">Erro ao carregar dados. Tente novamente.</td></tr>';
+      `<tr><td colspan="8" style="text-align:center;color:var(--red);padding:24px">
+        Erro ao carregar dados: ${e.message}<br>
+        <small>Verifique o console para mais detalhes.</small>
+      </td></tr>`;
+    document.getElementById('tabelaDetalheBody').innerHTML =
+      '<tr><td colspan="8" style="text-align:center;color:var(--red);padding:24px">Erro ao carregar dados.</td></tr>';
   } finally {
     document.getElementById('loadingOverlay').style.display = 'none';
   }
