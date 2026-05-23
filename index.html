@@ -57,19 +57,20 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .capa-att { position: absolute; bottom: 28px; right: 40px; font-size: 11px; color: #888; z-index: 1; }
 
 /* Caixa de busca na capa */
-.capa-busca { position: relative; z-index: 1; width: 100%; max-width: 580px; margin-bottom: 16px; }
+.capa-busca { position: relative; z-index: 10; width: 100%; max-width: 580px; margin-bottom: 16px; }
 .capa-busca-campo {
   display: flex; align-items: center;
   background: var(--white); border-radius: var(--radius);
   box-shadow: 0 8px 32px rgba(19,81,180,0.18);
-  overflow: hidden; border: 2px solid transparent;
-  transition: border-color .2s;
+  overflow: visible; border: 2px solid transparent;
+  transition: border-color .2s; position: relative;
 }
 .capa-busca-campo:focus-within { border-color: var(--blue); }
 .capa-busca-campo input {
   flex: 1; border: none; outline: none;
   padding: 18px 24px; font-size: 16px; font-family: inherit;
   background: transparent; color: var(--text);
+  border-radius: var(--radius) 0 0 var(--radius);
 }
 .capa-busca-campo input::placeholder { color: #aaa; }
 .capa-busca-btn {
@@ -77,8 +78,14 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   padding: 18px 24px; cursor: pointer; transition: background .2s;
   font-size: 16px; font-family: inherit; font-weight: 700;
   display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  border-radius: 0 var(--radius) var(--radius) 0;
 }
 .capa-busca-btn:hover { background: var(--blue-hover); }
+/* Autocomplete dentro da capa */
+.capa-busca .sugestoes {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  z-index: 200;
+}
 
 /* Filtros secundários na capa */
 .capa-filtros {
@@ -582,9 +589,11 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 
   <!-- Busca principal -->
   <div class="capa-busca">
-    <div class="capa-busca-campo busca-rel">
+    <div class="capa-busca-campo">
       <input type="text" id="buscaInput" placeholder="🔍  Digite o nome do município..."
-        autocomplete="off" oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
+        autocomplete="off"
+        oninput="onBuscaInput(); onMunicipioInput()"
+        onkeydown="onBuscaKey(event)">
       <button class="capa-busca-btn" onclick="executarConsulta()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         Ver credenciamentos
@@ -596,11 +605,11 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <!-- Filtros secundários -->
   <div class="capa-filtros">
     <div class="capa-filtros-label">Ou filtre por:</div>
-    <select id="fRegiao"><option value="">Região</option></select>
-    <select id="fUF"><option value="">UF</option></select>
-    <select id="fMacro"><option value="">Macrorregião</option></select>
-    <select id="fPortaria"><option value="">Portaria</option></select>
-    <select id="fAno"><option value="">Ano</option></select>
+    <select id="fRegiao"   onchange="onSelectChange()"><option value="">Região</option></select>
+    <select id="fUF"       onchange="onSelectChange()"><option value="">UF</option></select>
+    <select id="fMacro"    onchange="onSelectChange()"><option value="">Macrorregião</option></select>
+    <select id="fPortaria" onchange="onSelectChange()"><option value="">Portaria</option></select>
+    <select id="fAno"      onchange="onSelectChange()"><option value="">Ano</option></select>
     <button class="btn-limpar-sm" onclick="limparConsulta()" style="position:relative;z-index:1">✕ Limpar</button>
   </div>
 
@@ -858,7 +867,13 @@ function limparConsulta() {
   const erroEl = document.getElementById('consultaErro');
   erroEl.style.display = 'none';
   erroEl.textContent = 'Selecione pelo menos um município ou filtro para consultar.';
-  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value = '');
+  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.value = '';
+    sel.disabled = false;
+    sel.style.opacity = '';
+  });
+  if (dados.length) atualizarSelects(dados);
 }
 
 // ═══════════════════════════════════════
@@ -925,24 +940,73 @@ async function carregarDados() {
 }
 
 // ═══════════════════════════════════════
-// FILTROS
+// FILTROS — com hierarquia
 // ═══════════════════════════════════════
 function popularFiltros() {
-  fill('fRegiao',  [...new Set(dados.map(d=>d.regiao).filter(Boolean))].sort());
-  fill('fUF',      [...new Set(dados.map(d=>d.uf).filter(Boolean))].sort());
-  fill('fMacro',   [...new Set(dados.map(d=>d.macrorregiao).filter(Boolean))].sort());
-  fill('fPortaria',[...new Set(dados.map(d=>d.portaria).filter(Boolean))].sort((a,b)=>b-a));
-  fill('fAno',     [...new Set(dados.map(d=>d.ano).filter(Boolean))].sort((a,b)=>b-a));
+  // Popula com todos os valores (estado inicial)
+  atualizarSelects(dados);
 }
-function fill(id, vals) {
+
+function atualizarSelects(base) {
+  const cur = { fRegiao: v('fRegiao'), fUF: v('fUF'), fMacro: v('fMacro'), fPortaria: v('fPortaria'), fAno: v('fAno') };
+  fill('fRegiao',   [...new Set(base.map(d=>d.regiao).filter(Boolean))].sort(), cur.fRegiao);
+  fill('fUF',       [...new Set(base.map(d=>d.uf).filter(Boolean))].sort(), cur.fUF);
+  fill('fMacro',    [...new Set(base.map(d=>d.macrorregiao).filter(Boolean))].sort(), cur.fMacro);
+  fill('fPortaria', [...new Set(base.map(d=>d.portaria).filter(Boolean))].sort((a,b)=>b-a), cur.fPortaria);
+  fill('fAno',      [...new Set(base.map(d=>d.ano).filter(Boolean))].sort((a,b)=>b-a), cur.fAno);
+}
+
+function fill(id, vals, curVal) {
   const sel = document.getElementById(id);
   const ph = sel.options[0].text;
   sel.innerHTML = `<option value="">${ph}</option>`;
-  vals.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+  vals.forEach(val => {
+    const o = document.createElement('option');
+    o.value = val; o.textContent = val;
+    if (String(val) === String(curVal)) o.selected = true;
+    sel.appendChild(o);
+  });
 }
+
+// Chamado quando qualquer select muda
+function onSelectChange() {
+  // Se há município digitado, limpa (select tem prioridade)
+  const inp = document.getElementById('buscaInput');
+  if (inp.value.trim()) {
+    inp.value = '';
+    document.getElementById('sugestoes').style.display = 'none';
+  }
+  // Recalcula os outros selects com base nos dados filtrados pelos selects ativos
+  const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
+  const base = dados.filter(d =>
+    (!r || d.regiao === r) && (!u || d.uf === u) &&
+    (!m || d.macrorregiao === m) && (!p || String(d.portaria) === String(p)) &&
+    (!a || String(d.ano) === String(a))
+  );
+  atualizarSelects(base);
+  // Esconde erro se estava visível
+  document.getElementById('consultaErro').style.display = 'none';
+}
+
+// Chamado quando digita no campo município
+function onMunicipioInput() {
+  // Desabilita selects enquanto há texto no município
+  const temTexto = document.getElementById('buscaInput').value.trim().length > 0;
+  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.disabled = temTexto;
+    sel.style.opacity = temTexto ? '.4' : '';
+  });
+  if (!temTexto) {
+    // Restaura selects com todos os valores
+    atualizarSelects(dados);
+  }
+  document.getElementById('consultaErro').style.display = 'none';
+}
+
 function aplicarFiltros() { /* não usado no novo fluxo */ }
-function limparTudo() { voltarConsulta(); limparConsulta(); }
-function v(id) { return document.getElementById(id).value; }
+function limparTudo() { voltarCapa(); limparConsulta(); }
+function v(id) { const el = document.getElementById(id); return el ? el.value : ''; }
 
 // ═══════════════════════════════════════
 // BUSCA
@@ -968,6 +1032,13 @@ function onBuscaKey(e) {
 function selecionarMun(mun, uf) {
   document.getElementById('buscaInput').value = `${mun} - ${uf}`;
   document.getElementById('sugestoes').style.display = 'none';
+  // Desabilita selects — município já foi escolhido
+  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => {
+    const sel = document.getElementById(id);
+    sel.value = '';
+    sel.disabled = true;
+    sel.style.opacity = '.4';
+  });
 }
 function executarBusca() {
   executarConsulta();
