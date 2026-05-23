@@ -521,18 +521,28 @@ const MESES_CURTO = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','O
 // → 1ª comp: mês M | 2ª comp: M+1 | 3ª comp: M+2
 // → prazo máximo: último dia de M+2
 // → homologação de cada comp: mês da comp +2 (parcela)
+function parseData(dataPortaria) {
+  if (!dataPortaria || dataPortaria === '0000-00-00') return null;
+  const s = String(dataPortaria).slice(0,10);
+  const [y,m,d] = s.split('-').map(Number);
+  if (!y || !m || !d) return null;
+  return new Date(y, m-1, d);
+}
+
 function calcComps(dataPortaria) {
-  const dp = new Date((dataPortaria || '').slice(0,10));
+  const dp = parseData(dataPortaria);
+  if (!dp) return null;
   const ano = dp.getFullYear();
-  const mes = dp.getMonth() + 1; // 1-12
+  const mes = dp.getMonth() + 1;
   return [0,1,2].map(i => {
     const m = ((mes - 1 + i) % 12) + 1;
     const a = ano + Math.floor((mes - 1 + i) / 12);
-    const homol = ((m) % 12) + 1;
-    const aHomol = a + (m === 12 ? 1 : 0);
+    const homolOffset = ((mes - 1 + i + 2) % 12) + 1;
+    const homol = homolOffset;
+    const aHomol = ano + Math.floor((mes - 1 + i + 2) / 12);
     const inicio = new Date(a, m - 1, 1);
-    const fim    = new Date(a, m, 0); // último dia do mês
-    return { mes: m, ano: a, homol, aHomol, inicio, fim, label: `${MESES_CURTO[m]}/${String(a).slice(2)}` };
+    const fim    = new Date(a, m, 0);
+    return { mes: m, ano: a, homol, aHomol, inicio, fim, label: `${MESES_CURTO[m]}/${String(a).slice(2)}`, homolLabel: `${MESES_CURTO[homol]}/${String(aHomol).slice(2)}` };
   });
 }
 
@@ -543,10 +553,9 @@ function statusComp(comp, hoje) {
 }
 
 function isAtivo3Comp(dataPortaria) {
-  if (!dataPortaria || dataPortaria === '0000-00-00') return false;
-  const hoje = new Date();
   const comps = calcComps(dataPortaria);
-  return hoje <= comps[2].fim; // ativo se ainda dentro da 3ª competência
+  if (!comps) return false;
+  return new Date() <= comps[2].fim;
 }
 
 function isAtivoOutros(row) {
@@ -563,20 +572,22 @@ function isEstabelecimento(tipo) {
 }
 
 function diasRestantes(dataPortaria) {
-  const hoje = new Date();
   const comps = calcComps(dataPortaria);
-  const diff = Math.ceil((comps[2].fim - hoje) / (1000*60*60*24));
+  if (!comps) return null;
+  const diff = Math.ceil((comps[2].fim - new Date()) / (1000*60*60*24));
   return diff;
 }
 
 function farolClass(dias) {
-  if (dias < 0)  return 'farol-cinza';
+  if (dias === null || dias === undefined) return 'farol-cinza';
+  if (dias < 0)   return 'farol-cinza';
   if (dias <= 15) return 'farol-vermelho';
   if (dias <= 30) return 'farol-amarelo';
   return 'farol-verde';
 }
 function farolTxt(dias) {
-  if (dias < 0)  return 'Prazo encerrado';
+  if (dias === null || dias === undefined) return 'Sem prazo definido';
+  if (dias < 0)   return 'Prazo encerrado';
   if (dias === 0) return 'Último dia!';
   return `${dias} dia${dias===1?'':'s'} restante${dias===1?'':'s'}`;
 }
@@ -840,69 +851,80 @@ function card3Comp(grupo, hoje) {
   const dias = diasRestantes(dp);
   const fCls = farolClass(dias);
   const fTxt = farolTxt(dias);
-  const totalCred = grupo.reduce((s,d)=>s+Number(d.credenciado||0),0);
 
-  // Timeline
-  const steps = [
-    { nome: 'Credenciado', sub: `Portaria ${rep.portaria}\n${fmt(dp)}`, status: 'done' },
-    ...comps.map((c,i) => ({
-      nome: `${i+1}ª Competência`,
-      sub: `CNES: ${c.label}\nHomol: Parcela ${String(c.homol).padStart(2,'0')}`,
-      status: statusComp(c, hoje),
-      comp: c
-    })),
-    { nome: 'Cofinanciamento', sub: `A partir parcela\n${String(comps[0].homol).padStart(2,'0')}`, status: statusComp(comps[0],hoje)==='done'?'done':'futuro' }
-  ];
-
-  let tl = '<div class="timeline">';
-  steps.forEach((s,i) => {
-    const dc = s.status==='done'?'done':s.status==='atual'?'atual':s.status==='futuro'?'futuro':'done';
-    const icon = s.status==='done' ? '✓' : i===0 ? '📋' : i===4 ? '💰' : i;
-    const labelExtra = s.status==='atual'
-      ? '<span class="tl-atual-label">Agora</span>'
-      : s.status==='vencido' ? '<span class="tl-vencido-label">Vencido</span>' : '';
-    const subLines = s.sub.split('\n').map(l=>`<div>${l}</div>`).join('');
-    tl += `<div class="tl-step">
-      <div class="tl-dot ${dc}">${s.status==='done'&&i>0?'✓':i===0?'✓':i===4?'💰':i}</div>
-      <div class="tl-info">
-        <div class="tl-nome">${s.nome}</div>
-        <div class="tl-sub">${subLines}</div>
-        ${labelExtra}
-      </div>
-    </div>`;
-    if (i < steps.length-1) tl += `<div class="tl-conector ${s.status==='done'?'done':''}"></div>`;
-  });
-  tl += '</div>';
-
-  // Estratégias do grupo
-  const estrRows = grupo.map(d => `
+  // Estratégias em destaque no topo
+  const estrDestaque = grupo.map(d => `
     <div class="estrategia-row">
-      <span class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</span>
+      <div>
+        <div class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</div>
+        <div style="font-size:11px;color:var(--text-mid)">Portaria ${d.portaria} · ${fmt(d.data_portaria)}</div>
+      </div>
       <div class="estrategia-meta">
-        <span class="estrategia-qtd-label">Credenciado:</span>
-        <span class="estrategia-qtd">${d.credenciado||0}</span>
+        <div style="text-align:right">
+          <div class="estrategia-qtd">${d.credenciado||0}</div>
+          <div class="estrategia-qtd-label">credenciado(s)</div>
+        </div>
       </div>
     </div>`).join('');
 
-  const local = [rep.regiao_saude, rep.macrorregiao].filter(Boolean).join(' · ');
+  // Timeline — só se tiver comps válidas
+  let tlHTML = '';
+  if (comps) {
+    const steps = [
+      { nome: 'Credenciado', sub: `Portaria ${rep.portaria}`, sub2: fmt(dp), status: 'done', icon: '✓' },
+      ...comps.map((c,i) => ({
+        nome: `${i+1}ª Competência`,
+        sub:  `CNES: ${c.label}`,
+        sub2: `Homol: parcela ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}`,
+        status: statusComp(c, hoje),
+        icon: String(i+1)
+      })),
+      {
+        nome: 'Cofinanciamento',
+        sub:  `A partir da parcela`,
+        sub2: `${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}`,
+        status: comps[0] && statusComp(comps[0],hoje)==='done' ? 'done' : 'futuro',
+        icon: '💰'
+      }
+    ];
+
+    let tl = '<div class="timeline">';
+    steps.forEach((s,i) => {
+      const dc = s.status==='done'?'done':s.status==='atual'?'atual':'futuro';
+      const labelExtra = s.status==='atual' ? '<span class="tl-atual-label">▶ Agora</span>' : '';
+      tl += `<div class="tl-step">
+        <div class="tl-dot ${dc}">${s.icon}</div>
+        <div class="tl-info">
+          <div class="tl-nome">${s.nome}</div>
+          <div class="tl-sub"><div>${s.sub}</div><div>${s.sub2}</div></div>
+          ${labelExtra}
+        </div>
+      </div>`;
+      if (i < steps.length-1) {
+        tl += `<div class="tl-conector ${s.status==='done'?'done':''}"></div>`;
+      }
+    });
+    tl += '</div>';
+
+    tlHTML = `<div class="timeline-wrap">
+      <div class="timeline-titulo">Linha do tempo — prazo para cadastro no CNES e homologação</div>
+      ${tl}
+    </div>`;
+  }
 
   return `<div class="card-3comp">
     <div class="card-3comp-header">
       <div class="card-3comp-info">
         <div class="card-portaria-txt">Portaria ${rep.portaria} · ${fmt(dp)} · ${rep.ano||'—'}</div>
         <div class="card-estrategia-nome">${rep.municipio||'—'} — ${rep.uf||''}</div>
-        ${local ? `<div class="card-local">${local}</div>` : ''}
+        ${rep.macrorregiao ? `<div class="card-local">${rep.macrorregiao}</div>` : ''}
       </div>
       <div class="card-badges">
         <div class="farol ${fCls}"><div class="farol-dot"></div>${fTxt}</div>
-        <span class="badge badge-blue">${totalCred} credenciado(s)</span>
       </div>
     </div>
-    <div class="timeline-wrap">
-      <div class="timeline-titulo">Linha do tempo — prazo para cadastro no CNES e homologação</div>
-      ${tl}
-    </div>
-    <div class="card-outros-body">${estrRows}</div>
+    <div class="card-outros-body">${estrDestaque}</div>
+    ${tlHTML}
   </div>`;
 }
 
@@ -925,7 +947,7 @@ function cardOutros(grupo) {
       </div>${obsHTML}`;
   }).join('');
 
-  const local = [rep.regiao_saude, rep.macrorregiao].filter(Boolean).join(' · ');
+  const local = [rep.macrorregiao].filter(Boolean).join(' · ');
 
   return `<div class="card-outros">
     <div class="card-outros-header">
