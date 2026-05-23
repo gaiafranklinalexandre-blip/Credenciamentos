@@ -1157,7 +1157,7 @@ function renderEncerrados() {
   const todosGrupos = [...grupos3, ...gruposOut];
 
   renderComPaginacao(el, todosGrupos, 'encerrados', (g) => {
-    return isTipo3Comp(g[0].tipo) ? card3CompEncerrado(g, hoje) : cardOutros(g);
+    return isTipo3Comp(g[0].tipo) ? card3CompEncerrado(g, hoje) : cardEncerradoSimples(g);
   });
 }
 
@@ -1209,6 +1209,49 @@ function card3CompEncerrado(grupo, hoje) {
     </div>
     <div class="card-outros-body">${estr}</div>
     ${tlHTML}
+  </div>`;
+}
+
+// Card encerrado para tipos sem fluxo de 3 competências
+function cardEncerradoSimples(grupo) {
+  const rep = grupo[0];
+  const dp = fmt(rep.data_portaria);
+  const estr = grupo.map(d => {
+    const h1 = Number(d.homologacao_1||0);
+    const h2 = Number(d.homologacao_2||0);
+    const h3 = Number(d.homologacao_3||0);
+    const homolTotal = h1+h2+h3;
+    const homolHTML = homolTotal > 0
+      ? `<div style="font-size:11px;color:var(--text-mid);margin-top:3px">
+           Homologações: <strong style="color:var(--green)">${homolTotal}</strong>
+           <span style="color:var(--gray-border)">·</span> ${[h1&&`1ª: ${h1}`,h2&&`2ª: ${h2}`,h3&&`3ª: ${h3}`].filter(Boolean).join(' · ')}
+         </div>`
+      : `<div style="font-size:11px;color:var(--text-mid);margin-top:3px">Sem homologação registrada</div>`;
+    return `<div class="estrategia-row">
+      <div>
+        <div class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</div>
+        <div style="font-size:11px;color:var(--text-mid)">${d.tipo||''}</div>
+        ${homolHTML}
+      </div>
+      <div class="estrategia-meta">
+        <div style="text-align:right">
+          <div class="estrategia-qtd">${d.credenciado||0}</div>
+          <div class="estrategia-qtd-label">credenciado(s)</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="card-3comp" style="opacity:.85;border-left:4px solid var(--gray-border)">
+    <div class="card-3comp-header">
+      <div class="card-3comp-info">
+        <div class="card-portaria-txt">Portaria ${rep.portaria} · ${dp} · ${rep.ano||'—'}</div>
+        <div class="card-estrategia-nome">${rep.municipio||'—'} — ${rep.uf||''}</div>
+        ${rep.macrorregiao ? `<div class="card-local">${rep.macrorregiao}</div>` : ''}
+      </div>
+      <span class="badge badge-gray">✓ Encerrado</span>
+    </div>
+    <div class="card-outros-body">${estr}</div>
   </div>`;
 }
 
