@@ -155,16 +155,39 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .abas-bar {
   display: flex; border-bottom: 2px solid var(--gray-border);
   background: var(--white); padding: 0 24px; overflow-x: auto;
+  position: relative; z-index: 50;
 }
+.aba-grupo { position: relative; display: inline-flex; }
 .aba {
   padding: 13px 22px; font-size: 14px; font-weight: 600;
   color: var(--text-mid); cursor: pointer; border: none;
   background: transparent; white-space: nowrap;
   border-bottom: 3px solid transparent; margin-bottom: -2px;
   transition: all .2s; font-family: inherit;
+  display: flex; align-items: center; gap: 5px;
 }
 .aba.ativo { color: var(--blue); border-bottom-color: var(--blue); }
 .aba:hover:not(.ativo) { color: var(--blue); background: var(--blue-bg); }
+.aba-seta { font-size: 9px; opacity: .6; }
+
+/* Dropdown de aba */
+.aba-dropdown {
+  display: none; position: absolute; top: 100%; left: 0;
+  background: var(--white); border: 1px solid var(--gray-border);
+  border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  min-width: 180px; z-index: 200; overflow: hidden;
+}
+.aba-grupo:hover .aba-dropdown { display: block; }
+.aba-dropdown-item {
+  padding: 11px 20px; font-size: 13px; font-weight: 600;
+  color: var(--text-mid); cursor: pointer; border: none;
+  background: transparent; width: 100%; text-align: left;
+  font-family: inherit; display: block; border-bottom: 1px solid var(--gray-border);
+  transition: background .15s;
+}
+.aba-dropdown-item:last-child { border-bottom: none; }
+.aba-dropdown-item:hover { background: var(--blue-bg); color: var(--blue); }
+.aba-dropdown-item.ativo { color: var(--blue); background: var(--blue-bg); }
 
 /* Content */
 .content { padding: 24px; max-width: 1100px; margin: 0 auto; }
@@ -491,17 +514,36 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 
   <!-- Abas -->
   <div class="abas-bar">
-    <button class="aba ativo" id="aba-ativos"       onclick="trocarAba('ativos')">Credenciamentos Ativos</button>
-    <button class="aba"       id="aba-encerrados"   onclick="trocarAba('encerrados')">Encerrados</button>
-    <button class="aba"       id="aba-homologacoes" onclick="trocarAba('homologacoes')">Homologações</button>
-    <button class="aba"       id="aba-portarias"    onclick="trocarAba('portarias')">Portarias</button>
+    <!-- Grupo Credenciamentos -->
+    <div class="aba-grupo">
+      <button class="aba ativo" id="aba-ativos" onclick="trocarAba('ativos')">
+        Credenciamentos <span class="aba-seta">▾</span>
+      </button>
+      <div class="aba-dropdown">
+        <button class="aba-dropdown-item ativo" id="drop-ativos"     onclick="trocarAba('ativos')">Ativos</button>
+        <button class="aba-dropdown-item"       id="drop-encerrados" onclick="trocarAba('encerrados')">Encerrados</button>
+      </div>
+    </div>
+    <!-- Grupo Homologações -->
+    <div class="aba-grupo">
+      <button class="aba" id="aba-homologacoes" onclick="trocarAba('homol-ativas')">
+        Homologações <span class="aba-seta">▾</span>
+      </button>
+      <div class="aba-dropdown">
+        <button class="aba-dropdown-item" id="drop-homol-ativas"     onclick="trocarAba('homol-ativas')">Ativas</button>
+        <button class="aba-dropdown-item" id="drop-homol-encerradas" onclick="trocarAba('homol-encerradas')">Encerradas</button>
+      </div>
+    </div>
+    <!-- Portarias -->
+    <button class="aba" id="aba-portarias" onclick="trocarAba('portarias')">Portarias</button>
   </div>
 
   <div class="content">
     <div id="c-ativos"></div>
-    <div id="c-encerrados"   style="display:none"></div>
-    <div id="c-homologacoes" style="display:none"></div>
-    <div id="c-portarias"    style="display:none"></div>
+    <div id="c-encerrados"        style="display:none"></div>
+    <div id="c-homol-ativas"      style="display:none"></div>
+    <div id="c-homol-encerradas"  style="display:none"></div>
+    <div id="c-portarias"         style="display:none"></div>
   </div>
 
   <footer>Ministério da Saúde | SAPS &copy; 2026</footer>
@@ -513,6 +555,8 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 // ═══════════════════════════════════════
 const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php';
 const MESES_CURTO = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+// Datas fixas das portarias ativas (fallback quando data_portaria vier nula)
+const DATA_PORTARIA_FALLBACK = { 10345: '2026-03-13', 10979: '2026-05-01' };
 
 // ═══════════════════════════════════════
 // REGRAS DE PRAZO
@@ -529,8 +573,14 @@ function parseData(dataPortaria) {
   return new Date(y, m-1, d);
 }
 
-function calcComps(dataPortaria) {
-  const dp = parseData(dataPortaria);
+function resolveData(dataPortaria, portaria) {
+  return dataPortaria && dataPortaria !== '0000-00-00'
+    ? dataPortaria
+    : (DATA_PORTARIA_FALLBACK[Number(portaria)] || null);
+}
+
+function calcComps(dataPortaria, portaria) {
+  const dp = parseData(resolveData(dataPortaria, portaria));
   if (!dp) return null;
   const ano = dp.getFullYear();
   const mes = dp.getMonth() + 1;
@@ -552,8 +602,8 @@ function statusComp(comp, hoje) {
   return 'futuro';
 }
 
-function isAtivo3Comp(dataPortaria) {
-  const comps = calcComps(dataPortaria);
+function isAtivo3Comp(dataPortaria, portaria) {
+  const comps = calcComps(dataPortaria, portaria);
   if (!comps) return false;
   return new Date() <= comps[2].fim;
 }
@@ -571,8 +621,8 @@ function isEstabelecimento(tipo) {
   return (tipo || '').toLowerCase().includes('estabelec');
 }
 
-function diasRestantes(dataPortaria) {
-  const comps = calcComps(dataPortaria);
+function diasRestantes(dataPortaria, portaria) {
+  const comps = calcComps(dataPortaria, portaria);
   if (!comps) return null;
   const diff = Math.ceil((comps[2].fim - new Date()) / (1000*60*60*24));
   return diff;
@@ -725,26 +775,52 @@ document.addEventListener('click', e => {
 // ═══════════════════════════════════════
 // ABAS
 // ═══════════════════════════════════════
+const ABAS_CONTEUDO = ['ativos','encerrados','homol-ativas','homol-encerradas','portarias'];
+
 function trocarAba(aba) {
   abaAtiva = aba;
   atualizarAba();
   renderizar();
 }
+
 function atualizarAba() {
-  ['ativos','encerrados','homologacoes','portarias'].forEach(a => {
-    document.getElementById(`aba-${a}`).classList.toggle('ativo', a===abaAtiva);
-    document.getElementById(`c-${a}`).style.display = a===abaAtiva ? 'block' : 'none';
+  // Esconde todos os conteúdos
+  ABAS_CONTEUDO.forEach(a => {
+    const el = document.getElementById(`c-${a}`);
+    if (el) el.style.display = 'none';
   });
+  const elAtivo = document.getElementById(`c-${abaAtiva}`);
+  if (elAtivo) elAtivo.style.display = 'block';
+
+  // Remove ativo de todas as abas e drops
+  ['aba-ativos','aba-homologacoes','aba-portarias'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('ativo');
+  });
+  document.querySelectorAll('.aba-dropdown-item').forEach(el => el.classList.remove('ativo'));
+
+  // Ativa aba e dropdown corretos
+  if (abaAtiva === 'ativos' || abaAtiva === 'encerrados') {
+    document.getElementById('aba-ativos').classList.add('ativo');
+  } else if (abaAtiva === 'homol-ativas' || abaAtiva === 'homol-encerradas') {
+    document.getElementById('aba-homologacoes').classList.add('ativo');
+  } else if (abaAtiva === 'portarias') {
+    document.getElementById('aba-portarias').classList.add('ativo');
+  }
+
+  const dropEl = document.getElementById(`drop-${abaAtiva}`);
+  if (dropEl) dropEl.classList.add('ativo');
 }
 
 // ═══════════════════════════════════════
 // RENDER PRINCIPAL
 // ═══════════════════════════════════════
 function renderizar() {
-  if (abaAtiva==='ativos')       renderAtivos();
-  else if (abaAtiva==='encerrados')   renderEncerrados();
-  else if (abaAtiva==='homologacoes') renderHomologacoes();
-  else                                renderPortarias();
+  if (abaAtiva==='ativos')              renderAtivos();
+  else if (abaAtiva==='encerrados')     renderEncerrados();
+  else if (abaAtiva==='homol-ativas')   renderHomologacoes(true);
+  else if (abaAtiva==='homol-encerradas') renderHomologacoes(false);
+  else                                  renderPortarias();
 }
 
 // ═══════════════════════════════════════
@@ -766,7 +842,7 @@ function renderAtivos() {
   const totalCred3 = ativos3.reduce((s,d)=>s+Number(d.credenciado||0),0);
   const totalCredOut = ativosOut.reduce((s,d)=>s+Number(d.credenciado||0),0);
   const urgentes = ativos3.filter(d => {
-    const dias = diasRestantes(d.data_portaria);
+    const dias = diasRestantes(d.data_portaria, d.portaria);
     return dias>=0 && dias<=15;
   }).length;
 
@@ -846,9 +922,9 @@ function renderAtivos() {
 // ── Card 3 competências ──
 function card3Comp(grupo, hoje) {
   const rep = grupo[0];
-  const dp = rep.data_portaria;
-  const comps = calcComps(dp);
-  const dias = diasRestantes(dp);
+  const dp = resolveData(rep.data_portaria, rep.portaria);
+  const comps = calcComps(dp, rep.portaria);
+  const dias = diasRestantes(dp, rep.portaria);
   const fCls = farolClass(dias);
   const fTxt = farolTxt(dias);
 
@@ -996,11 +1072,16 @@ function renderEncerrados() {
 // ═══════════════════════════════════════
 // ABA HOMOLOGAÇÕES
 // ═══════════════════════════════════════
-function renderHomologacoes() {
-  const el = document.getElementById('c-homologacoes');
+function renderHomologacoes(ativo = true) {
+  const elId = ativo ? 'c-homol-ativas' : 'c-homol-encerradas';
+  const el = document.getElementById(elId);
   if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
-  const comCred = filtrados.filter(d => Number(d.credenciado)>0);
+  const comCred = filtrados.filter(d => {
+    if (!Number(d.credenciado)) return false;
+    const status = (d.selecao_credenciamento || '').toLowerCase();
+    return ativo ? status === 'ativo' : status === 'finalizado';
+  });
   if (!comCred.length) { el.innerHTML = vazioHTML('📊','Sem dados','Nenhum dado de homologação para o filtro selecionado.'); return; }
 
   const grupos = agrupar(comCred, d=>`${d.municipio}||${d.uf}||${d.portaria}||${d.nome_completo}`);
