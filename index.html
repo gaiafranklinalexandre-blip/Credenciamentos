@@ -1136,9 +1136,7 @@ function trocarStatusHomol(st) {
 async function carregarDados() {
   document.getElementById('loadingOverlay').style.display = 'flex';
   try {
-    const resp = await fetch(`${API_URL}?action=data`, {
-      headers: { 'X-Api-Key': API_KEY }
-    });
+    const resp = await fetch(`${API_URL}?action=data`);
 
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 
