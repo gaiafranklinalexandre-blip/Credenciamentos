@@ -685,6 +685,40 @@ function voltarCapa() {
 }
 
 // ═══════════════════════════════════════
+// PAGINAÇÃO
+// ═══════════════════════════════════════
+const POR_PAGINA = 20;
+const paginaAtual = {};
+
+function renderComPaginacao(el, grupos, chave, renderFn) {
+  if (!paginaAtual[chave]) paginaAtual[chave] = 1;
+  const pagina = paginaAtual[chave];
+  const total = grupos.length;
+  const inicio = (pagina - 1) * POR_PAGINA;
+  const fatia = grupos.slice(0, pagina * POR_PAGINA);
+
+  let html = contextoBar(total);
+  fatia.forEach(g => { html += renderFn(g); });
+
+  if (total > pagina * POR_PAGINA) {
+    const restam = total - pagina * POR_PAGINA;
+    html += `<div style="text-align:center;margin:24px 0">
+      <button class="btn-outline" style="padding:12px 32px;font-size:14px" onclick="carregarMais('${chave}')">
+        Carregar mais <span style="background:var(--blue-light);color:var(--blue);border-radius:20px;padding:2px 10px;margin-left:6px;font-size:12px">${restam} restantes</span>
+      </button>
+    </div>`;
+  }
+
+  html += `<div style="margin-top:8px;text-align:right"><button class="btn-download" onclick="downloadCSV('${chave}')">⬇ Baixar CSV</button></div>`;
+  el.innerHTML = html;
+}
+
+function carregarMais(chave) {
+  paginaAtual[chave] = (paginaAtual[chave] || 1) + 1;
+  renderizar();
+}
+
+// ═══════════════════════════════════════
 // DADOS
 // ═══════════════════════════════════════
 async function carregarDados() {
@@ -729,6 +763,7 @@ function fill(id, vals) {
 }
 function aplicarFiltros() {
   municipioSel = '';
+  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
   document.getElementById('buscaInput').value = '';
   document.getElementById('sugestoes').style.display = 'none';
   const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
@@ -741,6 +776,7 @@ function aplicarFiltros() {
 }
 function limparTudo() {
   municipioSel = '';
+  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
   document.getElementById('buscaInput').value = '';
   document.getElementById('sugestoes').style.display = 'none';
   ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value = '');
@@ -941,22 +977,20 @@ function renderAtivos() {
     });
 
   } else {
-    // ── Vista geral: agrupa por município + portaria ──
-    if (ativos3.length) {
-      html += `<div class="secao-titulo">Equipes e estratégias com prazo de implantação</div>`;
-      const grupos = agrupar(ativos3, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
-      Object.values(grupos).forEach(g => { html += card3Comp(g, hoje); });
-    }
-    if (ativosOut.length) {
-      html += `<div class="secao-titulo" style="margin-top:20px">Estabelecimentos e serviços credenciados</div>`;
-      const grupos = agrupar(ativosOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
-      Object.values(grupos).forEach(g => { html += cardOutros(g); });
-    }
-  }
+    // ── Vista geral: agrupa por município + portaria com paginação ──
+    const grupos3   = Object.values(agrupar(ativos3,  d=>`${d.municipio}||${d.uf}||${d.portaria}`));
+    const gruposOut = Object.values(agrupar(ativosOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`));
+    const todosGrupos = [...grupos3, ...gruposOut];
 
-  html += `<div style="margin-top:16px;text-align:right">
-    <button class="btn-download" onclick="downloadCSV('ativos')">⬇ Baixar CSV</button>
-  </div>`;
+    el.innerHTML = html; // resumo + contexto já montados
+    renderComPaginacao(el, todosGrupos, 'ativos', (g) => {
+      if (isTipo3Comp(g[0].tipo)) {
+        return `<div class="secao-titulo" style="display:none"></div>` + card3Comp(g, hoje);
+      }
+      return cardOutros(g);
+    });
+    return;
+  }
 
   el.innerHTML = html;
 }
@@ -1117,20 +1151,65 @@ function renderEncerrados() {
     return;
   }
 
-  let html = contextoBar(enc3.length + encOut.length);
   const hoje = new Date();
+  const grupos3   = enc3.length  ? Object.values(agrupar(enc3,  d=>`${d.municipio}||${d.uf}||${d.portaria}`)) : [];
+  const gruposOut = encOut.length ? Object.values(agrupar(encOut,d=>`${d.municipio}||${d.uf}||${d.portaria}`)) : [];
+  const todosGrupos = [...grupos3, ...gruposOut];
 
-  if (enc3.length) {
-    const grupos = agrupar(enc3, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
-    Object.values(grupos).forEach(g => { html += card3Comp(g, hoje); });
-  }
-  if (encOut.length) {
-    const grupos = agrupar(encOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
-    Object.values(grupos).forEach(g => { html += cardOutros(g); });
+  renderComPaginacao(el, todosGrupos, 'encerrados', (g) => {
+    return isTipo3Comp(g[0].tipo) ? card3CompEncerrado(g, hoje) : cardOutros(g);
+  });
+}
+
+// Card encerrado — espelho do ativo com visual de concluído
+function card3CompEncerrado(grupo, hoje) {
+  const rep = grupo[0];
+  const dp = resolveData(rep.data_portaria, rep.portaria);
+  const comps = calcComps(dp, rep.portaria);
+
+  const estr = estrategiaRow(grupo, false);
+
+  let tlHTML = '';
+  if (comps) {
+    const steps = [
+      { nome: 'Credenciado',    subHTML: `<span style="font-size:11px;color:var(--text-mid)">Portaria ${rep.portaria}<br>${fmt(dp)}</span>`, status: 'done', icon: '✓' },
+      ...comps.map((c,i) => ({
+        nome: `${i+1}ª Competência`,
+        subHTML: `<span class="tl-data-destaque">CNES ${c.label}</span><span class="tl-homol-destaque">Homol. ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}</span>`,
+        status: 'done', icon: '✓'
+      })),
+      { nome: 'Cofinanciamento', subHTML: `<span class="tl-data-destaque verde">${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}</span><span style="font-size:10px;color:var(--green)">Concluído</span>`, status: 'done', icon: '✓' }
+    ];
+    let tl = '<div class="timeline">';
+    steps.forEach((s,i) => {
+      tl += `<div class="tl-step">
+        <div class="tl-dot done">${s.icon}</div>
+        <div class="tl-info">
+          <div class="tl-nome">${s.nome}</div>
+          <div class="tl-sub">${s.subHTML}</div>
+        </div>
+      </div>`;
+      if (i < steps.length-1) tl += `<div class="tl-conector done"></div>`;
+    });
+    tl += '</div>';
+    tlHTML = `<div class="timeline-wrap">
+      <div class="timeline-titulo">Processo concluído — histórico do credenciamento</div>
+      ${tl}
+    </div>`;
   }
 
-  html += `<div style="margin-top:16px;text-align:right"><button class="btn-download" onclick="downloadCSV('encerrados')">⬇ Baixar CSV</button></div>`;
-  el.innerHTML = html;
+  return `<div class="card-3comp" style="opacity:.85;border-left:4px solid var(--gray-border)">
+    <div class="card-3comp-header">
+      <div class="card-3comp-info">
+        <div class="card-portaria-txt">Portaria ${rep.portaria} · ${fmt(dp)} · ${rep.ano||'—'}</div>
+        <div class="card-estrategia-nome">${rep.municipio||'—'} — ${rep.uf||''}</div>
+        ${rep.macrorregiao ? `<div class="card-local">${rep.macrorregiao}</div>` : ''}
+      </div>
+      <span class="badge badge-gray">✓ Encerrado</span>
+    </div>
+    <div class="card-outros-body">${estr}</div>
+    ${tlHTML}
+  </div>`;
 }
 
 // ═══════════════════════════════════════
