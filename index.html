@@ -456,19 +456,69 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── CONSULTA ── */
+.consulta-wrap {
+  max-width: 680px; margin: 0 auto; padding: 40px 24px 24px;
+}
+.consulta-titulo { font-size: 13px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.consulta-sub { font-size: 13px; color: var(--text-mid); margin-bottom: 24px; }
+
+.consulta-mun {
+  position: relative; margin-bottom: 20px;
+}
+.consulta-mun input {
+  width: 100%; border: 2px solid var(--blue); border-radius: var(--radius);
+  padding: 16px 24px; font-size: 17px; font-family: inherit;
+  outline: none; box-shadow: 0 4px 16px rgba(19,81,180,0.12);
+  transition: border-color .2s;
+}
+.consulta-mun input:focus { border-color: var(--blue-hover); }
+
+.consulta-filtros-sec {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; align-items: center;
+}
+.consulta-filtros-label { font-size: 12px; color: var(--text-mid); font-weight: 600; width: 100%; }
+.consulta-filtros-sec select {
+  border: 1px solid var(--gray-border); border-radius: var(--radius);
+  padding: 8px 28px 8px 14px; font-size: 13px; font-family: inherit;
+  color: var(--text); background: var(--white); cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.consulta-acoes { display: flex; gap: 12px; align-items: center; }
+.btn-consultar {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--blue); color: #fff; border: none;
+  border-radius: var(--radius); padding: 14px 32px;
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: background .2s; font-family: inherit;
+}
+.btn-consultar:hover { background: var(--blue-hover); }
+.consulta-erro { font-size: 13px; color: var(--red); font-weight: 600; display: none; margin-top: 8px; }
+
+/* ── RESULTADO ── */
+#resultado { display: none; }
+.resultado-header {
+  background: var(--white); border-bottom: 1px solid var(--gray-border);
+  padding: 12px 24px; display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+}
+.resultado-titulo { font-size: 15px; font-weight: 700; color: var(--blue); }
+.resultado-sub { font-size: 11px; color: var(--text-mid); }
+
 footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-mid); background: var(--white); border-top: 1px solid var(--gray-border); margin-top: 32px; }
 
 /* Responsivo */
 @media (max-width: 700px) {
   .content { padding: 14px 12px; }
-  .busca-wrap { padding: 14px 16px; }
   .header { padding: 0 16px; }
   .abas-bar { padding: 0 12px; }
   .aba { padding: 11px 14px; font-size: 13px; }
   .capa-nav { display: none; }
   .resumo-grid { grid-template-columns: 1fr 1fr; }
-  .header-filtros { gap: 6px; }
-  .header-filtros select { font-size: 11px; padding: 6px 24px 6px 10px; }
+  .consulta-wrap { padding: 24px 16px; }
+  .consulta-mun input { font-size: 15px; padding: 14px 18px; }
 }
 </style>
 </head>
@@ -488,7 +538,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <div class="capa-pre">P a i n e l</div>
   <h1 class="capa-title">Novos <strong>Credenciamentos</strong> da APS</h1>
   <div class="capa-line"></div>
-  <button class="capa-btn" onclick="abrirPainel('ativos')">
+  <button class="capa-btn" onclick="abrirPainel()">
     Visualizar <strong>novos credenciamentos</strong>
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/>
@@ -500,71 +550,90 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 <!-- ═══ PAINEL ═══ -->
 <div id="painel">
 
-  <!-- Header -->
+  <!-- Header fixo -->
   <div class="header">
     <div class="header-inner">
       <div class="header-titulo">
-        <h2>Painel</h2>
+        <h2>Ministério da Saúde · SAPS</h2>
         <h1>Credenciamentos da Atenção Primária à Saúde</h1>
       </div>
       <div class="header-right">
         <span class="att-txt" id="attTxt">—</span>
         <button class="btn-outline" onclick="voltarCapa()">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-          Voltar
+          Início
         </button>
       </div>
     </div>
-    <!-- Filtros apoiador -->
-    <div class="header-filtros">
-      <select id="fRegiao"   onchange="aplicarFiltros()"><option value="">Região</option></select>
-      <select id="fUF"       onchange="aplicarFiltros()"><option value="">UF</option></select>
-      <select id="fMacro"    onchange="aplicarFiltros()"><option value="">Macrorregião</option></select>
-      <select id="fPortaria" onchange="aplicarFiltros()"><option value="">Portaria</option></select>
-      <select id="fAno"      onchange="aplicarFiltros()"><option value="">Ano</option></select>
-      <button class="btn-limpar-sm" onclick="limparTudo()">✕ Limpar</button>
-    </div>
   </div>
 
-  <!-- Busca -->
-  <div class="busca-wrap">
-    <div class="busca-inner">
-      <div class="busca-rel">
-        <div class="busca-campo">
-          <input type="text" id="buscaInput" placeholder="🔍  Digite o nome do município..."
-            autocomplete="off" oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
-          <button onclick="executarBusca()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-          </button>
-        </div>
+  <!-- Tela de consulta -->
+  <div id="telaConsulta">
+    <div class="consulta-wrap">
+      <div class="consulta-titulo">Consulta de Credenciamentos</div>
+      <div class="consulta-sub">Informe o município ou selecione um filtro para visualizar os credenciamentos.</div>
+
+      <!-- Campo município em destaque -->
+      <div class="consulta-mun">
+        <input type="text" id="buscaInput" placeholder="🔍  Digite o nome do município..."
+          autocomplete="off" oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
         <div class="sugestoes" id="sugestoes" style="display:none"></div>
       </div>
-      <div class="busca-hint">ou use os filtros acima para visualizar por região, UF ou macrorregião</div>
+
+      <!-- Filtros secundários -->
+      <div class="consulta-filtros-sec">
+        <div class="consulta-filtros-label">Ou filtre por:</div>
+        <select id="fRegiao"><option value="">Região</option></select>
+        <select id="fUF"><option value="">UF</option></select>
+        <select id="fMacro"><option value="">Macrorregião</option></select>
+        <select id="fPortaria"><option value="">Portaria</option></select>
+        <select id="fAno"><option value="">Ano</option></select>
+      </div>
+
+      <div class="consulta-acoes">
+        <button class="btn-consultar" onclick="executarConsulta()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Ver credenciamentos
+        </button>
+        <button class="btn-limpar-sm" onclick="limparConsulta()">✕ Limpar</button>
+      </div>
+      <div class="consulta-erro" id="consultaErro">Selecione pelo menos um município ou filtro para consultar.</div>
     </div>
   </div>
 
-  <!-- Abas -->
-  <div class="abas-bar">
-    <button class="aba ativo" id="aba-ativos"            onclick="trocarAba('ativos')">Ativos</button>
-    <button class="aba"       id="aba-encerrados"         onclick="trocarAba('encerrados')">Encerrados</button>
-    <div class="aba-sep"></div>
-    <button class="aba"       id="aba-homol-ativas"       onclick="trocarAba('homol-ativas')">Homologações Ativas</button>
-    <button class="aba"       id="aba-homol-encerradas"   onclick="trocarAba('homol-encerradas')">Homologações Encerradas</button>
-    <div class="aba-sep"></div>
-    <button class="aba"       id="aba-portarias"          onclick="trocarAba('portarias')">Portarias</button>
-  </div>
+  <!-- Resultado -->
+  <div id="resultado">
+    <div class="resultado-header">
+      <div>
+        <div class="resultado-titulo" id="resultadoTitulo">—</div>
+        <div class="resultado-sub" id="resultadoSub">—</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-limpar-sm" onclick="voltarConsulta()">← Nova consulta</button>
+      </div>
+    </div>
 
-  <div class="content">
-    <div id="c-ativos"></div>
-    <div id="c-encerrados"        style="display:none"></div>
-    <div id="c-homol-ativas"      style="display:none"></div>
-    <div id="c-homol-encerradas"  style="display:none"></div>
-    <div id="c-portarias"         style="display:none"></div>
-  </div>
+    <!-- Abas -->
+    <div class="abas-bar">
+      <button class="aba ativo" id="aba-ativos"          onclick="trocarAba('ativos')">Ativos</button>
+      <button class="aba"       id="aba-encerrados"       onclick="trocarAba('encerrados')">Encerrados</button>
+      <div class="aba-sep"></div>
+      <button class="aba"       id="aba-homol-ativas"     onclick="trocarAba('homol-ativas')">Homologações Ativas</button>
+      <button class="aba"       id="aba-homol-encerradas" onclick="trocarAba('homol-encerradas')">Homologações Encerradas</button>
+      <div class="aba-sep"></div>
+      <button class="aba"       id="aba-portarias"        onclick="trocarAba('portarias')">Portarias</button>
+    </div>
 
-  <footer>Ministério da Saúde | SAPS &copy; 2026</footer>
+    <div class="content">
+      <div id="c-ativos"></div>
+      <div id="c-encerrados"        style="display:none"></div>
+      <div id="c-homol-ativas"      style="display:none"></div>
+      <div id="c-homol-encerradas"  style="display:none"></div>
+      <div id="c-portarias"         style="display:none"></div>
+    </div>
+
+    <footer>Ministério da Saúde | SAPS &copy; 2026</footer>
+  </div>
 </div>
 
 <script>
@@ -672,16 +741,76 @@ let municipioSel = '';
 // ═══════════════════════════════════════
 // NAVEGAÇÃO
 // ═══════════════════════════════════════
-function abrirPainel(aba) {
+function abrirPainel() {
   document.getElementById('capa').style.display = 'none';
   document.getElementById('painel').style.display = 'block';
-  abaAtiva = aba;
+  document.getElementById('telaConsulta').style.display = 'block';
+  document.getElementById('resultado').style.display = 'none';
   if (!dados.length) carregarDados();
-  else { atualizarAba(); renderizar(); }
 }
 function voltarCapa() {
   document.getElementById('painel').style.display = 'none';
   document.getElementById('capa').style.display = 'flex';
+}
+function voltarConsulta() {
+  document.getElementById('resultado').style.display = 'none';
+  document.getElementById('telaConsulta').style.display = 'block';
+}
+function executarConsulta() {
+  const mun = document.getElementById('buscaInput').value.trim();
+  const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
+  const erroEl = document.getElementById('consultaErro');
+
+  if (!mun && !r && !u && !m && !p && !a) {
+    erroEl.style.display = 'block';
+    return;
+  }
+  erroEl.style.display = 'none';
+
+  // Aplica filtros
+  if (mun) {
+    const partes = mun.split(' - ');
+    municipioSel = partes[0].trim();
+    const ufSel = partes[1] ? partes[1].trim() : '';
+    filtrados = dados.filter(d =>
+      d.municipio.toLowerCase() === municipioSel.toLowerCase() &&
+      (!ufSel || d.uf === ufSel)
+    );
+  } else {
+    municipioSel = '';
+    filtrados = dados.filter(d =>
+      (!r || d.regiao === r) && (!u || d.uf === u) &&
+      (!m || d.macrorregiao === m) && (!p || String(d.portaria) === String(p)) &&
+      (!a || String(d.ano) === String(a))
+    );
+  }
+
+  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
+
+  // Monta título do resultado
+  const tituloEl = document.getElementById('resultadoTitulo');
+  const subEl    = document.getElementById('resultadoSub');
+  if (municipioSel) {
+    tituloEl.textContent = municipioSel;
+    subEl.textContent = `${filtrados.length} registro(s) encontrado(s)`;
+  } else {
+    const partesFiltro = [r&&`Região: ${r}`, u&&`UF: ${u}`, m&&`Macrorregião: ${m}`, p&&`Portaria: ${p}`, a&&`Ano: ${a}`].filter(Boolean);
+    tituloEl.textContent = partesFiltro.join(' · ');
+    subEl.textContent = `${filtrados.length} registro(s) encontrado(s)`;
+  }
+
+  abaAtiva = 'ativos';
+  document.getElementById('telaConsulta').style.display = 'none';
+  document.getElementById('resultado').style.display = 'block';
+  atualizarAba();
+  renderizar();
+}
+function limparConsulta() {
+  municipioSel = '';
+  document.getElementById('buscaInput').value = '';
+  document.getElementById('sugestoes').style.display = 'none';
+  document.getElementById('consultaErro').style.display = 'none';
+  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value = '');
 }
 
 // ═══════════════════════════════════════
@@ -761,28 +890,8 @@ function fill(id, vals) {
   sel.innerHTML = `<option value="">${ph}</option>`;
   vals.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
 }
-function aplicarFiltros() {
-  municipioSel = '';
-  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
-  document.getElementById('buscaInput').value = '';
-  document.getElementById('sugestoes').style.display = 'none';
-  const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
-  filtrados = dados.filter(d =>
-    (!r || d.regiao === r) && (!u || d.uf === u) &&
-    (!m || d.macrorregiao === m) && (!p || String(d.portaria) === String(p)) &&
-    (!a || String(d.ano) === String(a))
-  );
-  renderizar();
-}
-function limparTudo() {
-  municipioSel = '';
-  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
-  document.getElementById('buscaInput').value = '';
-  document.getElementById('sugestoes').style.display = 'none';
-  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value = '');
-  filtrados = dados;
-  renderizar();
-}
+function aplicarFiltros() { /* não usado no novo fluxo */ }
+function limparTudo() { voltarConsulta(); limparConsulta(); }
 function v(id) { return document.getElementById(id).value; }
 
 // ═══════════════════════════════════════
@@ -803,25 +912,15 @@ function onBuscaInput() {
   el.style.display = 'block';
 }
 function onBuscaKey(e) {
-  if (e.key==='Enter') executarBusca();
+  if (e.key==='Enter') executarConsulta();
   if (e.key==='Escape') document.getElementById('sugestoes').style.display='none';
 }
 function selecionarMun(mun, uf) {
   document.getElementById('buscaInput').value = `${mun} - ${uf}`;
   document.getElementById('sugestoes').style.display = 'none';
-  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value='');
-  municipioSel = mun;
-  filtrados = dados.filter(d => d.municipio === mun && d.uf === uf);
-  renderizar();
 }
 function executarBusca() {
-  const q = document.getElementById('buscaInput').value.trim();
-  document.getElementById('sugestoes').style.display = 'none';
-  if (!q) { limparTudo(); return; }
-  const [mun] = q.split(' - ');
-  municipioSel = mun.trim();
-  filtrados = dados.filter(d => d.municipio.toLowerCase() === municipioSel.toLowerCase());
-  renderizar();
+  executarConsulta();
 }
 document.addEventListener('click', e => {
   if (!e.target.closest('.busca-rel')) document.getElementById('sugestoes').style.display='none';
