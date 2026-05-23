@@ -153,14 +153,22 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 
 /* Abas */
 .abas-bar {
-  display: flex; border-bottom: 2px solid var(--gray-border);
+  display: flex; align-items: center;
+  border-bottom: 2px solid var(--gray-border);
   background: var(--white); padding: 0 24px;
-  position: relative; z-index: 50;
-  overflow: visible;
+  overflow-x: auto; gap: 0;
 }
-.aba-grupo { position: relative; display: inline-flex; }
+.aba-sep {
+  width: 1px; height: 20px; background: var(--gray-border);
+  margin: 0 4px; flex-shrink: 0;
+}
+.aba-grupo-label {
+  font-size: 10px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .5px;
+  padding: 0 8px; white-space: nowrap; flex-shrink: 0;
+}
 .aba {
-  padding: 13px 22px; font-size: 14px; font-weight: 600;
+  padding: 13px 18px; font-size: 13px; font-weight: 600;
   color: var(--text-mid); cursor: pointer; border: none;
   background: transparent; white-space: nowrap;
   border-bottom: 3px solid transparent; margin-bottom: -2px;
@@ -169,26 +177,6 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 }
 .aba.ativo { color: var(--blue); border-bottom-color: var(--blue); }
 .aba:hover:not(.ativo) { color: var(--blue); background: var(--blue-bg); }
-.aba-seta { font-size: 9px; opacity: .6; }
-
-/* Dropdown de aba */
-.aba-dropdown {
-  display: none; position: absolute; top: 100%; left: 0;
-  background: var(--white); border: 1px solid var(--gray-border);
-  border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-  min-width: 180px; z-index: 200; overflow: hidden;
-}
-.aba-grupo.aberto .aba-dropdown { display: block; }
-.aba-dropdown-item {
-  padding: 11px 20px; font-size: 13px; font-weight: 600;
-  color: var(--text-mid); cursor: pointer; border: none;
-  background: transparent; width: 100%; text-align: left;
-  font-family: inherit; display: block; border-bottom: 1px solid var(--gray-border);
-  transition: background .15s;
-}
-.aba-dropdown-item:last-child { border-bottom: none; }
-.aba-dropdown-item:hover { background: var(--blue-bg); color: var(--blue); }
-.aba-dropdown-item.ativo { color: var(--blue); background: var(--blue-bg); }
 
 /* Content */
 .content { padding: 24px; max-width: 1100px; margin: 0 auto; }
@@ -559,28 +547,13 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 
   <!-- Abas -->
   <div class="abas-bar">
-    <!-- Grupo Credenciamentos -->
-    <div class="aba-grupo" id="grupo-cred">
-      <button class="aba ativo" id="aba-ativos" onclick="toggleGrupo('grupo-cred')">
-        Credenciamentos <span class="aba-seta">▾</span>
-      </button>
-      <div class="aba-dropdown">
-        <button class="aba-dropdown-item ativo" id="drop-ativos"     onclick="trocarAba('ativos')">Ativos</button>
-        <button class="aba-dropdown-item"       id="drop-encerrados" onclick="trocarAba('encerrados')">Encerrados</button>
-      </div>
-    </div>
-    <!-- Grupo Homologações -->
-    <div class="aba-grupo" id="grupo-homol">
-      <button class="aba" id="aba-homologacoes" onclick="toggleGrupo('grupo-homol')">
-        Homologações <span class="aba-seta">▾</span>
-      </button>
-      <div class="aba-dropdown">
-        <button class="aba-dropdown-item" id="drop-homol-ativas"     onclick="trocarAba('homol-ativas')">Ativas</button>
-        <button class="aba-dropdown-item" id="drop-homol-encerradas" onclick="trocarAba('homol-encerradas')">Encerradas</button>
-      </div>
-    </div>
-    <!-- Portarias -->
-    <button class="aba" id="aba-portarias" onclick="trocarAba('portarias')">Portarias</button>
+    <button class="aba ativo" id="aba-ativos"            onclick="trocarAba('ativos')">Ativos</button>
+    <button class="aba"       id="aba-encerrados"         onclick="trocarAba('encerrados')">Encerrados</button>
+    <div class="aba-sep"></div>
+    <button class="aba"       id="aba-homol-ativas"       onclick="trocarAba('homol-ativas')">Homologações Ativas</button>
+    <button class="aba"       id="aba-homol-encerradas"   onclick="trocarAba('homol-encerradas')">Homologações Encerradas</button>
+    <div class="aba-sep"></div>
+    <button class="aba"       id="aba-portarias"          onclick="trocarAba('portarias')">Portarias</button>
   </div>
 
   <div class="content">
@@ -818,20 +791,6 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.busca-rel')) document.getElementById('sugestoes').style.display='none';
 });
 
-// ═══════════════════════════════════════
-// DROPDOWN ABAS
-// ═══════════════════════════════════════
-function toggleGrupo(id) {
-  const grupo = document.getElementById(id);
-  const aberto = grupo.classList.contains('aberto');
-  document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
-  if (!aberto) grupo.classList.add('aberto');
-}
-document.addEventListener('click', e => {
-  if (!e.target.closest('.aba-grupo')) {
-    document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
-  }
-});
 
 // ═══════════════════════════════════════
 // ABAS
@@ -846,7 +805,6 @@ function trocarAba(aba) {
 }
 
 function atualizarAba() {
-  // Esconde todos os conteúdos
   ABAS_CONTEUDO.forEach(a => {
     const el = document.getElementById(`c-${a}`);
     if (el) el.style.display = 'none';
@@ -854,24 +812,12 @@ function atualizarAba() {
   const elAtivo = document.getElementById(`c-${abaAtiva}`);
   if (elAtivo) elAtivo.style.display = 'block';
 
-  // Remove ativo de todas as abas e drops
-  ['aba-ativos','aba-homologacoes','aba-portarias'].forEach(id => {
+  ['aba-ativos','aba-encerrados','aba-homol-ativas','aba-homol-encerradas','aba-portarias'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('ativo');
   });
-  document.querySelectorAll('.aba-dropdown-item').forEach(el => el.classList.remove('ativo'));
-
-  // Ativa aba e dropdown corretos
-  if (abaAtiva === 'ativos' || abaAtiva === 'encerrados') {
-    document.getElementById('aba-ativos').classList.add('ativo');
-  } else if (abaAtiva === 'homol-ativas' || abaAtiva === 'homol-encerradas') {
-    document.getElementById('aba-homologacoes').classList.add('ativo');
-  } else if (abaAtiva === 'portarias') {
-    document.getElementById('aba-portarias').classList.add('ativo');
-  }
-
-  const dropEl = document.getElementById(`drop-${abaAtiva}`);
-  if (dropEl) dropEl.classList.add('ativo');
+  const abaEl = document.getElementById(`aba-${abaAtiva}`);
+  if (abaEl) abaEl.classList.add('ativo');
 }
 
 // ═══════════════════════════════════════
