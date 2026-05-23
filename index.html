@@ -23,7 +23,7 @@
   --text-mid:    #666;
   --white:       #fff;
   --radius:      50px;
-  --card-radius: 12px;
+  --card-r:      12px;
   --shadow:      0 2px 12px rgba(0,0,0,0.07);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,139 +31,133 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 
 /* ── CAPA ── */
 #capa {
-  min-height: 100vh;
-  background: #EAECF4;
+  min-height: 100vh; background: #EAECF4;
   display: flex; flex-direction: column;
   justify-content: center; align-items: flex-start;
-  padding: 40px 8%;
-  position: relative; overflow: hidden;
+  padding: 40px 8%; position: relative; overflow: hidden;
 }
 #capa::after {
-  content: ''; position: absolute;
-  right: -100px; bottom: -100px;
+  content: ''; position: absolute; right: -100px; bottom: -100px;
   width: 500px; height: 500px; border-radius: 50%;
   background: rgba(19,81,180,0.06);
 }
-.capa-nav {
-  position: absolute; top: 28px; right: 40px;
-  display: flex; gap: 24px;
-}
+.capa-nav { position: absolute; top: 28px; right: 40px; display: flex; gap: 24px; }
 .capa-nav a { color: var(--blue); text-decoration: none; font-weight: 600; font-size: 14px; }
 .capa-nav a:hover { text-decoration: underline; }
 .capa-pre { font-size: 20px; font-weight: 400; color: var(--blue); letter-spacing: 5px; margin-bottom: 8px; }
-.capa-title { font-size: clamp(36px, 6vw, 72px); font-weight: 400; line-height: 1.1; }
+.capa-title { font-size: clamp(36px,6vw,72px); font-weight: 400; line-height: 1.1; }
 .capa-title strong { font-weight: 800; color: var(--blue); }
 .capa-line { width: 80px; height: 4px; background: var(--blue); margin: 16px 0 40px; }
 .capa-btn {
   display: inline-flex; align-items: center; gap: 14px;
-  background: var(--blue); color: #fff;
-  border: none; border-radius: var(--radius);
-  padding: 18px 40px; font-size: 17px; font-weight: 600;
-  cursor: pointer; transition: background .2s; font-family: inherit;
+  background: var(--blue); color: #fff; border: none;
+  border-radius: var(--radius); padding: 18px 40px;
+  font-size: 17px; font-weight: 600; cursor: pointer;
+  transition: background .2s; font-family: inherit;
 }
 .capa-btn:hover { background: var(--blue-hover); }
-.capa-logos {
-  position: absolute; bottom: 28px; right: 40px;
-  display: flex; align-items: center; gap: 16px;
-  font-size: 12px; color: #555;
-}
+.capa-logos { position: absolute; bottom: 28px; right: 40px; font-size: 12px; color: #555; }
 
 /* ── PAINEL ── */
 #painel { display: none; min-height: 100vh; }
 
 /* Header */
 .header {
-  background: var(--white); padding: 14px 24px;
-  display: flex; align-items: center; justify-content: space-between;
+  background: var(--white); padding: 0 24px;
   border-bottom: 1px solid var(--gray-border);
   position: sticky; top: 0; z-index: 100;
-  box-shadow: var(--shadow); flex-wrap: wrap; gap: 10px;
+  box-shadow: var(--shadow);
 }
-.header-titulo h2 { font-size: 12px; font-weight: 500; color: var(--blue); }
-.header-titulo h1 { font-size: 16px; font-weight: 700; color: var(--blue); }
-.header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 0; flex-wrap: wrap; gap: 10px;
+}
+.header-titulo h2 { font-size: 11px; font-weight: 500; color: var(--blue); }
+.header-titulo h1 { font-size: 15px; font-weight: 700; color: var(--blue); }
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .att-txt { font-size: 11px; color: var(--text-mid); }
+
+/* Filtros no header */
+.header-filtros {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0 10px; border-top: 1px solid var(--gray-border);
+  flex-wrap: wrap;
+}
+.header-filtros select {
+  border: 1px solid var(--gray-border); border-radius: var(--radius);
+  padding: 7px 28px 7px 12px; font-size: 12px; font-family: inherit;
+  color: var(--text); background: var(--white); cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.header-filtros select:focus { outline: 2px solid var(--blue); border-radius: var(--radius); }
+.btn-limpar-sm {
+  background: none; border: none; color: var(--red);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; padding: 4px 8px;
+}
+.btn-limpar-sm:hover { text-decoration: underline; }
+
 .btn-outline {
   display: inline-flex; align-items: center; gap: 6px;
   border: 2px solid var(--blue); color: var(--blue); background: transparent;
-  border-radius: var(--radius); padding: 7px 18px;
-  font-size: 13px; font-weight: 600; cursor: pointer;
+  border-radius: var(--radius); padding: 6px 16px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
   transition: all .2s; font-family: inherit;
 }
 .btn-outline:hover { background: var(--blue-light); }
 
-/* Busca */
+/* Busca centralizada */
 .busca-wrap {
   background: var(--white);
   border-bottom: 1px solid var(--gray-border);
-  padding: 16px 24px;
+  padding: 20px 24px;
 }
-.busca-inner { max-width: 900px; margin: 0 auto; }
-.busca-row {
-  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-}
+.busca-inner { max-width: 600px; margin: 0 auto; }
+.busca-rel { position: relative; }
 .busca-campo {
-  flex: 2; min-width: 200px;
   display: flex; align-items: center;
   border: 2px solid var(--blue); border-radius: var(--radius);
   overflow: hidden; background: var(--white);
+  box-shadow: 0 2px 8px rgba(19,81,180,0.12);
 }
 .busca-campo input {
   flex: 1; border: none; outline: none;
-  padding: 10px 16px; font-size: 14px; font-family: inherit;
+  padding: 12px 20px; font-size: 15px; font-family: inherit;
 }
 .busca-campo button {
   background: var(--blue); border: none; color: #fff;
-  padding: 10px 18px; cursor: pointer; transition: background .2s;
+  padding: 12px 20px; cursor: pointer; transition: background .2s;
+  font-size: 16px;
 }
 .busca-campo button:hover { background: var(--blue-hover); }
-.busca-sep { color: var(--text-mid); font-size: 12px; font-weight: 600; }
-.filtros-apoio {
-  display: flex; gap: 8px; flex-wrap: wrap; flex: 3;
-}
-.filtros-apoio select {
-  border: 1px solid var(--gray-border); border-radius: var(--radius);
-  padding: 9px 14px; font-size: 13px; font-family: inherit;
-  color: var(--text); background: var(--white); cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
-  flex: 1; min-width: 110px;
-}
-.filtros-apoio select:focus { outline: 2px solid var(--blue); }
-.btn-limpar-busca {
-  background: none; border: none; color: var(--red);
-  font-size: 12px; font-weight: 600; cursor: pointer;
-  font-family: inherit; white-space: nowrap; padding: 4px;
-}
-.btn-limpar-busca:hover { text-decoration: underline; }
+.busca-hint { text-align: center; font-size: 12px; color: var(--text-mid); margin-top: 8px; }
 
-/* Sugestões autocomplete */
+/* Autocomplete */
 .sugestoes {
   position: absolute; background: var(--white);
-  border: 1px solid var(--gray-border); border-radius: 8px;
-  box-shadow: var(--shadow); max-height: 240px; overflow-y: auto;
-  z-index: 200; width: 100%; top: 100%; left: 0;
+  border: 1px solid var(--gray-border); border-radius: 10px;
+  box-shadow: var(--shadow); max-height: 260px; overflow-y: auto;
+  z-index: 200; width: 100%; top: calc(100% + 4px); left: 0;
 }
-.sugestao-item {
-  padding: 10px 16px; cursor: pointer; font-size: 13px;
+.sug-item {
+  padding: 11px 20px; cursor: pointer; font-size: 13px;
   border-bottom: 1px solid var(--gray-border);
+  display: flex; justify-content: space-between; align-items: center;
 }
-.sugestao-item:last-child { border-bottom: none; }
-.sugestao-item:hover { background: var(--blue-light); }
-.sugestao-item strong { color: var(--blue); }
-.busca-rel { position: relative; flex: 2; min-width: 200px; }
+.sug-item:last-child { border-bottom: none; }
+.sug-item:hover { background: var(--blue-bg); }
+.sug-item strong { color: var(--blue); }
+.sug-uf { font-size: 11px; color: var(--text-mid); background: var(--gray-bg); padding: 2px 8px; border-radius: 10px; }
 
 /* Abas */
 .abas-bar {
-  display: flex; gap: 0;
-  border-bottom: 2px solid var(--gray-border);
-  background: var(--white);
-  padding: 0 24px;
-  overflow-x: auto;
+  display: flex; border-bottom: 2px solid var(--gray-border);
+  background: var(--white); padding: 0 24px; overflow-x: auto;
 }
 .aba {
-  padding: 14px 24px; font-size: 14px; font-weight: 600;
+  padding: 13px 22px; font-size: 14px; font-weight: 600;
   color: var(--text-mid); cursor: pointer; border: none;
   background: transparent; white-space: nowrap;
   border-bottom: 3px solid transparent; margin-bottom: -2px;
@@ -172,188 +166,218 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .aba.ativo { color: var(--blue); border-bottom-color: var(--blue); }
 .aba:hover:not(.ativo) { color: var(--blue); background: var(--blue-bg); }
 
-/* Conteúdo */
-.content { padding: 24px; max-width: 1200px; margin: 0 auto; }
+/* Content */
+.content { padding: 24px; max-width: 1100px; margin: 0 auto; }
 
-/* Estado vazio / inicial */
-.estado-vazio {
-  text-align: center; padding: 60px 20px;
-  color: var(--text-mid);
+/* Cards resumo no topo */
+.resumo-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin-bottom: 24px;
 }
-.estado-vazio .icone { font-size: 48px; margin-bottom: 16px; }
-.estado-vazio h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
-.estado-vazio p { font-size: 14px; line-height: 1.6; max-width: 400px; margin: 0 auto; }
+.resumo-card {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); padding: 16px 20px;
+  border-left: 4px solid var(--blue);
+}
+.resumo-card.green { border-left-color: var(--green); }
+.resumo-card.yellow { border-left-color: var(--yellow); }
+.resumo-card.red { border-left-color: var(--red); }
+.resumo-label { font-size: 11px; font-weight: 600; color: var(--text-mid); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+.resumo-valor { font-size: 28px; font-weight: 800; color: var(--blue); line-height: 1; }
+.resumo-card.green .resumo-valor { color: var(--green); }
+.resumo-card.yellow .resumo-valor { color: #7a5f00; }
+.resumo-card.red .resumo-valor { color: var(--red); }
+.resumo-sub { font-size: 11px; color: var(--text-mid); margin-top: 4px; }
 
-/* Contexto de busca */
-.busca-contexto {
+/* Contexto */
+.contexto-bar {
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+  flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
 }
-.busca-contexto h2 { font-size: 18px; font-weight: 700; }
-.busca-contexto span { font-size: 13px; color: var(--text-mid); }
+.contexto-bar h2 { font-size: 17px; font-weight: 700; }
 .total-badge {
   display: inline-block; background: var(--blue-light);
-  color: var(--blue); font-size: 12px; font-weight: 700;
+  color: var(--blue); font-size: 11px; font-weight: 700;
   padding: 3px 10px; border-radius: var(--radius); margin-left: 8px;
 }
 
-/* Cards de credenciamento */
-.cards-grid { display: flex; flex-direction: column; gap: 16px; }
+/* Estado vazio */
+.vazio {
+  text-align: center; padding: 60px 20px; color: var(--text-mid);
+}
+.vazio .ico { font-size: 48px; margin-bottom: 16px; }
+.vazio h3 { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.vazio p { font-size: 14px; line-height: 1.6; max-width: 420px; margin: 0 auto; }
 
-.card-cred {
-  background: var(--white); border-radius: var(--card-radius);
-  box-shadow: var(--shadow); overflow: hidden;
+/* ── CARD CREDENCIAMENTO 3 COMP ── */
+.card-3comp {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden;
 }
-.card-header {
-  display: flex; align-items: flex-start; justify-content: space-between;
+.card-3comp-header {
   padding: 16px 20px; border-bottom: 1px solid var(--gray-border);
-  flex-wrap: wrap; gap: 8px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
 }
-.card-header-left { display: flex; flex-direction: column; gap: 4px; }
-.card-portaria {
-  font-size: 11px; font-weight: 700; color: var(--text-mid);
-  text-transform: uppercase; letter-spacing: .5px;
+.card-3comp-info { display: flex; flex-direction: column; gap: 3px; }
+.card-portaria-txt { font-size: 11px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .5px; }
+.card-estrategia-nome { font-size: 16px; font-weight: 700; }
+.card-local { font-size: 12px; color: var(--text-mid); }
+.card-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* Farol */
+.farol {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: var(--radius);
+  font-size: 12px; font-weight: 700;
 }
-.card-estrategia { font-size: 15px; font-weight: 700; color: var(--text); }
-.card-municipio { font-size: 13px; color: var(--text-mid); }
-.card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.farol-verde  { background: var(--green-light); color: var(--green); }
+.farol-amarelo{ background: var(--yellow-light); color: #7a5f00; }
+.farol-vermelho{ background: var(--red-light); color: var(--red); }
+.farol-cinza  { background: #f0f0f5; color: #888; }
+.farol-dot { width: 8px; height: 8px; border-radius: 50%; }
+.farol-verde .farol-dot   { background: var(--green); }
+.farol-amarelo .farol-dot { background: var(--yellow); }
+.farol-vermelho .farol-dot{ background: var(--red); }
+.farol-cinza .farol-dot   { background: #aaa; }
 
 .badge {
-  display: inline-flex; align-items: center; gap-4px;
-  padding: 4px 12px; border-radius: var(--radius);
+  display: inline-block; padding: 4px 12px; border-radius: var(--radius);
   font-size: 11px; font-weight: 700;
 }
-.badge-green  { background: var(--green-light); color: var(--green); }
-.badge-red    { background: var(--red-light); color: var(--red); }
-.badge-yellow { background: var(--yellow-light); color: #7a5f00; }
 .badge-blue   { background: var(--blue-light); color: var(--blue); }
+.badge-green  { background: var(--green-light); color: var(--green); }
 .badge-gray   { background: #f0f0f5; color: #666; }
 
-.card-body { padding: 16px 20px; }
+/* Quantidade destaque */
+.card-qtd-destaque {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 20px; background: var(--blue-bg);
+  border-bottom: 1px solid var(--gray-border);
+}
+.qtd-num { font-size: 32px; font-weight: 800; color: var(--blue); line-height: 1; }
+.qtd-label { font-size: 12px; color: var(--text-mid); line-height: 1.4; }
+.qtd-label strong { display: block; color: var(--text); font-size: 13px; }
 
-/* Linha do tempo */
+/* Timeline 3 competências */
+.timeline-wrap { padding: 20px; }
+.timeline-titulo { font-size: 12px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; }
 .timeline {
-  display: flex; align-items: flex-start;
-  gap: 0; position: relative;
+  display: flex; align-items: flex-start; gap: 0;
   overflow-x: auto; padding-bottom: 4px;
 }
-.tl-step {
-  display: flex; flex-direction: column; align-items: center;
-  flex: 1; min-width: 100px; position: relative;
-}
-.tl-connector {
-  flex: 1; height: 2px; margin-top: 18px; min-width: 20px;
-  background: var(--gray-border);
-}
-.tl-connector.done { background: var(--blue); }
+.tl-step { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 90px; }
+.tl-conector { flex: 1; height: 2px; margin-top: 19px; min-width: 16px; background: var(--gray-border); }
+.tl-conector.done { background: var(--blue); }
 .tl-dot {
-  width: 36px; height: 36px; border-radius: 50%;
+  width: 38px; height: 38px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: 700; flex-shrink: 0;
-  border: 2px solid var(--gray-border);
-  background: var(--white); color: var(--text-mid);
-  position: relative; z-index: 1;
+  border: 2px solid var(--gray-border); background: var(--white);
+  color: var(--text-mid); position: relative; z-index: 1;
 }
-.tl-dot.done   { background: var(--blue); border-color: var(--blue); color: #fff; }
-.tl-dot.atual  { background: var(--white); border-color: var(--green); color: var(--green); box-shadow: 0 0 0 4px var(--green-light); }
-.tl-dot.futuro { background: var(--white); border-color: var(--gray-border); color: var(--text-mid); }
-.tl-dot.vencido{ background: var(--red-light); border-color: var(--red); color: var(--red); }
-.tl-label { font-size: 11px; text-align: center; margin-top: 6px; line-height: 1.4; color: var(--text-mid); max-width: 90px; }
-.tl-label strong { display: block; font-size: 12px; color: var(--text); }
-.tl-label .sub  { font-size: 10px; color: var(--text-mid); }
+.tl-dot.done    { background: var(--blue); border-color: var(--blue); color: #fff; }
+.tl-dot.atual   { background: var(--white); border-color: var(--green); color: var(--green); box-shadow: 0 0 0 4px var(--green-light); }
+.tl-dot.futuro  { background: var(--white); border-color: var(--gray-border); color: #bbb; }
+.tl-dot.vencido { background: var(--red-light); border-color: var(--red); color: var(--red); }
+.tl-info { text-align: center; margin-top: 8px; max-width: 90px; }
+.tl-info .tl-nome { font-size: 11px; font-weight: 700; color: var(--text); }
+.tl-info .tl-sub  { font-size: 10px; color: var(--text-mid); line-height: 1.5; margin-top: 2px; }
+.tl-info .tl-atual-label {
+  display: inline-block; background: var(--green); color: #fff;
+  font-size: 9px; font-weight: 700; padding: 1px 6px;
+  border-radius: 10px; margin-top: 3px;
+}
+.tl-info .tl-vencido-label {
+  display: inline-block; background: var(--red); color: #fff;
+  font-size: 9px; font-weight: 700; padding: 1px 6px;
+  border-radius: 10px; margin-top: 3px;
+}
 
-/* Quantitativo */
-.card-qtd {
-  display: flex; align-items: center; gap: 8px;
-  margin-top: 12px; font-size: 13px; color: var(--text-mid);
+/* ── CARD ESTABELECIMENTOS / ESPECÍFICOS ── */
+.card-outros {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden;
 }
-.card-qtd strong { color: var(--text); font-size: 22px; font-weight: 800; }
-
-/* Observação */
-.card-obs {
-  margin-top: 12px;
-  background: var(--blue-bg); border-left: 3px solid var(--blue);
-  border-radius: 6px; padding: 10px 14px;
-  font-size: 12px; line-height: 1.6; color: var(--text);
-}
-.card-obs-label { font-weight: 700; color: var(--blue); margin-bottom: 2px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
-
-/* Card mensagem (município sem credenciamento) */
-.card-msg {
-  background: var(--white); border-radius: var(--card-radius);
-  box-shadow: var(--shadow); padding: 24px;
-  border-left: 4px solid var(--yellow);
-  display: flex; gap: 16px; align-items: flex-start;
-}
-.card-msg-icon { font-size: 28px; flex-shrink: 0; }
-.card-msg-text h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-.card-msg-text p { font-size: 13px; line-height: 1.6; color: var(--text-mid); }
-
-/* Específico (sem linha do tempo) */
-.card-especifico {
-  background: var(--gray-bg); border-radius: 8px;
-  padding: 12px 16px; margin-top: 4px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 8px;
-}
-.card-especifico-nome { font-size: 13px; font-weight: 600; }
-.card-especifico-qtd { font-size: 20px; font-weight: 800; color: var(--blue); }
-
-/* Homologações */
-.homol-card {
-  background: var(--white); border-radius: var(--card-radius);
-  box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
-}
-.homol-header {
+.card-outros-header {
   padding: 14px 20px; border-bottom: 1px solid var(--gray-border);
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 8px;
 }
-.homol-titulo { font-size: 14px; font-weight: 700; }
-.homol-body { padding: 16px 20px; }
-.homol-barra-wrap { margin-bottom: 12px; }
-.homol-barra-label {
-  display: flex; justify-content: space-between;
-  font-size: 12px; margin-bottom: 6px;
+.card-outros-titulo { font-size: 13px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .5px; }
+.card-outros-body { padding: 0; }
+.estrategia-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-bottom: 1px solid var(--gray-border);
+  flex-wrap: wrap; gap: 8px;
 }
-.homol-barra-bg {
-  background: var(--gray-border); border-radius: 8px; height: 10px; overflow: hidden;
+.estrategia-row:last-child { border-bottom: none; }
+.estrategia-nome { font-size: 13px; font-weight: 600; }
+.estrategia-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.estrategia-qtd { font-size: 20px; font-weight: 800; color: var(--blue); }
+.estrategia-qtd-label { font-size: 11px; color: var(--text-mid); }
+.obs-box {
+  margin: 0 20px 12px; background: var(--blue-bg);
+  border-left: 3px solid var(--blue); border-radius: 6px;
+  padding: 8px 12px; font-size: 12px; line-height: 1.6;
 }
-.homol-barra-fill { height: 100%; border-radius: 8px; transition: width .5s; }
-.homol-parcelas {
-  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;
-}
-.parcela-chip {
-  flex: 1; min-width: 80px;
-  background: var(--gray-bg); border-radius: 8px;
-  padding: 10px 12px; text-align: center;
-}
-.parcela-chip .p-num { font-size: 11px; color: var(--text-mid); font-weight: 600; }
-.parcela-chip .p-val { font-size: 20px; font-weight: 800; color: var(--blue); }
-.parcela-chip .p-label { font-size: 10px; color: var(--text-mid); }
-.parcela-chip.tem { background: var(--blue-light); }
-.parcela-chip.tem .p-val { color: var(--blue); }
+.obs-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
 
-/* Portarias */
+/* Mensagem município sem credenciamento */
+.card-msg {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); padding: 24px;
+  border-left: 4px solid var(--yellow);
+  display: flex; gap: 16px; align-items: flex-start;
+  margin-bottom: 16px;
+}
+.card-msg-icon { font-size: 28px; flex-shrink: 0; }
+.card-msg h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.card-msg p { font-size: 13px; line-height: 1.6; color: var(--text-mid); }
+
+/* ── HOMOLOGAÇÕES ── */
+.homol-card {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden;
+}
+.homol-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--gray-border);
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.homol-titulo { font-size: 15px; font-weight: 700; }
+.homol-sub { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
+.homol-body { padding: 16px 20px; }
+.barra-wrap { margin-bottom: 14px; }
+.barra-labels { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+.barra-bg { background: var(--gray-border); border-radius: 8px; height: 12px; overflow: hidden; }
+.barra-fill { height: 100%; border-radius: 8px; transition: width .5s; }
+.parcelas-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.parcela {
+  flex: 1; min-width: 80px; background: var(--gray-bg);
+  border-radius: 8px; padding: 10px 12px; text-align: center;
+}
+.parcela.tem { background: var(--blue-light); }
+.parcela-num { font-size: 10px; color: var(--text-mid); font-weight: 600; margin-bottom: 4px; }
+.parcela-val { font-size: 22px; font-weight: 800; color: var(--blue); line-height: 1; }
+.parcela-lbl { font-size: 10px; color: var(--text-mid); margin-top: 2px; }
+.parcela-saldo { background: var(--red-light); }
+.parcela-saldo .parcela-val { color: var(--red); }
+
+/* ── PORTARIAS ── */
 .portarias-card {
-  background: var(--white); border-radius: var(--card-radius);
+  background: var(--white); border-radius: var(--card-r);
   box-shadow: var(--shadow); padding: 24px;
 }
-.portarias-ano-titulo {
-  font-size: 15px; font-weight: 700; color: var(--blue);
-  margin: 20px 0 12px; display: flex; align-items: center; gap: 8px;
-}
-.portarias-ano-titulo:first-child { margin-top: 0; }
-.portaria-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--gray-border); }
-.portaria-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-.portaria-data-txt { font-size: 12px; font-weight: 700; color: var(--text-mid); margin-bottom: 4px; }
-.portaria-link {
-  color: var(--blue); text-decoration: underline;
-  font-size: 13px; line-height: 1.6; display: block;
-}
-.portaria-link:hover { color: var(--blue-hover); }
+.port-ano { font-size: 14px; font-weight: 700; color: var(--blue); margin: 20px 0 12px; display: flex; align-items: center; gap: 8px; }
+.port-ano:first-child { margin-top: 0; }
+.port-item { margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1px solid var(--gray-border); }
+.port-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+.port-data { font-size: 11px; font-weight: 700; color: var(--text-mid); margin-bottom: 4px; }
+.port-link { color: var(--blue); font-size: 13px; line-height: 1.6; text-decoration: underline; display: block; }
+.port-link:hover { color: var(--blue-hover); }
 
-/* Download */
+/* Botões */
 .btn-download {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--blue); color: #fff; border: none;
@@ -365,43 +389,30 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 
 /* Loading */
 .loading-overlay {
-  position: fixed; inset: 0;
-  background: rgba(240,240,245,0.92);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
+  position: fixed; inset: 0; background: rgba(240,240,245,0.92);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
   z-index: 9999; gap: 16px;
 }
 .spinner {
-  width: 44px; height: 44px;
-  border: 4px solid var(--blue-light);
-  border-top-color: var(--blue);
-  border-radius: 50%;
+  width: 44px; height: 44px; border: 4px solid var(--blue-light);
+  border-top-color: var(--blue); border-radius: 50%;
   animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-footer {
-  text-align: center; padding: 20px;
-  font-size: 11px; color: var(--text-mid);
-  background: var(--white);
-  border-top: 1px solid var(--gray-border);
-  margin-top: 32px;
-}
+footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-mid); background: var(--white); border-top: 1px solid var(--gray-border); margin-top: 32px; }
 
 /* Responsivo */
 @media (max-width: 700px) {
-  .content { padding: 16px 12px; }
-  .busca-wrap { padding: 12px 16px; }
-  .busca-row { flex-direction: column; }
-  .busca-sep { display: none; }
-  .filtros-apoio { width: 100%; }
-  .filtros-apoio select { min-width: 100%; }
-  .capa-nav { display: none; }
-  .capa-logos { right: 16px; bottom: 16px; }
-  .header { padding: 10px 16px; }
+  .content { padding: 14px 12px; }
+  .busca-wrap { padding: 14px 16px; }
+  .header { padding: 0 16px; }
   .abas-bar { padding: 0 12px; }
-  .aba { padding: 12px 14px; font-size: 13px; }
-  .tl-label { max-width: 70px; font-size: 10px; }
+  .aba { padding: 11px 14px; font-size: 13px; }
+  .capa-nav { display: none; }
+  .resumo-grid { grid-template-columns: 1fr 1fr; }
+  .header-filtros { gap: 6px; }
+  .header-filtros select { font-size: 11px; padding: 6px 24px 6px 10px; }
 }
 </style>
 </head>
@@ -427,53 +438,54 @@ footer {
       <circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/>
     </svg>
   </button>
-  <div class="capa-logos">
-    <span>MINISTÉRIO DA SAÚDE</span>
-    <span style="font-weight:800;color:var(--blue);font-size:16px">SUS 35 ANOS</span>
-  </div>
+  <div class="capa-logos">MINISTÉRIO DA SAÚDE · SAPS · 2026</div>
 </div>
 
 <!-- ═══ PAINEL ═══ -->
 <div id="painel">
+
+  <!-- Header -->
   <div class="header">
-    <div class="header-titulo">
-      <h2>Painel</h2>
-      <h1>Credenciamentos da Atenção Primária à Saúde</h1>
+    <div class="header-inner">
+      <div class="header-titulo">
+        <h2>Painel</h2>
+        <h1>Credenciamentos da Atenção Primária à Saúde</h1>
+      </div>
+      <div class="header-right">
+        <span class="att-txt" id="attTxt">—</span>
+        <button class="btn-outline" onclick="voltarCapa()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          Voltar
+        </button>
+      </div>
     </div>
-    <div class="header-right">
-      <span class="att-txt" id="attTxt">—</span>
-      <button class="btn-outline" onclick="voltarCapa()">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
-        Voltar
-      </button>
+    <!-- Filtros apoiador -->
+    <div class="header-filtros">
+      <select id="fRegiao"   onchange="aplicarFiltros()"><option value="">Região</option></select>
+      <select id="fUF"       onchange="aplicarFiltros()"><option value="">UF</option></select>
+      <select id="fMacro"    onchange="aplicarFiltros()"><option value="">Macrorregião</option></select>
+      <select id="fPortaria" onchange="aplicarFiltros()"><option value="">Portaria</option></select>
+      <select id="fAno"      onchange="aplicarFiltros()"><option value="">Ano</option></select>
+      <button class="btn-limpar-sm" onclick="limparTudo()">✕ Limpar</button>
     </div>
   </div>
 
   <!-- Busca -->
   <div class="busca-wrap">
     <div class="busca-inner">
-      <div class="busca-row">
-        <div class="busca-rel">
-          <div class="busca-campo">
-            <input type="text" id="buscaInput" placeholder="Digite o município..." autocomplete="off"
-              oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
-            <button onclick="executarBusca()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-            </button>
-          </div>
-          <div class="sugestoes" id="sugestoes" style="display:none"></div>
+      <div class="busca-rel">
+        <div class="busca-campo">
+          <input type="text" id="buscaInput" placeholder="🔍  Digite o nome do município..."
+            autocomplete="off" oninput="onBuscaInput()" onkeydown="onBuscaKey(event)">
+          <button onclick="executarBusca()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
         </div>
-        <span class="busca-sep">ou filtre por</span>
-        <div class="filtros-apoio">
-          <select id="fRegiao" onchange="aplicarFiltrosApoio()"><option value="">Região</option></select>
-          <select id="fUF" onchange="aplicarFiltrosApoio()"><option value="">UF</option></select>
-          <select id="fMacro" onchange="aplicarFiltrosApoio()"><option value="">Macrorregião</option></select>
-          <select id="fPortaria" onchange="aplicarFiltrosApoio()"><option value="">Portaria</option></select>
-          <button class="btn-limpar-busca" onclick="limparTudo()">✕ Limpar</button>
-        </div>
+        <div class="sugestoes" id="sugestoes" style="display:none"></div>
       </div>
+      <div class="busca-hint">ou use os filtros acima para visualizar por região, UF ou macrorregião</div>
     </div>
   </div>
 
@@ -486,41 +498,114 @@ footer {
   </div>
 
   <div class="content">
-    <div id="conteudo-ativos"></div>
-    <div id="conteudo-encerrados"   style="display:none"></div>
-    <div id="conteudo-homologacoes" style="display:none"></div>
-    <div id="conteudo-portarias"    style="display:none"></div>
+    <div id="c-ativos"></div>
+    <div id="c-encerrados"   style="display:none"></div>
+    <div id="c-homologacoes" style="display:none"></div>
+    <div id="c-portarias"    style="display:none"></div>
   </div>
 
   <footer>Ministério da Saúde | SAPS &copy; 2026</footer>
 </div>
 
 <script>
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
 const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php';
-const API_KEY = 'painel_cred_2026_key';
-
-const MESES = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const MESES_CURTO = ['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
+// ═══════════════════════════════════════
+// REGRAS DE PRAZO
+// ═══════════════════════════════════════
+// Para "3 competências": portaria publicada no mês M
+// → 1ª comp: mês M | 2ª comp: M+1 | 3ª comp: M+2
+// → prazo máximo: último dia de M+2
+// → homologação de cada comp: mês da comp +2 (parcela)
+function calcComps(dataPortaria) {
+  const dp = new Date(dataPortaria);
+  const ano = dp.getFullYear();
+  const mes = dp.getMonth() + 1; // 1-12
+  return [0,1,2].map(i => {
+    const m = ((mes - 1 + i) % 12) + 1;
+    const a = ano + Math.floor((mes - 1 + i) / 12);
+    const homol = ((m) % 12) + 1;
+    const aHomol = a + (m === 12 ? 1 : 0);
+    const inicio = new Date(a, m - 1, 1);
+    const fim    = new Date(a, m, 0); // último dia do mês
+    return { mes: m, ano: a, homol, aHomol, inicio, fim, label: `${MESES_CURTO[m]}/${String(a).slice(2)}` };
+  });
+}
+
+function statusComp(comp, hoje) {
+  if (hoje > comp.fim)    return 'done';
+  if (hoje >= comp.inicio) return 'atual';
+  return 'futuro';
+}
+
+function isAtivo3Comp(dataPortaria) {
+  if (!dataPortaria || dataPortaria === '0000-00-00') return false;
+  const hoje = new Date();
+  const comps = calcComps(dataPortaria);
+  return hoje <= comps[2].fim; // ativo se ainda dentro da 3ª competência
+}
+
+function isAtivoOutros(row) {
+  return (row.selecao_credenciamento || '').toLowerCase() === 'ativo';
+}
+
+function isTipo3Comp(tipo) {
+  return (tipo || '').toLowerCase().includes('3') || (tipo || '').toLowerCase().includes('compet');
+}
+
+function isEstabelecimento(tipo) {
+  return (tipo || '').toLowerCase().includes('estabelec');
+}
+
+function diasRestantes(dataPortaria) {
+  const hoje = new Date();
+  const comps = calcComps(dataPortaria);
+  const diff = Math.ceil((comps[2].fim - hoje) / (1000*60*60*24));
+  return diff;
+}
+
+function farolClass(dias) {
+  if (dias < 0)  return 'farol-cinza';
+  if (dias <= 15) return 'farol-vermelho';
+  if (dias <= 30) return 'farol-amarelo';
+  return 'farol-verde';
+}
+function farolTxt(dias) {
+  if (dias < 0)  return 'Prazo encerrado';
+  if (dias === 0) return 'Último dia!';
+  return `${dias} dia${dias===1?'':'s'} restante${dias===1?'':'s'}`;
+}
+
+// ═══════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════
 let dados = [];
 let filtrados = [];
 let abaAtiva = 'ativos';
-let municipioSelecionado = '';
+let municipioSel = '';
 
-// ── Navegação ──
+// ═══════════════════════════════════════
+// NAVEGAÇÃO
+// ═══════════════════════════════════════
 function abrirPainel(aba) {
   document.getElementById('capa').style.display = 'none';
   document.getElementById('painel').style.display = 'block';
   abaAtiva = aba;
   if (!dados.length) carregarDados();
-  else { trocarAba(aba); renderizar(); }
+  else { atualizarAba(); renderizar(); }
 }
 function voltarCapa() {
   document.getElementById('painel').style.display = 'none';
   document.getElementById('capa').style.display = 'flex';
 }
 
-// ── Carregar dados ──
+// ═══════════════════════════════════════
+// DADOS
+// ═══════════════════════════════════════
 async function carregarDados() {
   document.getElementById('loadingOverlay').style.display = 'flex';
   try {
@@ -531,378 +616,422 @@ async function carregarDados() {
     if (!dados.length) throw new Error('Sem dados');
 
     const datas = dados.map(d => d.data_portaria).filter(d => d && d !== '0000-00-00').sort().reverse();
-    if (datas.length) document.getElementById('attTxt').textContent = 'Última atualização: ' + formatarData(datas[0]);
+    if (datas.length) document.getElementById('attTxt').textContent = 'Atualizado em ' + fmt(datas[0]);
 
     popularFiltros();
     filtrados = dados;
-    trocarAba(abaAtiva);
+    atualizarAba();
     renderizar();
   } catch(e) {
     console.error(e);
-    document.getElementById('conteudo-ativos').innerHTML = erroHTML(e.message);
+    document.getElementById('c-ativos').innerHTML = erroHTML(e.message);
   } finally {
     document.getElementById('loadingOverlay').style.display = 'none';
   }
 }
 
-// ── Filtros ──
+// ═══════════════════════════════════════
+// FILTROS
+// ═══════════════════════════════════════
 function popularFiltros() {
-  preencherSelect('fRegiao', [...new Set(dados.map(d=>d.regiao).filter(Boolean))].sort());
-  preencherSelect('fUF',     [...new Set(dados.map(d=>d.uf).filter(Boolean))].sort());
-  preencherSelect('fMacro',  [...new Set(dados.map(d=>d.macrorregiao).filter(Boolean))].sort());
-  preencherSelect('fPortaria',[...new Set(dados.map(d=>d.portaria).filter(Boolean))].sort((a,b)=>b-a));
+  fill('fRegiao',  [...new Set(dados.map(d=>d.regiao).filter(Boolean))].sort());
+  fill('fUF',      [...new Set(dados.map(d=>d.uf).filter(Boolean))].sort());
+  fill('fMacro',   [...new Set(dados.map(d=>d.macrorregiao).filter(Boolean))].sort());
+  fill('fPortaria',[...new Set(dados.map(d=>d.portaria).filter(Boolean))].sort((a,b)=>b-a));
+  fill('fAno',     [...new Set(dados.map(d=>d.ano).filter(Boolean))].sort((a,b)=>b-a));
 }
-function preencherSelect(id, vals) {
+function fill(id, vals) {
   const sel = document.getElementById(id);
-  const placeholder = sel.options[0].text;
-  sel.innerHTML = `<option value="">${placeholder}</option>`;
-  vals.forEach(v => { const o = document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
+  const ph = sel.options[0].text;
+  sel.innerHTML = `<option value="">${ph}</option>`;
+  vals.forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent=v; sel.appendChild(o); });
 }
-
-function aplicarFiltrosApoio() {
-  municipioSelecionado = '';
+function aplicarFiltros() {
+  municipioSel = '';
   document.getElementById('buscaInput').value = '';
   document.getElementById('sugestoes').style.display = 'none';
-  const r = document.getElementById('fRegiao').value;
-  const u = document.getElementById('fUF').value;
-  const m = document.getElementById('fMacro').value;
-  const p = document.getElementById('fPortaria').value;
+  const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
   filtrados = dados.filter(d =>
-    (!r || d.regiao === r) &&
-    (!u || d.uf === u) &&
-    (!m || d.macrorregiao === m) &&
-    (!p || String(d.portaria) === String(p))
+    (!r || d.regiao === r) && (!u || d.uf === u) &&
+    (!m || d.macrorregiao === m) && (!p || String(d.portaria) === String(p)) &&
+    (!a || String(d.ano) === String(a))
   );
   renderizar();
 }
-
 function limparTudo() {
-  municipioSelecionado = '';
+  municipioSel = '';
   document.getElementById('buscaInput').value = '';
   document.getElementById('sugestoes').style.display = 'none';
-  ['fRegiao','fUF','fMacro','fPortaria'].forEach(id => document.getElementById(id).value = '');
+  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value = '');
   filtrados = dados;
   renderizar();
 }
+function v(id) { return document.getElementById(id).value; }
 
-// ── Busca por município ──
+// ═══════════════════════════════════════
+// BUSCA
+// ═══════════════════════════════════════
 function onBuscaInput() {
   const q = document.getElementById('buscaInput').value.trim().toLowerCase();
   const el = document.getElementById('sugestoes');
-  if (q.length < 2) { el.style.display = 'none'; return; }
-
-  const muns = [...new Set(dados.map(d => d.municipio + (d.uf ? ` - ${d.uf}` : '')).filter(Boolean))]
-    .filter(m => m.toLowerCase().includes(q)).slice(0, 8);
-
-  if (!muns.length) { el.style.display = 'none'; return; }
-
-  el.innerHTML = muns.map(m => {
-    const idx = m.toLowerCase().indexOf(q);
-    const hl = m.slice(0,idx) + '<strong>' + m.slice(idx, idx+q.length) + '</strong>' + m.slice(idx+q.length);
-    return `<div class="sugestao-item" onclick="selecionarMunicipio('${m}')">${hl}</div>`;
+  if (q.length < 2) { el.style.display='none'; return; }
+  const muns = [...new Map(dados.map(d => [`${d.municipio}||${d.uf}`, {mun: d.municipio, uf: d.uf}]))
+    .values()].filter(x => x.mun && x.mun.toLowerCase().includes(q)).slice(0,8);
+  if (!muns.length) { el.style.display='none'; return; }
+  el.innerHTML = muns.map(x => {
+    const idx = x.mun.toLowerCase().indexOf(q);
+    const hl = x.mun.slice(0,idx)+'<strong>'+x.mun.slice(idx,idx+q.length)+'</strong>'+x.mun.slice(idx+q.length);
+    return `<div class="sug-item" onclick="selecionarMun('${x.mun}','${x.uf}')">${hl}<span class="sug-uf">${x.uf}</span></div>`;
   }).join('');
   el.style.display = 'block';
 }
-
 function onBuscaKey(e) {
-  if (e.key === 'Enter') executarBusca();
-  if (e.key === 'Escape') document.getElementById('sugestoes').style.display = 'none';
+  if (e.key==='Enter') executarBusca();
+  if (e.key==='Escape') document.getElementById('sugestoes').style.display='none';
 }
-
-function selecionarMunicipio(m) {
-  document.getElementById('buscaInput').value = m;
+function selecionarMun(mun, uf) {
+  document.getElementById('buscaInput').value = `${mun} - ${uf}`;
   document.getElementById('sugestoes').style.display = 'none';
-  ['fRegiao','fUF','fMacro','fPortaria'].forEach(id => document.getElementById(id).value = '');
-  const [nome, uf] = m.split(' - ');
-  municipioSelecionado = nome.trim();
-  filtrados = dados.filter(d => d.municipio === municipioSelecionado && (!uf || d.uf === uf.trim()));
+  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => document.getElementById(id).value='');
+  municipioSel = mun;
+  filtrados = dados.filter(d => d.municipio === mun && d.uf === uf);
   renderizar();
 }
-
 function executarBusca() {
   const q = document.getElementById('buscaInput').value.trim();
-  if (!q) { limparTudo(); return; }
   document.getElementById('sugestoes').style.display = 'none';
-  const [nome] = q.split(' - ');
-  municipioSelecionado = nome.trim();
-  filtrados = dados.filter(d => d.municipio.toLowerCase() === municipioSelecionado.toLowerCase());
+  if (!q) { limparTudo(); return; }
+  const [mun] = q.split(' - ');
+  municipioSel = mun.trim();
+  filtrados = dados.filter(d => d.municipio.toLowerCase() === municipioSel.toLowerCase());
   renderizar();
 }
-
 document.addEventListener('click', e => {
-  if (!e.target.closest('.busca-rel')) document.getElementById('sugestoes').style.display = 'none';
+  if (!e.target.closest('.busca-rel')) document.getElementById('sugestoes').style.display='none';
 });
 
-// ── Abas ──
+// ═══════════════════════════════════════
+// ABAS
+// ═══════════════════════════════════════
 function trocarAba(aba) {
   abaAtiva = aba;
-  ['ativos','encerrados','homologacoes','portarias'].forEach(a => {
-    document.getElementById(`aba-${a}`).classList.toggle('ativo', a === aba);
-    document.getElementById(`conteudo-${a}`).style.display = a === aba ? 'block' : 'none';
-  });
+  atualizarAba();
   renderizar();
 }
-
-// ── Render principal ──
-function renderizar() {
-  if (abaAtiva === 'ativos')        renderAtivos();
-  else if (abaAtiva === 'encerrados')   renderEncerrados();
-  else if (abaAtiva === 'homologacoes') renderHomologacoes();
-  else if (abaAtiva === 'portarias')    renderPortarias();
+function atualizarAba() {
+  ['ativos','encerrados','homologacoes','portarias'].forEach(a => {
+    document.getElementById(`aba-${a}`).classList.toggle('ativo', a===abaAtiva);
+    document.getElementById(`c-${a}`).style.display = a===abaAtiva ? 'block' : 'none';
+  });
 }
 
-// ── Aba Ativos ──
-function renderAtivos() {
-  const el = document.getElementById('conteudo-ativos');
-  const ativos = filtrados.filter(d => (d.selecao_credenciamento || '').toLowerCase() === 'finalizado' ||
-    (d.selecao_credenciamento || '').toLowerCase().includes('ativo') ||
-    (d.selecao_credenciamento || '').toLowerCase() === 'em andamento' ||
-    (d.selecao_credenciamento || '') !== 'Descredenciado');
+// ═══════════════════════════════════════
+// RENDER PRINCIPAL
+// ═══════════════════════════════════════
+function renderizar() {
+  if (abaAtiva==='ativos')       renderAtivos();
+  else if (abaAtiva==='encerrados')   renderEncerrados();
+  else if (abaAtiva==='homologacoes') renderHomologacoes();
+  else                                renderPortarias();
+}
 
-  // Separa mensagens (municípios sem credenciamento) de credenciamentos reais
-  const msgs = filtrados.filter(d => d.mensagem_painel && !d.credenciado);
-  const creds = filtrados.filter(d => Number(d.credenciado) > 0 &&
-    (d.selecao_credenciamento || '').toLowerCase() !== 'descredenciado');
+// ═══════════════════════════════════════
+// ABA ATIVOS
+// ═══════════════════════════════════════
+function renderAtivos() {
+  const el = document.getElementById('c-ativos');
+  const hoje = new Date();
+
+  // Filtra ativos
+  const ativos3 = filtrados.filter(d => isTipo3Comp(d.tipo) && isAtivo3Comp(d.data_portaria) && Number(d.credenciado)>0);
+  const ativosOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
+  const msgs = filtrados.filter(d => d.mensagem_painel && !Number(d.credenciado));
+
+  const totalAtivos = ativos3.length + ativosOut.length;
+
+  // Cards resumo
+  const port3Ativas = [...new Set(ativos3.map(d=>d.portaria))];
+  const totalCred3 = ativos3.reduce((s,d)=>s+Number(d.credenciado||0),0);
+  const totalCredOut = ativosOut.reduce((s,d)=>s+Number(d.credenciado||0),0);
+  const urgentes = ativos3.filter(d => {
+    const dias = diasRestantes(d.data_portaria);
+    return dias>=0 && dias<=15;
+  }).length;
+
+  let html = `<div class="resumo-grid">
+    <div class="resumo-card">
+      <div class="resumo-label">Portarias ativas</div>
+      <div class="resumo-valor">${port3Ativas.length}</div>
+      <div class="resumo-sub">${port3Ativas.join(', ') || '—'}</div>
+    </div>
+    <div class="resumo-card green">
+      <div class="resumo-label">Equipes credenciadas</div>
+      <div class="resumo-valor">${totalCred3.toLocaleString('pt-BR')}</div>
+      <div class="resumo-sub">Tipo 3 competências</div>
+    </div>
+    <div class="resumo-card">
+      <div class="resumo-label">Estabelecimentos / Específicos</div>
+      <div class="resumo-valor">${totalCredOut.toLocaleString('pt-BR')}</div>
+      <div class="resumo-sub">Credenciados</div>
+    </div>
+    ${urgentes>0 ? `<div class="resumo-card red">
+      <div class="resumo-label">⚠️ Prazo crítico</div>
+      <div class="resumo-valor">${urgentes}</div>
+      <div class="resumo-sub">registros com ≤15 dias</div>
+    </div>` : ''}
+  </div>`;
+
+  // Contexto
+  html += contextoBar(totalAtivos + msgs.length);
 
   if (!filtrados.length) {
-    el.innerHTML = vazioHTML('🔍', 'Pesquise um município', 'Digite o nome do município na busca acima ou use os filtros de região para visualizar os credenciamentos.');
+    el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município na busca acima ou use os filtros de região para visualizar os credenciamentos.');
     return;
   }
 
-  let html = cabecalhoContexto(creds.length + msgs.length);
-
-  // Mensagem para municípios sem credenciamento
+  // Mensagens (município sem credenciamento ativo)
   msgs.forEach(d => {
     if (!d.mensagem_painel) return;
     html += `<div class="card-msg">
       <div class="card-msg-icon">⚠️</div>
-      <div class="card-msg-text">
-        <h3>${d.municipio} - ${d.uf}</h3>
+      <div>
+        <h3>${d.municipio} — ${d.uf}</h3>
         <p>${d.mensagem_painel}</p>
       </div>
     </div>`;
   });
 
-  if (!creds.length && !msgs.length) {
-    el.innerHTML = vazioHTML('✅', 'Nenhum credenciamento ativo', 'Não há credenciamentos ativos para o filtro selecionado.');
+  if (!ativos3.length && !ativosOut.length && !msgs.length) {
+    el.innerHTML = html + vazioHTML('✅','Nenhum credenciamento ativo','Não há credenciamentos ativos para o filtro selecionado.');
     return;
   }
 
-  // Agrupa por município + portaria
-  const grupos = agruparPor(creds, d => `${d.municipio}||${d.uf}||${d.portaria}`);
-  html += '<div class="cards-grid">';
-  Object.values(grupos).forEach(grupo => {
-    html += cardCredenciamento(grupo, 'ativo');
-  });
-  html += '</div>';
-
-  if (creds.length) {
-    html += `<div style="margin-top:16px;text-align:right">
-      <button class="btn-download" onclick="downloadCSV('ativos')">⬇ Baixar CSV</button>
+  // ── 1. Equipes com 3 competências (agrupadas por município + portaria) ──
+  if (ativos3.length) {
+    html += `<div style="font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
+      Equipes e estratégias com prazo de implantação
     </div>`;
+    const grupos = agrupar(ativos3, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
+    Object.values(grupos).forEach(g => { html += card3Comp(g, hoje); });
   }
+
+  // ── 2. Estabelecimentos e Específicos ──
+  if (ativosOut.length) {
+    html += `<div style="font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px">
+      Estabelecimentos e serviços credenciados
+    </div>`;
+    const grupos = agrupar(ativosOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
+    Object.values(grupos).forEach(g => { html += cardOutros(g); });
+  }
+
+  html += `<div style="margin-top:16px;text-align:right">
+    <button class="btn-download" onclick="downloadCSV('ativos')">⬇ Baixar CSV</button>
+  </div>`;
 
   el.innerHTML = html;
 }
 
-// ── Aba Encerrados ──
+// ── Card 3 competências ──
+function card3Comp(grupo, hoje) {
+  const rep = grupo[0];
+  const dp = rep.data_portaria;
+  const comps = calcComps(dp);
+  const dias = diasRestantes(dp);
+  const fCls = farolClass(dias);
+  const fTxt = farolTxt(dias);
+  const totalCred = grupo.reduce((s,d)=>s+Number(d.credenciado||0),0);
+
+  // Timeline
+  const steps = [
+    { nome: 'Credenciado', sub: `Portaria ${rep.portaria}\n${fmt(dp)}`, status: 'done' },
+    ...comps.map((c,i) => ({
+      nome: `${i+1}ª Competência`,
+      sub: `CNES: ${c.label}\nHomol: Parcela ${String(c.homol).padStart(2,'0')}`,
+      status: statusComp(c, hoje),
+      comp: c
+    })),
+    { nome: 'Cofinanciamento', sub: `A partir parcela\n${String(comps[0].homol).padStart(2,'0')}`, status: statusComp(comps[0],hoje)==='done'?'done':'futuro' }
+  ];
+
+  let tl = '<div class="timeline">';
+  steps.forEach((s,i) => {
+    const dc = s.status==='done'?'done':s.status==='atual'?'atual':s.status==='futuro'?'futuro':'done';
+    const icon = s.status==='done' ? '✓' : i===0 ? '📋' : i===4 ? '💰' : i;
+    const labelExtra = s.status==='atual'
+      ? '<span class="tl-atual-label">Agora</span>'
+      : s.status==='vencido' ? '<span class="tl-vencido-label">Vencido</span>' : '';
+    const subLines = s.sub.split('\n').map(l=>`<div>${l}</div>`).join('');
+    tl += `<div class="tl-step">
+      <div class="tl-dot ${dc}">${s.status==='done'&&i>0?'✓':i===0?'✓':i===4?'💰':i}</div>
+      <div class="tl-info">
+        <div class="tl-nome">${s.nome}</div>
+        <div class="tl-sub">${subLines}</div>
+        ${labelExtra}
+      </div>
+    </div>`;
+    if (i < steps.length-1) tl += `<div class="tl-conector ${s.status==='done'?'done':''}"></div>`;
+  });
+  tl += '</div>';
+
+  // Estratégias do grupo
+  const estrRows = grupo.map(d => `
+    <div class="estrategia-row">
+      <span class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</span>
+      <div class="estrategia-meta">
+        <span class="estrategia-qtd-label">Credenciado:</span>
+        <span class="estrategia-qtd">${d.credenciado||0}</span>
+      </div>
+    </div>`).join('');
+
+  const local = [rep.regiao_saude, rep.macrorregiao].filter(Boolean).join(' · ');
+
+  return `<div class="card-3comp">
+    <div class="card-3comp-header">
+      <div class="card-3comp-info">
+        <div class="card-portaria-txt">Portaria ${rep.portaria} · ${fmt(dp)} · ${rep.ano||'—'}</div>
+        <div class="card-estrategia-nome">${rep.municipio||'—'} — ${rep.uf||''}</div>
+        ${local ? `<div class="card-local">${local}</div>` : ''}
+      </div>
+      <div class="card-badges">
+        <div class="farol ${fCls}"><div class="farol-dot"></div>${fTxt}</div>
+        <span class="badge badge-blue">${totalCred} credenciado(s)</span>
+      </div>
+    </div>
+    <div class="timeline-wrap">
+      <div class="timeline-titulo">Linha do tempo — prazo para cadastro no CNES e homologação</div>
+      ${tl}
+    </div>
+    <div class="card-outros-body">${estrRows}</div>
+  </div>`;
+}
+
+// ── Card Estabelecimentos / Específicos ──
+function cardOutros(grupo) {
+  const rep = grupo[0];
+  const ehEstab = isEstabelecimento(rep.tipo);
+  const tipoLabel = ehEstab ? 'Estabelecimentos e Serviços' : 'Estratégias Específicas';
+
+  const rows = grupo.map(d => {
+    const obsHTML = ehEstab && d.observacao && d.observacao !== '-'
+      ? `<div class="obs-box"><div class="obs-label">Observação</div>${d.observacao}</div>`
+      : '';
+    return `<div class="estrategia-row">
+        <span class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</span>
+        <div class="estrategia-meta">
+          <span class="estrategia-qtd-label">Credenciado:</span>
+          <span class="estrategia-qtd">${d.credenciado||0}</span>
+        </div>
+      </div>${obsHTML}`;
+  }).join('');
+
+  const local = [rep.regiao_saude, rep.macrorregiao].filter(Boolean).join(' · ');
+
+  return `<div class="card-outros">
+    <div class="card-outros-header">
+      <div>
+        <div class="card-portaria-txt">Portaria ${rep.portaria} · ${fmt(rep.data_portaria)} · ${rep.ano||'—'}</div>
+        <div style="font-size:15px;font-weight:700;margin-top:2px">${rep.municipio||'—'} — ${rep.uf||''}</div>
+        ${local?`<div style="font-size:12px;color:var(--text-mid)">${local}</div>`:''}
+      </div>
+      <span class="badge badge-green">${tipoLabel}</span>
+    </div>
+    <div class="card-outros-body">${rows}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// ABA ENCERRADOS
+// ═══════════════════════════════════════
 function renderEncerrados() {
-  const el = document.getElementById('conteudo-encerrados');
-  const enc = filtrados.filter(d => (d.selecao_credenciamento || '').toLowerCase() === 'descredenciado');
+  const el = document.getElementById('c-encerrados');
+  if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
-  if (!filtrados.length) {
-    el.innerHTML = vazioHTML('🔍', 'Pesquise um município', 'Digite o nome do município na busca acima ou use os filtros de região.');
+  const enc3 = filtrados.filter(d => isTipo3Comp(d.tipo) && !isAtivo3Comp(d.data_portaria) && Number(d.credenciado)>0);
+  const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && (d.selecao_credenciamento||'').toLowerCase()==='finalizado' && Number(d.credenciado)>0);
+
+  if (!enc3.length && !encOut.length) {
+    el.innerHTML = vazioHTML('📋','Nenhum credenciamento encerrado','Não há credenciamentos encerrados para o filtro selecionado.');
     return;
   }
-  if (!enc.length) {
-    el.innerHTML = vazioHTML('📋', 'Nenhum credenciamento encerrado', 'Não há credenciamentos encerrados para o filtro selecionado.');
-    return;
+
+  let html = contextoBar(enc3.length + encOut.length);
+  const hoje = new Date();
+
+  if (enc3.length) {
+    const grupos = agrupar(enc3, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
+    Object.values(grupos).forEach(g => { html += card3Comp(g, hoje); });
+  }
+  if (encOut.length) {
+    const grupos = agrupar(encOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
+    Object.values(grupos).forEach(g => { html += cardOutros(g); });
   }
 
-  const grupos = agruparPor(enc, d => `${d.municipio}||${d.uf}||${d.portaria}`);
-  let html = cabecalhoContexto(enc.length);
-  html += '<div class="cards-grid">';
-  Object.values(grupos).forEach(grupo => { html += cardCredenciamento(grupo, 'encerrado'); });
-  html += '</div>';
   html += `<div style="margin-top:16px;text-align:right"><button class="btn-download" onclick="downloadCSV('encerrados')">⬇ Baixar CSV</button></div>`;
   el.innerHTML = html;
 }
 
-// ── Card de credenciamento ──
-function cardCredenciamento(grupo, modo) {
-  const rep = grupo[0];
-  const totalCred = grupo.reduce((s,d) => s + (Number(d.credenciado)||0), 0);
-  const dp = rep.data_portaria && rep.data_portaria !== '0000-00-00' ? new Date(rep.data_portaria) : null;
-  const dataFmt = dp ? dp.toLocaleDateString('pt-BR') : '—';
-  const statusBadge = modo === 'encerrado'
-    ? '<span class="badge badge-gray">Encerrado</span>'
-    : '<span class="badge badge-green">Ativo</span>';
-
-  // Verifica se é "3 competências" ou específico
-  const tipo = (rep.tipo || '').toLowerCase();
-  const eh3comp = tipo.includes('3') || tipo.includes('competência') || tipo === 'equipe';
-
-  let timelineHTML = '';
-  if (eh3comp && dp && modo === 'ativo') {
-    timelineHTML = renderTimeline(dp);
-  }
-
-  // Observação
-  const obsHTML = rep.observacao
-    ? `<div class="card-obs"><div class="card-obs-label">Observação</div>${rep.observacao}</div>` : '';
-
-  // Estratégias do grupo
-  const estrategiasHTML = grupo.map(d => `
-    <div class="card-especifico">
-      <span class="card-especifico-nome">${d.nome_completo || d.estrategia || '—'}</span>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;color:var(--text-mid)">Credenciado:</span>
-        <span class="card-especifico-qtd">${d.credenciado || 0}</span>
-        ${d.observacao ? `<span class="badge badge-blue" title="${d.observacao}">ℹ obs</span>` : ''}
-      </div>
-    </div>`).join('');
-
-  return `<div class="card-cred">
-    <div class="card-header">
-      <div class="card-header-left">
-        <div class="card-portaria">Portaria ${rep.portaria || '—'} · ${dataFmt} · ${rep.ano || '—'}</div>
-        <div class="card-estrategia">${rep.municipio || '—'} — ${rep.uf || ''}</div>
-        <div class="card-municipio">${rep.regiao_saude || ''} · ${rep.macrorregiao || ''}</div>
-      </div>
-      <div class="card-meta">
-        ${statusBadge}
-        <span class="badge badge-blue">${totalCred} credenciado(s)</span>
-      </div>
-    </div>
-    <div class="card-body">
-      ${timelineHTML}
-      ${estrategiasHTML}
-      ${obsHTML}
-    </div>
-  </div>`;
-}
-
-// ── Linha do tempo ──
-function renderTimeline(dp) {
-  const hoje = new Date();
-  const mes = dp.getMonth() + 1;
-  const ano = dp.getFullYear();
-
-  // 3 competências CNES: mesmo mês da portaria, +1, +2
-  const comps = [0,1,2].map(i => {
-    const m = ((mes - 1 + i) % 12) + 1;
-    const a = ano + Math.floor((mes - 1 + i) / 12);
-    const homol = ((m) % 12) + 1;
-    const aHomol = a + (m === 12 ? 1 : 0);
-    return { mes: m, ano: a, homol, aHomol };
-  });
-
-  // Status de cada etapa
-  function statusComp(comp) {
-    const dataComp = new Date(comp.ano, comp.mes - 1, 1);
-    const fimComp = new Date(comp.ano, comp.mes, 0); // último dia do mês
-    if (hoje > fimComp) return 'done';
-    if (hoje >= dataComp) return 'atual';
-    return 'futuro';
-  }
-
-  const steps = [
-    { label: 'Credenciado', sub: dp.toLocaleDateString('pt-BR'), status: 'done', icon: '✓' },
-    ...comps.map((c,i) => ({
-      label: `${i+1}ª Competência`,
-      sub: `CNES: ${MESES_CURTO[c.mes]}/${String(c.ano).slice(2)}\nHomol: Parcela ${String(c.homol).padStart(2,'0')}`,
-      status: statusComp(c),
-      icon: i+1
-    })),
-    { label: 'Cofinanciamento', sub: `A partir parcela ${String(comps[0].homol).padStart(2,'0')}`, status: statusComp(comps[0]) === 'done' ? 'done' : 'futuro', icon: '💰' }
-  ];
-
-  let html = '<div class="timeline">';
-  steps.forEach((s, i) => {
-    const dotClass = s.status === 'done' ? 'done' : s.status === 'atual' ? 'atual' : 'futuro';
-    const subLines = s.sub.split('\n').map(l => `<span class="sub">${l}</span>`).join('');
-    html += `<div class="tl-step">
-      <div class="tl-dot ${dotClass}">${s.status === 'done' && typeof s.icon !== 'number' ? s.icon : s.icon}</div>
-      <div class="tl-label"><strong>${s.label}</strong>${subLines}</div>
-    </div>`;
-    if (i < steps.length - 1) {
-      html += `<div class="tl-connector ${s.status === 'done' ? 'done' : ''}"></div>`;
-    }
-  });
-  html += '</div>';
-  return html;
-}
-
-// ── Homologações ──
+// ═══════════════════════════════════════
+// ABA HOMOLOGAÇÕES
+// ═══════════════════════════════════════
 function renderHomologacoes() {
-  const el = document.getElementById('conteudo-homologacoes');
+  const el = document.getElementById('c-homologacoes');
+  if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
-  if (!filtrados.length) {
-    el.innerHTML = vazioHTML('🔍', 'Pesquise um município', 'Digite o nome do município na busca acima ou use os filtros de região.');
-    return;
-  }
+  const comCred = filtrados.filter(d => Number(d.credenciado)>0);
+  if (!comCred.length) { el.innerHTML = vazioHTML('📊','Sem dados','Nenhum dado de homologação para o filtro selecionado.'); return; }
 
-  const comCred = filtrados.filter(d => Number(d.credenciado) > 0);
-  if (!comCred.length) {
-    el.innerHTML = vazioHTML('📊', 'Sem dados de homologação', 'Não há dados de homologação para o filtro selecionado.');
-    return;
-  }
-
-  // Agrupa por município + portaria + estratégia
-  const grupos = agruparPor(comCred, d => `${d.municipio}||${d.uf}||${d.portaria}||${d.nome_completo}`);
-
-  let html = cabecalhoContexto(Object.keys(grupos).length);
+  const grupos = agrupar(comCred, d=>`${d.municipio}||${d.uf}||${d.portaria}||${d.nome_completo}`);
+  let html = contextoBar(Object.keys(grupos).length);
   html += `<div style="margin-bottom:16px;text-align:right"><button class="btn-download" onclick="downloadCSV('homologacoes')">⬇ Baixar CSV</button></div>`;
 
   Object.values(grupos).forEach(grupo => {
     const rep = grupo[0];
-    const cred = grupo.reduce((s,d) => s+(Number(d.credenciado)||0), 0);
-    const h1   = grupo.reduce((s,d) => s+(Number(d.homologacao_1)||0), 0);
-    const h2   = grupo.reduce((s,d) => s+(Number(d.homologacao_2)||0), 0);
-    const h3   = grupo.reduce((s,d) => s+(Number(d.homologacao_3)||0), 0);
-    const total = h1 + h2 + h3;
-    const pct = cred > 0 ? Math.round((total/cred)*100) : 0;
-    const cor = pct >= 80 ? 'var(--green)' : pct >= 40 ? 'var(--yellow)' : 'var(--red)';
+    const cred = grupo.reduce((s,d)=>s+Number(d.credenciado||0),0);
+    const h1   = grupo.reduce((s,d)=>s+Number(d.homologacao_1||0),0);
+    const h2   = grupo.reduce((s,d)=>s+Number(d.homologacao_2||0),0);
+    const h3   = grupo.reduce((s,d)=>s+Number(d.homologacao_3||0),0);
+    const total = h1+h2+h3;
+    const saldo = cred-total;
+    const pct = cred>0 ? Math.round((total/cred)*100) : 0;
+    const cor = pct>=80 ? 'var(--green)' : pct>=40 ? 'var(--yellow)' : 'var(--red)';
     const sit = rep.selecao_homologacao || '—';
 
     html += `<div class="homol-card">
       <div class="homol-header">
         <div>
-          <div class="homol-titulo">${rep.municipio} — ${rep.uf} · ${rep.nome_completo || '—'}</div>
-          <div style="font-size:11px;color:var(--text-mid)">Portaria ${rep.portaria} · ${formatarData(rep.data_portaria)}</div>
+          <div class="homol-titulo">${rep.municipio} — ${rep.uf} · ${rep.nome_completo||'—'}</div>
+          <div class="homol-sub">Portaria ${rep.portaria} · ${fmt(rep.data_portaria)}</div>
         </div>
-        <span class="badge ${sit.toLowerCase().includes('homologado') ? 'badge-green' : 'badge-yellow'}">${sit}</span>
+        <span class="badge ${sit.toLowerCase().includes('homologado')&&!sit.toLowerCase().includes('não')?'badge-green':'badge badge-gray'}">${sit}</span>
       </div>
       <div class="homol-body">
-        <div class="homol-barra-wrap">
-          <div class="homol-barra-label">
+        <div class="barra-wrap">
+          <div class="barra-labels">
             <span><strong>${total}</strong> de <strong>${cred}</strong> homologados</span>
-            <span style="font-weight:700;color:${cor}">${pct}%</span>
+            <span style="font-weight:800;color:${cor}">${pct}%</span>
           </div>
-          <div class="homol-barra-bg">
-            <div class="homol-barra-fill" style="width:${pct}%;background:${cor}"></div>
-          </div>
+          <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
         </div>
-        <div class="homol-parcelas">
-          <div class="parcela-chip ${h1>0?'tem':''}">
-            <div class="p-num">1ª Homologação</div>
-            <div class="p-val">${h1}</div>
-            <div class="p-label">equipes</div>
+        <div class="parcelas-grid">
+          <div class="parcela ${h1>0?'tem':''}">
+            <div class="parcela-num">1ª Homologação</div>
+            <div class="parcela-val">${h1}</div>
+            <div class="parcela-lbl">equipes</div>
           </div>
-          <div class="parcela-chip ${h2>0?'tem':''}">
-            <div class="p-num">2ª Homologação</div>
-            <div class="p-val">${h2}</div>
-            <div class="p-label">equipes</div>
+          <div class="parcela ${h2>0?'tem':''}">
+            <div class="parcela-num">2ª Homologação</div>
+            <div class="parcela-val">${h2}</div>
+            <div class="parcela-lbl">equipes</div>
           </div>
-          <div class="parcela-chip ${h3>0?'tem':''}">
-            <div class="p-num">3ª Homologação</div>
-            <div class="p-val">${h3}</div>
-            <div class="p-label">equipes</div>
+          <div class="parcela ${h3>0?'tem':''}">
+            <div class="parcela-num">3ª Homologação</div>
+            <div class="parcela-val">${h3}</div>
+            <div class="parcela-lbl">equipes</div>
           </div>
-          <div class="parcela-chip" style="background:var(--blue-light)">
-            <div class="p-num">Saldo</div>
-            <div class="p-val" style="color:var(--red)">${cred-total}</div>
-            <div class="p-label">pendentes</div>
+          <div class="parcela parcela-saldo">
+            <div class="parcela-num">Saldo pendente</div>
+            <div class="parcela-val">${saldo}</div>
+            <div class="parcela-lbl">equipes</div>
           </div>
         </div>
       </div>
@@ -912,107 +1041,89 @@ function renderHomologacoes() {
   el.innerHTML = html;
 }
 
-// ── Portarias ──
+// ═══════════════════════════════════════
+// ABA PORTARIAS
+// ═══════════════════════════════════════
 function renderPortarias() {
-  document.getElementById('conteudo-portarias').innerHTML = `
-  <div class="portarias-card">
-    <div class="portarias-ano-titulo">📋 Portarias 2026</div>
-
-    <div class="portaria-item">
-      <div class="portaria-data-txt">30 de Abril de 2026</div>
-      <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.979" target="_blank" rel="noopener">
+  document.getElementById('c-portarias').innerHTML = `<div class="portarias-card">
+    <div class="port-ano">📋 Portarias 2026</div>
+    <div class="port-item">
+      <div class="port-data">30 de Abril de 2026</div>
+      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.979" target="_blank" rel="noopener">
         Portaria GM/MS nº 10.979 – Credencia municípios a fazerem jus à transferência dos incentivos financeiros federais de custeio, referentes aos serviços do Programa Academia da Saúde – PAS, no âmbito da Atenção Primária à Saúde – APS.
       </a>
     </div>
-
-    <div class="portaria-item">
-      <div class="portaria-data-txt">13 de Março de 2026</div>
-      <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.345" target="_blank" rel="noopener">
+    <div class="port-item">
+      <div class="port-data">13 de Março de 2026</div>
+      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-10.345" target="_blank" rel="noopener">
         Portaria GM/MS nº 10.345 – Credencia e habilita municípios a fazerem jus à transferência dos incentivos financeiros federais de custeio, referentes às equipes, serviços, programas e profissionais no âmbito da Atenção Primária à Saúde – APS.
       </a>
     </div>
-
-    <div class="portarias-ano-titulo">📋 Portarias 2025</div>
-
-    <div class="portaria-item">
-      <div class="portaria-data-txt">30 de Dezembro de 2025</div>
-      <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.991" target="_blank" rel="noopener">
+    <div class="port-ano">📋 Portarias 2025</div>
+    <div class="port-item">
+      <div class="port-data">30 de Dezembro de 2025</div>
+      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.991" target="_blank" rel="noopener">
         Portaria GM/MS nº 9.991 – Credencia municípios a fazerem jus à transferência do incentivo financeiro federal de custeio, referentes às equipes específicas, no âmbito da Atenção Primária à Saúde – APS.
       </a>
     </div>
-
-    <div class="portaria-item">
-      <div class="portaria-data-txt">03 de Novembro de 2025</div>
-      <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.082" target="_blank" rel="noopener">
+    <div class="port-item">
+      <div class="port-data">03 de Novembro de 2025</div>
+      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-9.082" target="_blank" rel="noopener">
         Portaria GM/MS nº 9.082 – Credencia e habilita municípios a fazerem jus à transferência do incentivo financeiro federal de custeio, referentes às equipes e serviços no âmbito da Atenção Primária à Saúde – APS.
       </a>
     </div>
-
-    <div class="portaria-item">
-      <div class="portaria-data-txt">17 de Novembro de 2025</div>
-      <a class="portaria-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-8.808" target="_blank" rel="noopener">
-        Portaria GM/MS nº 8.808 – Autoriza a migração de equipes e profissionais da Atenção Primária à Saúde – APS do Município de Sorriso para Boa Esperança do Norte.
+    <div class="port-item">
+      <div class="port-data">17 de Novembro de 2025</div>
+      <a class="port-link" href="https://www.in.gov.br/web/dou/-/portaria-gm/ms-n-8.808" target="_blank" rel="noopener">
+        Portaria GM/MS nº 8.808 – Autoriza a migração de equipes e profissionais da Atenção Primária à Saúde – APS do Município de Sorriso para Boa Esperança do Norte, MT.
       </a>
     </div>
   </div>`;
 }
 
-// ── Helpers ──
-function agruparPor(arr, fn) {
-  return arr.reduce((acc, d) => {
-    const k = fn(d);
-    if (!acc[k]) acc[k] = [];
-    acc[k].push(d);
-    return acc;
-  }, {});
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function agrupar(arr, fn) {
+  return arr.reduce((acc,d) => { const k=fn(d); if(!acc[k])acc[k]=[]; acc[k].push(d); return acc; }, {});
 }
-
-function cabecalhoContexto(total) {
-  const ctx = municipioSelecionado
-    ? `<h2>${municipioSelecionado} <span class="total-badge">${total} registro(s)</span></h2>`
-    : `<h2>Todos os municípios <span class="total-badge">${total} registro(s)</span></h2>`;
-  return `<div class="busca-contexto">${ctx}<button class="btn-limpar-busca" onclick="limparTudo()">✕ Limpar filtros</button></div>`;
+function contextoBar(total) {
+  const titulo = municipioSel
+    ? `${municipioSel} <span class="total-badge">${total} registro(s)</span>`
+    : `Todos os municípios <span class="total-badge">${total} registro(s)</span>`;
+  return `<div class="contexto-bar"><h2>${titulo}</h2><button class="btn-limpar-sm" onclick="limparTudo()">✕ Limpar filtros</button></div>`;
 }
-
-function vazioHTML(icone, titulo, msg) {
-  return `<div class="estado-vazio"><div class="icone">${icone}</div><h3>${titulo}</h3><p>${msg}</p></div>`;
+function vazioHTML(ico, titulo, msg) {
+  return `<div class="vazio"><div class="ico">${ico}</div><h3>${titulo}</h3><p>${msg}</p></div>`;
 }
 function erroHTML(msg) {
-  return `<div class="estado-vazio"><div class="icone">❌</div><h3>Erro ao carregar dados</h3><p>${msg}</p></div>`;
+  return `<div class="vazio"><div class="ico">❌</div><h3>Erro ao carregar</h3><p>${msg}</p></div>`;
+}
+function fmt(d) {
+  if (!d || d==='0000-00-00') return '—';
+  try { const [y,m,day]=d.split('-'); return `${day}/${m}/${y}`; } catch { return d; }
 }
 
-function formatarData(d) {
-  if (!d || d === '0000-00-00') return '—';
-  try {
-    const [y,m,day] = d.split('-');
-    return `${day}/${m}/${y}`;
-  } catch { return d; }
-}
-
-// ── Download CSV ──
+// ═══════════════════════════════════════
+// DOWNLOAD CSV
+// ═══════════════════════════════════════
 function downloadCSV(tipo) {
-  let rows, headers, filename;
-  const base = tipo === 'encerrados'
-    ? filtrados.filter(d => (d.selecao_credenciamento||'').toLowerCase() === 'descredenciado')
-    : tipo === 'homologacoes'
-    ? filtrados.filter(d => Number(d.credenciado) > 0)
-    : filtrados.filter(d => Number(d.credenciado) > 0 && (d.selecao_credenciamento||'').toLowerCase() !== 'descredenciado');
+  const base = tipo==='encerrados'
+    ? filtrados.filter(d => (isTipo3Comp(d.tipo)&&!isAtivo3Comp(d.data_portaria))||(d.selecao_credenciamento||'').toLowerCase()==='finalizado')
+    : tipo==='homologacoes'
+    ? filtrados.filter(d => Number(d.credenciado)>0)
+    : filtrados.filter(d => (isTipo3Comp(d.tipo)&&isAtivo3Comp(d.data_portaria))||isAtivoOutros(d));
 
-  headers = ['Município','UF','Região','Macrorregião','Portaria','Data','Estratégia','Credenciado','Homol1','Homol2','Homol3','Status','Observação'];
-  rows = base.map(d => [
-    d.municipio, d.uf, d.regiao, d.macrorregiao,
-    d.portaria, formatarData(d.data_portaria), d.nome_completo,
-    d.credenciado, d.homologacao_1, d.homologacao_2, d.homologacao_3,
-    d.selecao_credenciamento, d.observacao
+  const headers = ['Município','UF','Região','Macrorregião','Portaria','Data','Estratégia','Tipo','Credenciado','Homol1','Homol2','Homol3','Status Cred','Status Homol','Observação'];
+  const rows = base.map(d => [
+    d.municipio,d.uf,d.regiao,d.macrorregiao,d.portaria,fmt(d.data_portaria),
+    d.nome_completo,d.tipo,d.credenciado,d.homologacao_1,d.homologacao_2,d.homologacao_3,
+    d.selecao_credenciamento,d.selecao_homologacao,d.observacao
   ]);
-  filename = `credenciamentos_${tipo}.csv`;
-
-  const csv = [headers, ...rows].map(r =>
-    r.map(v => `"${String(v??'').replace(/"/g,'""')}"`).join(',')
-  ).join('\n');
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'}));
-  a.download = filename; a.click();
+  a.href = URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download = `credenciamentos_${tipo}.csv`; a.click();
 }
 </script>
 </body>
