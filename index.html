@@ -694,10 +694,10 @@ function renderComPaginacao(el, grupos, chave, renderFn) {
   if (!paginaAtual[chave]) paginaAtual[chave] = 1;
   const pagina = paginaAtual[chave];
   const total = grupos.length;
-  const inicio = (pagina - 1) * POR_PAGINA;
   const fatia = grupos.slice(0, pagina * POR_PAGINA);
 
-  let html = contextoBar(total);
+  // Preserva html já colocado no el (resumo), adiciona contexto + cards
+  let html = el.innerHTML + contextoBar(total);
   fatia.forEach(g => { html += renderFn(g); });
 
   if (total > pagina * POR_PAGINA) {
@@ -1169,10 +1169,8 @@ function renderEncerrados() {
     </div>
   </div>`;
 
-  html += contextoBar(enc3.length + encOut.length);
-
   if (!enc3.length && !encOut.length) {
-    el.innerHTML = html + vazioHTML('📋','Nenhum credenciamento encerrado','Não há credenciamentos encerrados para o filtro selecionado.');
+    el.innerHTML = html + contextoBar(0) + vazioHTML('📋','Nenhum credenciamento encerrado','Não há credenciamentos encerrados para o filtro selecionado.');
     return;
   }
 
