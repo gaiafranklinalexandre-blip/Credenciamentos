@@ -346,6 +346,25 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 }
 .obs-label { font-size: 10px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 2px; }
 
+/* Seção de portaria (vista município) */
+.portaria-secao {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden;
+}
+.portaria-secao-header {
+  padding: 14px 20px; background: var(--blue);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px;
+}
+.portaria-secao-num { font-size: 15px; font-weight: 800; color: #fff; }
+.portaria-secao-data { font-size: 11px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+
+/* Título de seção (vista geral) */
+.secao-titulo {
+  font-size: 13px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 12px;
+}
+
 /* Mensagem município sem credenciamento */
 .card-msg {
   background: var(--white); border-radius: var(--card-r);
@@ -910,22 +929,52 @@ function renderAtivos() {
     return;
   }
 
-  // ── 1. Equipes com 3 competências (agrupadas por município + portaria) ──
-  if (ativos3.length) {
-    html += `<div style="font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">
-      Equipes e estratégias com prazo de implantação
-    </div>`;
-    const grupos = agrupar(ativos3, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
-    Object.values(grupos).forEach(g => { html += card3Comp(g, hoje); });
-  }
+  const munSel = !!municipioSel;
 
-  // ── 2. Estabelecimentos e Específicos ──
-  if (ativosOut.length) {
-    html += `<div style="font-size:13px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px">
-      Estabelecimentos e serviços credenciados
-    </div>`;
-    const grupos = agrupar(ativosOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
-    Object.values(grupos).forEach(g => { html += cardOutros(g); });
+  if (munSel) {
+    // ── Vista município: agrupa tudo por portaria, sem repetir município no card ──
+    const todasPortarias = [...new Set([...ativos3, ...ativosOut].map(d => d.portaria))].sort((a,b)=>b-a);
+    todasPortarias.forEach(port => {
+      const p3  = ativos3.filter(d => d.portaria === port);
+      const pOut = ativosOut.filter(d => d.portaria === port);
+      const rep  = (p3[0] || pOut[0]);
+      const dp   = resolveData(rep.data_portaria, port);
+      const dias = p3.length ? diasRestantes(dp, port) : null;
+      const fCls = farolClass(dias);
+      const fTxt = farolTxt(dias);
+
+      html += `<div class="portaria-secao">
+        <div class="portaria-secao-header">
+          <div>
+            <div class="portaria-secao-num">Portaria ${port}</div>
+            <div class="portaria-secao-data">${fmt(dp)} · ${rep.ano||'—'} · ${rep.macrorregiao||''}</div>
+          </div>
+          ${p3.length ? `<div class="farol ${fCls}"><div class="farol-dot"></div>${fTxt}</div>` : ''}
+        </div>`;
+
+      if (p3.length) {
+        const grupos3 = agrupar(p3, d => d.nome_completo || d.estrategia || '');
+        Object.values(grupos3).forEach(g => { html += estrategiaRow(g, false); });
+        html += timelineHTML(p3[0], hoje);
+      }
+      if (pOut.length) {
+        pOut.forEach(d => { html += estrategiaRow([d], false); });
+      }
+      html += `</div>`;
+    });
+
+  } else {
+    // ── Vista geral: agrupa por município + portaria ──
+    if (ativos3.length) {
+      html += `<div class="secao-titulo">Equipes e estratégias com prazo de implantação</div>`;
+      const grupos = agrupar(ativos3, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
+      Object.values(grupos).forEach(g => { html += card3Comp(g, hoje); });
+    }
+    if (ativosOut.length) {
+      html += `<div class="secao-titulo" style="margin-top:20px">Estabelecimentos e serviços credenciados</div>`;
+      const grupos = agrupar(ativosOut, d=>`${d.municipio}||${d.uf}||${d.portaria}`);
+      Object.values(grupos).forEach(g => { html += cardOutros(g); });
+    }
   }
 
   html += `<div style="margin-top:16px;text-align:right">
@@ -935,21 +984,13 @@ function renderAtivos() {
   el.innerHTML = html;
 }
 
-// ── Card 3 competências ──
-function card3Comp(grupo, hoje) {
-  const rep = grupo[0];
-  const dp = resolveData(rep.data_portaria, rep.portaria);
-  const comps = calcComps(dp, rep.portaria);
-  const dias = diasRestantes(dp, rep.portaria);
-  const fCls = farolClass(dias);
-  const fTxt = farolTxt(dias);
-
-  // Estratégias em destaque no topo
-  const estrDestaque = grupo.map(d => `
+// ── Linha de estratégia (compartilhada entre card3Comp e vista município) ──
+function estrategiaRow(grupo, mostrarPortaria = true) {
+  return grupo.map(d => `
     <div class="estrategia-row">
       <div>
         <div class="estrategia-nome">${d.nome_completo||d.estrategia||'—'}</div>
-        <div style="font-size:11px;color:var(--text-mid)">Portaria ${d.portaria} · ${fmt(d.data_portaria)}</div>
+        ${mostrarPortaria ? `<div style="font-size:11px;color:var(--text-mid)">Portaria ${d.portaria} · ${fmt(d.data_portaria)}</div>` : ''}
       </div>
       <div class="estrategia-meta">
         <div style="text-align:right">
@@ -958,51 +999,58 @@ function card3Comp(grupo, hoje) {
         </div>
       </div>
     </div>`).join('');
+}
 
-  // Timeline — só se tiver comps válidas
-  let tlHTML = '';
-  if (comps) {
-    const steps = [
-      { nome: 'Credenciado', sub: `Portaria ${rep.portaria}`, sub2: fmt(dp), status: 'done', icon: '✓' },
-      ...comps.map((c,i) => ({
-        nome: `${i+1}ª Competência`,
-        sub:  `CNES: ${c.label}`,
-        sub2: `Homol: parcela ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}`,
-        status: statusComp(c, hoje),
-        icon: String(i+1)
-      })),
-      {
-        nome: 'Cofinanciamento',
-        sub:  `A partir da parcela`,
-        sub2: `${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}`,
-        status: comps[0] && statusComp(comps[0],hoje)==='done' ? 'done' : 'futuro',
-        icon: '💰'
-      }
-    ];
-
-    let tl = '<div class="timeline">';
-    steps.forEach((s,i) => {
-      const dc = s.status==='done'?'done':s.status==='atual'?'atual':'futuro';
-      const labelExtra = s.status==='atual' ? '<span class="tl-atual-label">▶ Agora</span>' : '';
-      tl += `<div class="tl-step">
-        <div class="tl-dot ${dc}">${s.icon}</div>
-        <div class="tl-info">
-          <div class="tl-nome">${s.nome}</div>
-          <div class="tl-sub"><div>${s.sub}</div><div>${s.sub2}</div></div>
-          ${labelExtra}
-        </div>
-      </div>`;
-      if (i < steps.length-1) {
-        tl += `<div class="tl-conector ${s.status==='done'?'done':''}"></div>`;
-      }
-    });
-    tl += '</div>';
-
-    tlHTML = `<div class="timeline-wrap">
-      <div class="timeline-titulo">Linha do tempo — prazo para cadastro no CNES e homologação</div>
-      ${tl}
+// ── Timeline (compartilhada) ──
+function timelineHTML(rep, hoje) {
+  const dp = resolveData(rep.data_portaria, rep.portaria);
+  const comps = calcComps(dp, rep.portaria);
+  if (!comps) return '';
+  const steps = [
+    { nome: 'Credenciado', sub: `Portaria ${rep.portaria}`, sub2: fmt(dp), status: 'done', icon: '✓' },
+    ...comps.map((c,i) => ({
+      nome: `${i+1}ª Competência`,
+      sub:  `CNES: ${c.label}`,
+      sub2: `Homol: parcela ${String(c.homol).padStart(2,'0')}/${String(c.aHomol).slice(2)}`,
+      status: statusComp(c, hoje),
+      icon: String(i+1)
+    })),
+    {
+      nome: 'Cofinanciamento',
+      sub:  `A partir da parcela`,
+      sub2: `${String(comps[0].homol).padStart(2,'0')}/${String(comps[0].aHomol).slice(2)}`,
+      status: comps[0] && statusComp(comps[0],hoje)==='done' ? 'done' : 'futuro',
+      icon: '💰'
+    }
+  ];
+  let tl = '<div class="timeline">';
+  steps.forEach((s,i) => {
+    const dc = s.status==='done'?'done':s.status==='atual'?'atual':'futuro';
+    const labelExtra = s.status==='atual' ? '<span class="tl-atual-label">▶ Agora</span>' : '';
+    tl += `<div class="tl-step">
+      <div class="tl-dot ${dc}">${s.icon}</div>
+      <div class="tl-info">
+        <div class="tl-nome">${s.nome}</div>
+        <div class="tl-sub"><div>${s.sub}</div><div>${s.sub2}</div></div>
+        ${labelExtra}
+      </div>
     </div>`;
-  }
+    if (i < steps.length-1) tl += `<div class="tl-conector ${s.status==='done'?'done':''}"></div>`;
+  });
+  tl += '</div>';
+  return `<div class="timeline-wrap">
+    <div class="timeline-titulo">Linha do tempo — prazo para cadastro no CNES e homologação</div>
+    ${tl}
+  </div>`;
+}
+
+// ── Card 3 competências (vista geral — mostra município) ──
+function card3Comp(grupo, hoje) {
+  const rep = grupo[0];
+  const dp = resolveData(rep.data_portaria, rep.portaria);
+  const dias = diasRestantes(dp, rep.portaria);
+  const fCls = farolClass(dias);
+  const fTxt = farolTxt(dias);
 
   return `<div class="card-3comp">
     <div class="card-3comp-header">
@@ -1015,8 +1063,8 @@ function card3Comp(grupo, hoje) {
         <div class="farol ${fCls}"><div class="farol-dot"></div>${fTxt}</div>
       </div>
     </div>
-    <div class="card-outros-body">${estrDestaque}</div>
-    ${tlHTML}
+    <div class="card-outros-body">${estrategiaRow(grupo, false)}</div>
+    ${timelineHTML(rep, hoje)}
   </div>`;
 }
 
