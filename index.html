@@ -1215,9 +1215,46 @@ function card3CompEncerrado(grupo, hoje) {
 // ═══════════════════════════════════════
 // ABA HOMOLOGAÇÕES
 // ═══════════════════════════════════════
+function cardHomol(grupo) {
+  const rep = grupo[0];
+  const cred  = grupo.reduce((s,d)=>s+Number(d.credenciado||0),0);
+  const h1    = grupo.reduce((s,d)=>s+Number(d.homologacao_1||0),0);
+  const h2    = grupo.reduce((s,d)=>s+Number(d.homologacao_2||0),0);
+  const h3    = grupo.reduce((s,d)=>s+Number(d.homologacao_3||0),0);
+  const total = h1+h2+h3;
+  const saldo = cred-total;
+  const pct   = cred>0 ? Math.round((total/cred)*100) : 0;
+  const cor   = pct>=80 ? 'var(--green)' : pct>=40 ? 'var(--yellow)' : 'var(--red)';
+  const sit   = rep.selecao_homologacao || '—';
+  return `<div class="homol-card">
+    <div class="homol-header">
+      <div>
+        <div class="homol-titulo">${rep.municipio} — ${rep.uf} · ${rep.nome_completo||'—'}</div>
+        <div class="homol-sub">Portaria ${rep.portaria} · ${fmt(rep.data_portaria)}</div>
+      </div>
+      <span class="badge ${sit.toLowerCase().includes('homologado')&&!sit.toLowerCase().includes('não')?'badge-green':'badge badge-gray'}">${sit}</span>
+    </div>
+    <div class="homol-body">
+      <div class="barra-wrap">
+        <div class="barra-labels">
+          <span><strong>${total}</strong> de <strong>${cred}</strong> homologados</span>
+          <span style="font-weight:800;color:${cor}">${pct}%</span>
+        </div>
+        <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
+      </div>
+      <div class="parcelas-grid">
+        <div class="parcela ${h1>0?'tem':''}"><div class="parcela-num">1ª Homologação</div><div class="parcela-val">${h1}</div><div class="parcela-lbl">equipes</div></div>
+        <div class="parcela ${h2>0?'tem':''}"><div class="parcela-num">2ª Homologação</div><div class="parcela-val">${h2}</div><div class="parcela-lbl">equipes</div></div>
+        <div class="parcela ${h3>0?'tem':''}"><div class="parcela-num">3ª Homologação</div><div class="parcela-val">${h3}</div><div class="parcela-lbl">equipes</div></div>
+        <div class="parcela parcela-saldo"><div class="parcela-num">Saldo pendente</div><div class="parcela-val">${saldo}</div><div class="parcela-lbl">equipes</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderHomologacoes(ativo = true) {
-  const elId = ativo ? 'c-homol-ativas' : 'c-homol-encerradas';
-  const el = document.getElementById(elId);
+  const chave = ativo ? 'homol-ativas' : 'homol-encerradas';
+  const el = document.getElementById(`c-${chave}`);
   if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
   const comCred = filtrados.filter(d => {
@@ -1227,65 +1264,8 @@ function renderHomologacoes(ativo = true) {
   });
   if (!comCred.length) { el.innerHTML = vazioHTML('📊','Sem dados','Nenhum dado de homologação para o filtro selecionado.'); return; }
 
-  const grupos = agrupar(comCred, d=>`${d.municipio}||${d.uf}||${d.portaria}||${d.nome_completo}`);
-  let html = contextoBar(Object.keys(grupos).length);
-  html += `<div style="margin-bottom:16px;text-align:right"><button class="btn-download" onclick="downloadCSV('homologacoes')">⬇ Baixar CSV</button></div>`;
-
-  Object.values(grupos).forEach(grupo => {
-    const rep = grupo[0];
-    const cred = grupo.reduce((s,d)=>s+Number(d.credenciado||0),0);
-    const h1   = grupo.reduce((s,d)=>s+Number(d.homologacao_1||0),0);
-    const h2   = grupo.reduce((s,d)=>s+Number(d.homologacao_2||0),0);
-    const h3   = grupo.reduce((s,d)=>s+Number(d.homologacao_3||0),0);
-    const total = h1+h2+h3;
-    const saldo = cred-total;
-    const pct = cred>0 ? Math.round((total/cred)*100) : 0;
-    const cor = pct>=80 ? 'var(--green)' : pct>=40 ? 'var(--yellow)' : 'var(--red)';
-    const sit = rep.selecao_homologacao || '—';
-
-    html += `<div class="homol-card">
-      <div class="homol-header">
-        <div>
-          <div class="homol-titulo">${rep.municipio} — ${rep.uf} · ${rep.nome_completo||'—'}</div>
-          <div class="homol-sub">Portaria ${rep.portaria} · ${fmt(rep.data_portaria)}</div>
-        </div>
-        <span class="badge ${sit.toLowerCase().includes('homologado')&&!sit.toLowerCase().includes('não')?'badge-green':'badge badge-gray'}">${sit}</span>
-      </div>
-      <div class="homol-body">
-        <div class="barra-wrap">
-          <div class="barra-labels">
-            <span><strong>${total}</strong> de <strong>${cred}</strong> homologados</span>
-            <span style="font-weight:800;color:${cor}">${pct}%</span>
-          </div>
-          <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
-        </div>
-        <div class="parcelas-grid">
-          <div class="parcela ${h1>0?'tem':''}">
-            <div class="parcela-num">1ª Homologação</div>
-            <div class="parcela-val">${h1}</div>
-            <div class="parcela-lbl">equipes</div>
-          </div>
-          <div class="parcela ${h2>0?'tem':''}">
-            <div class="parcela-num">2ª Homologação</div>
-            <div class="parcela-val">${h2}</div>
-            <div class="parcela-lbl">equipes</div>
-          </div>
-          <div class="parcela ${h3>0?'tem':''}">
-            <div class="parcela-num">3ª Homologação</div>
-            <div class="parcela-val">${h3}</div>
-            <div class="parcela-lbl">equipes</div>
-          </div>
-          <div class="parcela parcela-saldo">
-            <div class="parcela-num">Saldo pendente</div>
-            <div class="parcela-val">${saldo}</div>
-            <div class="parcela-lbl">equipes</div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  });
-
-  el.innerHTML = html;
+  const grupos = Object.values(agrupar(comCred, d=>`${d.municipio}||${d.uf}||${d.portaria}||${d.nome_completo}`));
+  renderComPaginacao(el, grupos, chave, cardHomol);
 }
 
 // ═══════════════════════════════════════
