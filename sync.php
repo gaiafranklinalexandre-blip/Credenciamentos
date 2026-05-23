@@ -132,13 +132,17 @@ if ($action === 'sync' || $action === 'append') {
     $stmt = $conn->prepare("INSERT INTO portarias_aps
         (n_portaria, data_portaria, ano, tipo_ato, equipe_servico, link, descricao)
         VALUES (?,?,?,?,?,?,?)");
+    // bind: i=n_portaria  s=data_portaria  i=ano  s=tipo_ato  s=equipe_servico  s=link  s=descricao
     $count = 0;
     foreach ($data['records'] as $r) {
+        $n  = (int)($r['n_portaria'] ?? 0);
         $dp = $r['data_portaria'] ?: null;
-        $stmt->bind_param('isisssss',
-            $r['n_portaria'], $dp, $r['ano'],
-            $r['tipo_ato'], $r['equipe_servico'], $r['link'], $r['descricao']
-        );
+        $an = (int)($r['ano'] ?? 0);
+        $ta = (string)($r['tipo_ato'] ?? '');
+        $es = (string)($r['equipe_servico'] ?? '');
+        $lk = (string)($r['link'] ?? '');
+        $de = (string)($r['descricao'] ?? '');
+        $stmt->bind_param('isissss', $n, $dp, $an, $ta, $es, $lk, $de);
         $stmt->execute();
         $count++;
     }
