@@ -692,6 +692,160 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   .consulta-wrap { padding: 24px 16px; }
   .consulta-mun input { font-size: 15px; padding: 14px 18px; }
 }
+
+/* ══════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════ */
+#dashboard { display: none; min-height: 100vh; background: var(--gray-bg); }
+
+.dash-header {
+  background: var(--white); padding: 0 28px;
+  border-bottom: 1px solid var(--gray-border);
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow);
+}
+.dash-header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 0; flex-wrap: wrap; gap: 10px;
+}
+.dash-titulo h2 { font-size: 11px; font-weight: 500; color: var(--blue); }
+.dash-titulo h1 { font-size: 15px; font-weight: 700; color: var(--blue); }
+
+.dash-body { padding: 28px; max-width: 1200px; margin: 0 auto; }
+
+/* KPI cards */
+.dash-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.dash-kpi {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); padding: 20px 22px;
+  border-top: 4px solid var(--blue);
+  position: relative; overflow: hidden;
+}
+.dash-kpi.verde  { border-top-color: var(--green); }
+.dash-kpi.amarelo{ border-top-color: var(--yellow); }
+.dash-kpi.roxo   { border-top-color: #6c3fc5; }
+.dash-kpi-label { font-size: 11px; font-weight: 700; color: var(--text-mid); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+.dash-kpi-valor {
+  font-size: 36px; font-weight: 800; color: var(--blue); line-height: 1;
+  transition: all .3s;
+}
+.dash-kpi.verde  .dash-kpi-valor { color: var(--green); }
+.dash-kpi.amarelo .dash-kpi-valor { color: #7a5f00; }
+.dash-kpi.roxo   .dash-kpi-valor { color: #6c3fc5; }
+.dash-kpi-pct {
+  display: inline-block; font-size: 12px; font-weight: 700;
+  background: var(--blue-light); color: var(--blue);
+  border-radius: 10px; padding: 2px 8px; margin-top: 6px;
+}
+.dash-kpi.verde  .dash-kpi-pct { background: var(--green-light); color: var(--green); }
+.dash-kpi.amarelo .dash-kpi-pct { background: var(--yellow-light); color: #7a5f00; }
+.dash-kpi.roxo   .dash-kpi-pct { background: #ede7f6; color: #6c3fc5; }
+.dash-kpi-sub { font-size: 11px; color: var(--text-mid); margin-top: 4px; line-height: 1.5; }
+.dash-kpi-bg-ico {
+  position: absolute; right: 14px; bottom: 8px;
+  font-size: 42px; opacity: .07; pointer-events: none; line-height: 1;
+}
+
+/* Linha de portarias ativas */
+.dash-portarias-atv {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); padding: 20px 24px;
+  margin-bottom: 28px;
+}
+.dash-section-title {
+  font-size: 13px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.dash-section-title span { font-size: 16px; }
+.dash-port-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.dash-port-item {
+  border: 1px solid var(--gray-border); border-radius: 10px;
+  padding: 14px 16px; position: relative; overflow: hidden;
+}
+.dash-port-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--green);
+}
+.dash-port-num { font-size: 14px; font-weight: 800; color: var(--blue); }
+.dash-port-data { font-size: 11px; color: var(--text-mid); margin-top: 2px; }
+.dash-port-stats {
+  display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap;
+}
+.dash-port-stat-val { font-size: 22px; font-weight: 800; color: var(--blue); line-height: 1; }
+.dash-port-stat-lbl { font-size: 10px; color: var(--text-mid); }
+.dash-port-prazo {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin-top: 10px; font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+}
+.prazo-verde  { background: var(--green-light); color: var(--green); }
+.prazo-amarelo{ background: var(--yellow-light); color: #7a5f00; }
+.prazo-vermelho{ background: var(--red-light); color: var(--red); }
+.prazo-cinza  { background: var(--gray-bg); color: var(--text-mid); }
+
+/* Grid de gráficos */
+.dash-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px; margin-bottom: 28px;
+}
+@media (max-width: 900px) { .dash-charts-grid { grid-template-columns: 1fr; } }
+
+.dash-chart-card {
+  background: var(--white); border-radius: var(--card-r);
+  box-shadow: var(--shadow); padding: 20px 22px;
+}
+.dash-chart-card.wide { grid-column: 1 / -1; }
+.dash-chart-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 16px;
+}
+.dash-chart-wrap { position: relative; }
+
+/* Tabela de ranking */
+.dash-ranking { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.dash-ranking th {
+  font-size: 10px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .5px;
+  text-align: left; padding: 6px 8px; border-bottom: 2px solid var(--gray-border);
+}
+.dash-ranking td { padding: 8px 8px; border-bottom: 1px solid var(--gray-border); font-size: 13px; }
+.dash-ranking tr:last-child td { border-bottom: none; }
+.dash-ranking .rank-pos { font-weight: 800; color: var(--text-mid); font-size: 12px; width: 28px; }
+.dash-ranking .rank-barra-wrap { position: relative; }
+.dash-ranking .rank-barra-bg { background: var(--gray-border); border-radius: 4px; height: 8px; }
+.dash-ranking .rank-barra-fill { height: 100%; border-radius: 4px; background: var(--blue); transition: width .6s; }
+.dash-ranking .rank-val { font-weight: 800; color: var(--blue); white-space: nowrap; }
+
+/* Filtro de portaria no dashboard */
+.dash-filtro-wrap {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px; flex-wrap: wrap;
+}
+.dash-filtro-label { font-size: 12px; font-weight: 700; color: var(--text-mid); }
+.dash-filtro-btn {
+  border: 2px solid var(--gray-border); background: var(--white);
+  border-radius: var(--radius); padding: 6px 16px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  font-family: inherit; color: var(--text-mid); transition: all .2s;
+}
+.dash-filtro-btn.ativo {
+  background: var(--blue); border-color: var(--blue); color: #fff;
+}
+
+@media (max-width: 700px) {
+  .dash-body { padding: 14px 12px; }
+  .dash-kpi-grid { grid-template-columns: 1fr 1fr; }
+  .dash-kpi-valor { font-size: 28px; }
+}
 </style>
 </head>
 <body>
@@ -704,6 +858,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 <!-- ═══ CAPA ═══ -->
 <div id="capa">
   <nav class="capa-nav">
+    <a href="#" onclick="abrirDashboard();return false">Dashboard</a>
     <a href="#" onclick="abrirPainel('portarias');return false">Legislação</a>
     <a href="#" onclick="alert('Painel de Novos Credenciamentos da APS\nSAPS — Ministério da Saúde, 2026');return false">Sobre o Painel</a>
   </nav>
@@ -741,6 +896,28 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 
   <div class="capa-logos">MINISTÉRIO DA SAÚDE · SAPS · 2026</div>
   <div class="capa-att" id="attTxt"></div>
+</div>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div id="dashboard">
+  <div class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-titulo">
+        <h2>Ministério da Saúde · SAPS</h2>
+        <h1>Dashboard — Novos Credenciamentos da APS</h1>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="att-txt" id="dashAttTxt"></span>
+        <button class="btn-outline" onclick="voltarCapa()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+          Início
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="dash-body" id="dashBody">
+    <div class="vazio"><div class="ico">⏳</div><h3>Carregando dashboard...</h3></div>
+  </div>
 </div>
 
 <!-- ═══ PAINEL ═══ -->
@@ -923,6 +1100,7 @@ function abrirPainel(aba) {
 function voltarCapa() {
   document.getElementById('painel').style.display = 'none';
   document.getElementById('resultado').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'none';
   document.getElementById('capa').style.display = 'flex';
 }
 function voltarConsulta() {
@@ -2126,6 +2304,371 @@ function downloadCSV(tipo) {
   await carregarDados();
   if (btn) { btn.disabled = false; btn.style.opacity = ''; }
 })();
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+
+// Instâncias dos charts (para destruir antes de recriar)
+const _charts = {};
+
+function abrirDashboard() {
+  document.getElementById('capa').style.display = 'none';
+  document.getElementById('painel').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  renderDashboard();
+}
+
+function voltarCapaDash() { voltarCapa(); }
+
+// Carrega Chart.js e Leaflet sob demanda, uma única vez
+let _chartJsLoaded = false;
+function carregarChartJs(cb) {
+  if (_chartJsLoaded) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js';
+  s.onload = () => { _chartJsLoaded = true; cb(); };
+  document.head.appendChild(s);
+}
+
+// Filtro do dashboard (portaria ou 'todas')
+let dashFiltroPort = 'todas';
+
+function renderDashboard() {
+  const el = document.getElementById('dashBody');
+  if (!dados.length) {
+    el.innerHTML = '<div class="vazio"><div class="ico">⏳</div><h3>Carregando dados...</h3><p>Aguarde enquanto os dados são carregados da API.</p></div>';
+    setTimeout(renderDashboard, 800);
+    return;
+  }
+
+  // Atualiza data de atualização
+  const datas = dados.map(d => d.data_portaria).filter(d => d && d !== '0000-00-00').sort().reverse();
+  const attEl = document.getElementById('dashAttTxt');
+  if (attEl && datas.length) attEl.textContent = 'Atualizado em ' + fmt(datas[0]);
+
+  carregarChartJs(() => montarDashboard(el));
+}
+
+function montarDashboard(el) {
+  const hoje = new Date();
+
+  // ── Portarias disponíveis (detectadas dinamicamente dos dados) ──
+  const portsUnicas = [...new Set(dados.map(d => Number(d.portaria)).filter(Boolean))].sort((a,b) => b - a);
+
+  // ── Base filtrada ──
+  const base = dashFiltroPort === 'todas'
+    ? dados
+    : dados.filter(d => String(d.portaria) === String(dashFiltroPort));
+
+  // ── KPIs ──
+  const totalMunicipiosBrasil = 5570;
+  const totalPortariasAtivas = portsUnicas.filter(p => {
+    const rep = dados.find(d => Number(d.portaria) === p);
+    if (!rep) return false;
+    const comps = calcComps(resolveData(rep.data_portaria, p), p);
+    return comps ? hoje <= comps[2].fim : (rep.selecao_credenciamento||'').toLowerCase() === 'ativo';
+  }).length;
+
+  const credenciados = base.filter(d => Number(d.credenciado) > 0);
+  const totalCred = credenciados.reduce((s, d) => s + Number(d.credenciado || 0), 0);
+  const munsUnicas = new Set(credenciados.map(d => `${d.municipio}||${d.uf}`)).size;
+  const portAtivas3 = credenciados.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d));
+  const portAtivasOut = credenciados.filter(d => !isTipo3Comp(d.tipo) && isAtivoOutros(d));
+  const totalAtivos = portAtivas3.length + portAtivasOut.length;
+  const totalRegistros = base.length;
+
+  const pctMuns = Math.round((munsUnicas / totalMunicipiosBrasil) * 100);
+
+  // Animação count-up
+  function countUp(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const dur = 900, start = performance.now();
+    const from = parseInt(el.textContent.replace(/\D/g, '')) || 0;
+    function step(now) {
+      const p = Math.min((now - start) / dur, 1);
+      const ease = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+      el.textContent = Math.round(from + (target - from) * ease).toLocaleString('pt-BR');
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ── Portarias ativas (para o card) ──
+  const portAtivasInfo = portsUnicas.map(p => {
+    const rows = dados.filter(d => Number(d.portaria) === p && Number(d.credenciado) > 0);
+    const rep = dados.find(d => Number(d.portaria) === p);
+    if (!rows.length || !rep) return null;
+    const dp = resolveData(rep.data_portaria, p);
+    const comps = calcComps(dp, p);
+    const ativo = comps ? hoje <= comps[2].fim : (rep.selecao_credenciamento||'').toLowerCase() === 'ativo';
+    const cred = rows.reduce((s, d) => s + Number(d.credenciado || 0), 0);
+    const muns = new Set(rows.map(d => d.municipio)).size;
+    const dias = comps ? Math.ceil((comps[2].fim - hoje) / (1000*60*60*24)) : null;
+    return { p, dp, ativo, cred, muns, dias, comps };
+  }).filter(Boolean).filter(x => x.ativo);
+
+  // ── Dados por região ──
+  const porRegiao = {};
+  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+    const r = d.regiao || 'Não informado';
+    porRegiao[r] = (porRegiao[r] || 0) + Number(d.credenciado || 0);
+  });
+
+  // ── Dados por tipo ──
+  const porTipo = {};
+  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+    const t = isTipo3Comp(d.tipo) ? '3 Competências' : isEstabelecimento(d.tipo) ? 'Estabelecimentos' : 'Específicos';
+    porTipo[t] = (porTipo[t] || 0) + Number(d.credenciado || 0);
+  });
+
+  // ── Ranking por UF ──
+  const porUF = {};
+  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+    porUF[d.uf] = (porUF[d.uf] || 0) + Number(d.credenciado || 0);
+  });
+  const rankingUF = Object.entries(porUF).sort((a, b) => b[1] - a[1]);
+  const maxUF = rankingUF[0]?.[1] || 1;
+
+  // ── Portaria recente vs antiga (evolução) ──
+  const porPortaria = {};
+  base.filter(d => Number(d.credenciado) > 0).forEach(d => {
+    const key = `Port. ${d.portaria}`;
+    porPortaria[key] = (porPortaria[key] || 0) + Number(d.credenciado || 0);
+  });
+
+  // ── Botões de filtro ──
+  const filtrosBtns = ['todas', ...portsUnicas].map(p =>
+    `<button class="dash-filtro-btn ${dashFiltroPort == p || (p === 'todas' && dashFiltroPort === 'todas') ? 'ativo' : ''}"
+      onclick="dashFiltroPort='${p}';renderDashboard()">
+      ${p === 'todas' ? 'Todas as portarias' : `Portaria ${Number(p).toLocaleString('pt-BR')}`}
+    </button>`
+  ).join('');
+
+  // ── Portarias ativas card HTML ──
+  const portAtivasHTML = portAtivasInfo.length
+    ? portAtivasInfo.map(x => {
+        const prazoClass = x.dias === null ? 'prazo-cinza' : x.dias <= 0 ? 'prazo-cinza' : x.dias <= 15 ? 'prazo-vermelho' : x.dias <= 30 ? 'prazo-amarelo' : 'prazo-verde';
+        const prazoTxt = x.dias === null ? 'Sem prazo definido' : x.dias <= 0 ? 'Prazo encerrado' : `${x.dias} dia(s) restante${x.dias===1?'':'s'}`;
+        return `<div class="dash-port-item">
+          <div class="dash-port-num">Portaria GM/MS nº ${Number(x.p).toLocaleString('pt-BR')}</div>
+          <div class="dash-port-data">${fmt(x.dp)} · ${x.comps ? `CNES até ${fmt(x.comps[2].fim.toISOString().slice(0,10))}` : 'Sem prazo definido'}</div>
+          <div class="dash-port-stats">
+            <div><div class="dash-port-stat-val">${x.cred.toLocaleString('pt-BR')}</div><div class="dash-port-stat-lbl">credenciados</div></div>
+            <div><div class="dash-port-stat-val">${x.muns.toLocaleString('pt-BR')}</div><div class="dash-port-stat-lbl">municípios</div></div>
+          </div>
+          ${x.dias !== null ? `<div class="dash-port-prazo ${prazoClass}">⏱ ${prazoTxt}</div>` : ''}
+        </div>`;
+      }).join('')
+    : '<p style="color:var(--text-mid);font-size:13px">Nenhuma portaria ativa no momento.</p>';
+
+  // ── HTML principal ──
+  el.innerHTML = `
+    <!-- Filtro de portaria -->
+    <div class="dash-filtro-wrap">
+      <span class="dash-filtro-label">Filtrar por:</span>
+      ${filtrosBtns}
+    </div>
+
+    <!-- KPIs -->
+    <div class="dash-kpi-grid">
+      <div class="dash-kpi">
+        <div class="dash-kpi-label">Equipes credenciadas</div>
+        <div class="dash-kpi-valor" id="kpi-cred">0</div>
+        <div class="dash-kpi-pct" id="kpi-ativos-badge">— ativos</div>
+        <div class="dash-kpi-sub" id="kpi-cred-sub">—</div>
+        <div class="dash-kpi-bg-ico">🏥</div>
+      </div>
+      <div class="dash-kpi verde">
+        <div class="dash-kpi-label">Municípios beneficiados</div>
+        <div class="dash-kpi-valor" id="kpi-muns">0</div>
+        <div class="dash-kpi-pct">${munsUnicas} de ${totalMunicipiosBrasil.toLocaleString('pt-BR')} = ${pctMuns}%</div>
+        <div class="dash-kpi-sub">dos municípios brasileiros</div>
+        <div class="dash-kpi-bg-ico">📍</div>
+      </div>
+      <div class="dash-kpi amarelo">
+        <div class="dash-kpi-label">Portarias no painel</div>
+        <div class="dash-kpi-valor" id="kpi-ports">0</div>
+        <div class="dash-kpi-pct" id="kpi-ports-badge">— ativas</div>
+        <div class="dash-kpi-sub">portaria(s) com credenciamentos</div>
+        <div class="dash-kpi-bg-ico">📋</div>
+      </div>
+      <div class="dash-kpi roxo">
+        <div class="dash-kpi-label">Registros no painel</div>
+        <div class="dash-kpi-valor" id="kpi-regs">0</div>
+        <div class="dash-kpi-pct">Total de linhas na base</div>
+        <div class="dash-kpi-sub">estratégias × municípios × portarias</div>
+        <div class="dash-kpi-bg-ico">🗂️</div>
+      </div>
+    </div>
+
+    <!-- Portarias ativas -->
+    <div class="dash-portarias-atv">
+      <div class="dash-section-title"><span>🟢</span> Portarias Ativas</div>
+      <div class="dash-port-grid">${portAtivasHTML}</div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="dash-charts-grid">
+
+      <!-- Gráfico por região -->
+      <div class="dash-chart-card">
+        <div class="dash-chart-title">Credenciamentos por Região</div>
+        <div class="dash-chart-wrap" style="height:260px">
+          <canvas id="chartRegiao"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico por tipo (donut) -->
+      <div class="dash-chart-card">
+        <div class="dash-chart-title">Distribuição por Tipo</div>
+        <div class="dash-chart-wrap" style="height:260px">
+          <canvas id="chartTipo"></canvas>
+        </div>
+      </div>
+
+      <!-- Ranking por UF (tabela com barras) -->
+      <div class="dash-chart-card wide">
+        <div class="dash-chart-title">Ranking por UF — Top ${Math.min(27, rankingUF.length)}</div>
+        <div style="overflow-x:auto">
+          <table class="dash-ranking">
+            <thead>
+              <tr>
+                <th class="rank-pos">#</th>
+                <th>UF</th>
+                <th style="min-width:180px">Volume</th>
+                <th class="rank-val">Qtd.</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rankingUF.slice(0, 27).map(([uf, qtd], i) => `
+                <tr>
+                  <td class="rank-pos">${i + 1}</td>
+                  <td><strong>${uf || '—'}</strong></td>
+                  <td class="rank-barra-wrap">
+                    <div class="rank-barra-bg">
+                      <div class="rank-barra-fill" style="width:${Math.round((qtd / maxUF) * 100)}%"></div>
+                    </div>
+                  </td>
+                  <td class="rank-val">${qtd.toLocaleString('pt-BR')}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Evolução por portaria -->
+      ${Object.keys(porPortaria).length > 1 ? `
+      <div class="dash-chart-card wide">
+        <div class="dash-chart-title">Credenciamentos por Portaria</div>
+        <div class="dash-chart-wrap" style="height:260px">
+          <canvas id="chartPortaria"></canvas>
+        </div>
+      </div>` : ''}
+    </div>`;
+
+  // Count-up animations
+  countUp('kpi-cred', totalCred);
+  countUp('kpi-muns', munsUnicas);
+  countUp('kpi-ports', portsUnicas.length);
+  countUp('kpi-regs', totalRegistros);
+
+  const ativosEl = document.getElementById('kpi-ativos-badge');
+  if (ativosEl) ativosEl.textContent = `${totalAtivos.toLocaleString('pt-BR')} ativos`;
+  const portsBadgeEl = document.getElementById('kpi-ports-badge');
+  if (portsBadgeEl) portsBadgeEl.textContent = `${totalPortariasAtivas} ativa(s)`;
+  const credSubEl = document.getElementById('kpi-cred-sub');
+  if (credSubEl) credSubEl.textContent = `em ${munsUnicas.toLocaleString('pt-BR')} municípios`;
+
+  // ── Charts ──
+  const CORES_REGIAO = ['#1351B4', '#168821', '#E52207', '#FFCD07', '#6c3fc5', '#e67e22', '#1abc9c'];
+
+  // Gráfico por região
+  if (_charts.regiao) _charts.regiao.destroy();
+  const ctxR = document.getElementById('chartRegiao');
+  if (ctxR) {
+    const labelsR = Object.keys(porRegiao).sort((a, b) => porRegiao[b] - porRegiao[a]);
+    _charts.regiao = new Chart(ctxR, {
+      type: 'bar',
+      data: {
+        labels: labelsR,
+        datasets: [{
+          data: labelsR.map(l => porRegiao[l]),
+          backgroundColor: labelsR.map((_, i) => CORES_REGIAO[i % CORES_REGIAO.length]),
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f5' }, ticks: { font: { family: 'Raleway', size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Raleway', size: 11, weight: '600' } } }
+        }
+      }
+    });
+  }
+
+  // Gráfico por tipo (donut)
+  if (_charts.tipo) _charts.tipo.destroy();
+  const ctxT = document.getElementById('chartTipo');
+  if (ctxT) {
+    const labelsT = Object.keys(porTipo);
+    _charts.tipo = new Chart(ctxT, {
+      type: 'doughnut',
+      data: {
+        labels: labelsT,
+        datasets: [{
+          data: labelsT.map(l => porTipo[l]),
+          backgroundColor: ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5'],
+          borderWidth: 3,
+          borderColor: '#fff',
+          hoverOffset: 8,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { font: { family: 'Raleway', size: 11, weight: '600' }, padding: 16 }
+          }
+        },
+        cutout: '62%',
+      }
+    });
+  }
+
+  // Gráfico por portaria (se múltiplas)
+  if (_charts.portaria) _charts.portaria.destroy();
+  const ctxP = document.getElementById('chartPortaria');
+  if (ctxP) {
+    const labelsP = Object.keys(porPortaria).sort();
+    _charts.portaria = new Chart(ctxP, {
+      type: 'bar',
+      data: {
+        labels: labelsP,
+        datasets: [{
+          label: 'Credenciamentos',
+          data: labelsP.map(l => porPortaria[l]),
+          backgroundColor: labelsP.map((_, i) => CORES_REGIAO[i % CORES_REGIAO.length]),
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f5' }, ticks: { font: { family: 'Raleway', size: 11 } } },
+          x: { grid: { display: false }, ticks: { font: { family: 'Raleway', size: 12, weight: '700' } } }
+        }
+      }
+    });
+  }
+}
 </script>
 </body>
 </html>
