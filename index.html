@@ -190,14 +190,16 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   z-index: 200; width: 100%; top: calc(100% + 4px); left: 0;
 }
 .sug-item {
-  padding: 11px 20px; cursor: pointer; font-size: 13px;
+  padding: 10px 16px; cursor: pointer; font-size: 13px;
   border-bottom: 1px solid var(--gray-border);
   display: flex; justify-content: space-between; align-items: center;
+  gap: 12px;
 }
 .sug-item:last-child { border-bottom: none; }
 .sug-item:hover { background: var(--blue-bg); }
-.sug-item strong { color: var(--blue); }
-.sug-uf { font-size: 11px; color: var(--text-mid); background: var(--gray-bg); padding: 2px 8px; border-radius: 10px; }
+.sug-nome { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sug-nome strong { color: var(--blue); font-weight: 700; }
+.sug-uf { font-size: 11px; color: var(--text-mid); background: var(--gray-bg); padding: 2px 8px; border-radius: 10px; flex-shrink: 0; }
 
 /* Abas */
 .abas-bar {
@@ -1147,12 +1149,20 @@ function onBuscaInput() {
   const el = document.getElementById('sugestoes');
   if (q.length < 2) { el.style.display='none'; return; }
   const muns = [...new Map(dados.map(d => [`${d.municipio}||${d.uf}`, {mun: d.municipio, uf: d.uf}]))
-    .values()].filter(x => x.mun && x.mun.toLowerCase().includes(q)).slice(0,8);
+    .values()].filter(x => x.mun && x.mun.toLowerCase().includes(q)).slice(0, 12);
   if (!muns.length) { el.style.display='none'; return; }
   el.innerHTML = muns.map(x => {
     const idx = x.mun.toLowerCase().indexOf(q);
-    const hl = x.mun.slice(0,idx)+'<strong>'+x.mun.slice(idx,idx+q.length)+'</strong>'+x.mun.slice(idx+q.length);
-    return `<div class="sug-item" onclick="selecionarMun('${x.mun}','${x.uf}')">${hl}<span class="sug-uf">${x.uf}</span></div>`;
+    const hl  = x.mun.slice(0,idx)
+              + '<strong>' + x.mun.slice(idx, idx+q.length) + '</strong>'
+              + x.mun.slice(idx+q.length);
+    // Escapa aspas simples no nome para não quebrar o onclick
+    const munEsc = x.mun.replace(/'/g, "\\'");
+    const ufEsc  = x.uf.replace(/'/g, "\\'");
+    return `<div class="sug-item" onclick="selecionarMun('${munEsc}','${ufEsc}')">
+      <span class="sug-nome">${hl}</span>
+      <span class="sug-uf">${x.uf}</span>
+    </div>`;
   }).join('');
   el.style.display = 'block';
 }
