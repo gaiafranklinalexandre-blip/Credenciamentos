@@ -1783,20 +1783,84 @@ function cardHomol(grupo, ativo = true) {
     </div>`;
 
   } else {
-    // ── CARD ENCERRADO: consolidado financeiro ──
+    // ── CARD ENCERRADO: espelho do ativo, processo concluído ──
     const cor = pct>=80?'var(--green)':pct>=40?'var(--yellow)':'var(--red)';
     const sit = rep.selecao_homologacao || '—';
-    const homolParcelas = comps ? [
-      { label: comps[0].homolLabel, val: h1 },
-      { label: comps[1].homolLabel, val: h2 },
-      { label: comps[2].homolLabel, val: h3 },
-    ] : [
-      { label: '1ª Parcela', val: h1 },
-      { label: '2ª Parcela', val: h2 },
-      { label: '3ª Parcela', val: h3 },
-    ];
 
-    return `<div class="homol-card" style="opacity:.9">
+    // Banner de encerramento
+    const bannerHTML = `<div class="homol-alerta homol-alerta-cinza">
+      🔒 Processo encerrado — janela de cadastro no CNES e parcelas financeiras já foram processadas.
+      <span class="homol-alerta-dica" title="Este processo foi encerrado. As 3 competências de CNES e as respectivas parcelas financeiras já foram processadas. O resultado abaixo é definitivo.">?</span>
+    </div>`;
+
+    // Grid de competências — mesmo layout do ativo, mas tudo encerrado
+    let gridHTML = '<div class="homol-comp-grid">';
+    const parcelas = comps
+      ? [{ comp: comps[0], hVal: h1, idx: 1 },
+         { comp: comps[1], hVal: h2, idx: 2 },
+         { comp: comps[2], hVal: h3, idx: 3 }]
+      : [{ comp: null, hVal: h1, idx: 1 },
+         { comp: null, hVal: h2, idx: 2 },
+         { comp: null, hVal: h3, idx: 3 }];
+
+    parcelas.forEach(({comp, hVal, idx}) => {
+      const cnesLabel   = comp ? `CNES ${comp.label}` : `${idx}ª Competência`;
+      const parcelaLabel= comp ? `Parcela ${String(comp.homol).padStart(2,'0')}/${comp.aHomol}` : `${idx}ª Parcela`;
+      const homolCls    = hVal > 0 ? 'comp-homol-ok' : 'comp-homol-atrasada';
+      const homolIco    = hVal > 0 ? '✅' : '⚠️';
+
+      const cnesTitle   = `${idx}ª competência de CNES encerrada${comp?' ('+comp.label+')':''}. Cadastro não pode mais ser alterado.`;
+      const homolTitle  = hVal > 0
+        ? `${hVal} equipe(s) homologada(s) na ${parcelaLabel}. Pagamento iniciado nesta parcela.`
+        : `Nenhuma equipe homologada na ${parcelaLabel}. O cadastro no CNES para a ${idx}ª competência não estava completo ou correto no momento do processamento.`;
+
+      gridHTML += `
+      <div class="homol-comp-item">
+        <div class="homol-comp-num">${idx}ª Competência</div>
+        <div class="homol-comp-cnes comp-cnes-fechado" title="${cnesTitle}">
+          <span class="homol-comp-icone">🔒</span>
+          <div>
+            <div class="homol-comp-cnes-label">${cnesLabel}</div>
+            <div class="homol-comp-cnes-sub">Cadastro encerrado</div>
+          </div>
+          <span class="homol-tooltip-ico" title="${cnesTitle}">?</span>
+        </div>
+        <div class="homol-comp-arrow">↓</div>
+        <div class="homol-comp-parcela ${homolCls}" title="${homolTitle}">
+          <span class="homol-comp-icone">${homolIco}</span>
+          <div>
+            <div class="homol-comp-parcela-label">${parcelaLabel}</div>
+            <div class="homol-comp-parcela-val">${hVal>0?`<strong>${hVal}</strong> equipe(s) homologada(s)`:'0 equipes homologadas'}</div>
+          </div>
+          <span class="homol-tooltip-ico" title="${homolTitle}">?</span>
+        </div>
+      </div>`;
+    });
+    gridHTML += '</div>';
+
+    // Resumo consolidado
+    const resumoTitle = `Resultado final: ${total} de ${cred} equipes homologadas (${pct}%). ${saldo>0?saldo+' equipe(s) não foram homologadas em nenhuma das 3 parcelas.':'Todas as equipes foram homologadas.'}`;
+    const resumoHTML = `
+    <div class="homol-resumo" title="${resumoTitle}">
+      <div class="homol-resumo-item">
+        <div class="homol-resumo-val">${cred}</div>
+        <div class="homol-resumo-lbl">credenciadas</div>
+      </div>
+      <div class="homol-resumo-item homol-resumo-sep">
+        <div class="homol-resumo-val" style="color:${cor}">${total}</div>
+        <div class="homol-resumo-lbl">homologadas</div>
+      </div>
+      <div class="homol-resumo-item">
+        <div class="homol-resumo-val" style="color:${saldo>0?'var(--red)':'var(--green)'}">${saldo}</div>
+        <div class="homol-resumo-lbl">não homologadas</div>
+      </div>
+      <div class="homol-resumo-barra">
+        <div class="barra-bg" style="height:8px"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
+        <div style="font-size:11px;color:${cor};font-weight:800;margin-top:2px">${pct}% homologado — resultado final</div>
+      </div>
+    </div>`;
+
+    return `<div class="homol-card" style="opacity:.92">
       <div class="homol-header">
         <div>
           <div class="homol-titulo">${rep.municipio} — ${rep.uf} · ${rep.nome_completo||'—'}</div>
@@ -1805,26 +1869,9 @@ function cardHomol(grupo, ativo = true) {
         <span class="badge ${sit.toLowerCase().includes('homologado')&&!sit.toLowerCase().includes('não')?'badge-green':'badge-gray'}">${sit}</span>
       </div>
       <div class="homol-body">
-        <div class="barra-wrap" title="Resultado final do processo de homologação. Compara o total credenciado com o total homologado nas 3 parcelas financeiras.">
-          <div class="barra-labels">
-            <span><strong>${total}</strong> de <strong>${cred}</strong> homologados</span>
-            <span style="font-weight:800;color:${cor}">${pct}%</span>
-          </div>
-          <div class="barra-bg"><div class="barra-fill" style="width:${pct}%;background:${cor}"></div></div>
-        </div>
-        <div class="parcelas-grid">
-          ${homolParcelas.map((p,i)=>`
-          <div class="parcela ${p.val>0?'tem':''}" title="Parcela ${p.label}: equipes homologadas nesta competência de CNES. ${p.val===0?'Nenhuma equipe foi homologada nesta parcela.':''}">
-            <div class="parcela-num">${p.label}</div>
-            <div class="parcela-val">${p.val}</div>
-            <div class="parcela-lbl">equipes</div>
-          </div>`).join('')}
-          <div class="parcela parcela-saldo" title="Equipes credenciadas que não foram homologadas em nenhuma das 3 parcelas.">
-            <div class="parcela-num">Não homologado</div>
-            <div class="parcela-val">${saldo}</div>
-            <div class="parcela-lbl">equipes</div>
-          </div>
-        </div>
+        ${bannerHTML}
+        ${gridHTML}
+        ${resumoHTML}
       </div>
     </div>`;
   }
