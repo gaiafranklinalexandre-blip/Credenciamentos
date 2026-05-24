@@ -122,8 +122,22 @@ Sempre que o contexto do projeto mudar:
 
 ---
 
+## Dois projetos em paralelo
+
+Este repositório documenta **dois projetos simultâneos**:
+
+| Projeto | Status | Arquivo principal |
+|---|---|---|
+| **Site web** (substituto) | Em desenvolvimento e validação | `index.html` |
+| **Power BI** (legado ativo) | Em uso até validação completa do site | `novo_painel.pbix` (local) |
+
+O Power BI será descontinuado quando o site estiver totalmente validado pela SAPS. Ambos compartilham a mesma base de dados Excel e as mesmas regras de negócio.
+
+---
+
 ## Documentos de referência
 
+### Site
 | Documento | Conteúdo |
 |---|---|
 | [`docs/contexto-do-projeto.md`](docs/contexto-do-projeto.md) | Objetivo, funcionalidades, decisões técnicas e visuais |
@@ -132,3 +146,9 @@ Sempre que o contexto do projeto mudar:
 | [`docs/github-flow.md`](docs/github-flow.md) | Branches, commits, arquivos ignorados |
 | [`docs/deploy-render.md`](docs/deploy-render.md) | Deploy, validação, rollback |
 | [`docs/atualizacao-das-regras.md`](docs/atualizacao-das-regras.md) | Quando e como atualizar a documentação |
+
+### Power BI
+| Documento | Conteúdo |
+|---|---|
+| [`docs/powerbi/contexto-powerbi.md`](docs/powerbi/contexto-powerbi.md) | Status, objetivo, relação com o site, critério de descontinuação |
+| [`docs/powerbi/medidas-dax.md`](docs/powerbi/medidas-dax.md) | Todas as medidas DAX criadas, regras e erros já ocorridos |
