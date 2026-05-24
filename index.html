@@ -228,6 +228,32 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .aba.ativo { color: var(--blue); border-bottom-color: var(--blue); }
 .aba:hover:not(.ativo) { color: var(--blue); background: var(--blue-bg); }
 
+/* Filtros secundários (dentro do painel de resultados) */
+.filtros-sec {
+  background: var(--gray-bg); border-bottom: 1px solid var(--gray-border);
+  padding: 10px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.filtros-sec-label {
+  font-size: 11px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
+}
+.filtros-sec select {
+  font-size: 13px; padding: 5px 10px; border: 1px solid var(--gray-border);
+  border-radius: 6px; background: var(--white); color: var(--text);
+  font-family: inherit; cursor: pointer; min-width: 140px; max-width: 240px;
+}
+.filtros-sec select:focus { outline: none; border-color: var(--blue); }
+.filtros-sec-limpar {
+  font-size: 12px; color: var(--blue); cursor: pointer; background: none;
+  border: none; font-family: inherit; font-weight: 600; padding: 4px 6px;
+  border-radius: 4px; white-space: nowrap;
+  display: none;
+}
+.filtros-sec-limpar:hover { background: var(--blue-bg); }
+.filtros-sec-contador {
+  font-size: 12px; color: var(--text-mid); margin-left: auto; white-space: nowrap;
+}
+
 /* Content */
 .content { padding: 24px; max-width: 1100px; margin: 0 auto; }
 
@@ -987,6 +1013,19 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
       <button class="aba"       id="aba-portarias"        onclick="trocarAba('portarias')">Portarias</button>
     </div>
 
+    <!-- Filtros secundários -->
+    <div class="filtros-sec" id="filtrosSec">
+      <span class="filtros-sec-label">Refinar:</span>
+      <select id="fsPortaria" onchange="aplicarFiltrosSec()">
+        <option value="">Todas as portarias</option>
+      </select>
+      <select id="fsEstrategia" onchange="aplicarFiltrosSec()">
+        <option value="">Todas as estratégias</option>
+      </select>
+      <button class="filtros-sec-limpar" id="fsLimpar" onclick="limparFiltrosSec()">✕ Limpar filtros</button>
+      <span class="filtros-sec-contador" id="fsContador"></span>
+    </div>
+
     <div class="content">
       <div id="c-ativos"></div>
       <div id="c-encerrados"        style="display:none"></div>
@@ -1098,6 +1137,7 @@ function farolTxt(dias) {
 // ═══════════════════════════════════════
 let dados = [];
 let filtrados = [];
+let filtradosSec = []; // filtrados após aplicação dos filtros secundários (portaria/estratégia)
 let portarias = [];   // base Portarias_APS_Database
 let abaAtiva = 'ativos';
 let municipioSel = '';
@@ -1116,8 +1156,9 @@ function abrirPainel(aba) {
   Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
   document.getElementById('resultadoTitulo').textContent = 'Todos os municípios';
   document.getElementById('resultadoSub').textContent = `${filtrados.length} registro(s)`;
+  popularFiltrosSec();
+  aplicarFiltrosSec();
   atualizarAba();
-  renderizar();
 }
 function voltarCapa() {
   document.getElementById('painel').style.display = 'none';
@@ -1182,8 +1223,9 @@ function executarConsulta() {
   document.getElementById('capa').style.display = 'none';
   document.getElementById('painel').style.display = 'block';
   document.getElementById('resultado').style.display = 'block';
+  popularFiltrosSec();
+  aplicarFiltrosSec();
   atualizarAba();
-  renderizar();
 }
 function limparConsulta() {
   municipioSel = '';
@@ -1263,6 +1305,7 @@ async function carregarDados() {
 
     popularFiltros();
     filtrados = dados;
+    filtradosSec = dados;
     // Se o usuário já digitou algo enquanto carregava, atualiza o autocomplete
     if (document.getElementById('buscaInput').value.trim().length >= 2) onBuscaInput();
   } catch(e) {
@@ -1425,6 +1468,58 @@ function atualizarAba() {
 }
 
 // ═══════════════════════════════════════
+// FILTROS SECUNDÁRIOS (portaria / estratégia)
+// ═══════════════════════════════════════
+function popularFiltrosSec() {
+  // Monta opções a partir de filtrados (resultado da consulta principal)
+  const portarias = [...new Set(filtrados.map(d => d.portaria).filter(Boolean))]
+    .map(Number).sort((a,b) => b - a);
+  const estrategias = [...new Set(filtrados.map(d => d.estrategia).filter(Boolean))].sort();
+
+  const fsP = document.getElementById('fsPortaria');
+  const fsE = document.getElementById('fsEstrategia');
+
+  fsP.innerHTML = '<option value="">Todas as portarias</option>' +
+    portarias.map(p => `<option value="${p}">Portaria Nº ${p}</option>`).join('');
+  fsE.innerHTML = '<option value="">Todas as estratégias</option>' +
+    estrategias.map(e => `<option value="${e}">${e}</option>`).join('');
+
+  // Só mostra a barra se houver mais de uma opção em pelo menos um select
+  const mostrar = portarias.length > 1 || estrategias.length > 1;
+  document.getElementById('filtrosSec').style.display = mostrar ? 'flex' : 'none';
+}
+
+function aplicarFiltrosSec() {
+  const p = document.getElementById('fsPortaria').value;
+  const e = document.getElementById('fsEstrategia').value;
+
+  filtradosSec = filtrados.filter(d =>
+    (!p || String(Number(d.portaria)) === String(Number(p))) &&
+    (!e || d.estrategia === e)
+  );
+
+  const temFiltro = p || e;
+  const btn = document.getElementById('fsLimpar');
+  btn.style.display = temFiltro ? 'inline-block' : 'none';
+
+  const contador = document.getElementById('fsContador');
+  if (temFiltro) {
+    contador.textContent = `${filtradosSec.length} de ${filtrados.length} registro(s)`;
+  } else {
+    contador.textContent = '';
+  }
+
+  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
+  renderizar();
+}
+
+function limparFiltrosSec() {
+  document.getElementById('fsPortaria').value = '';
+  document.getElementById('fsEstrategia').value = '';
+  aplicarFiltrosSec();
+}
+
+// ═══════════════════════════════════════
 // RENDER PRINCIPAL
 // ═══════════════════════════════════════
 function renderizar() {
@@ -1443,9 +1538,9 @@ function renderAtivos() {
   const hoje = new Date();
 
   // Filtra ativos — usa Seleção Credenciamento = 'Ativo' como fonte da verdade
-  const ativos3 = filtrados.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
-  const ativosOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
-  const msgs = filtrados.filter(d => d.mensagem_painel && !Number(d.credenciado));
+  const ativos3 = filtradosSec.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
+  const ativosOut = filtradosSec.filter(d => !isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado)>0);
+  const msgs = filtradosSec.filter(d => d.mensagem_painel && !Number(d.credenciado));
 
   const totalAtivos = ativos3.length + ativosOut.length;
 
@@ -1484,7 +1579,7 @@ function renderAtivos() {
   // Contexto
   html += contextoBar(totalAtivos + msgs.length);
 
-  if (!filtrados.length) {
+  if (!filtradosSec.length) {
     el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município na busca acima ou use os filtros de região para visualizar os credenciamentos.');
     return;
   }
@@ -1711,8 +1806,8 @@ function renderEncerrados() {
   const el = document.getElementById('c-encerrados');
   const hoje = new Date();
 
-  const enc3   = filtrados.filter(d => isTipo3Comp(d.tipo)  && !isAtivoOutros(d) && Number(d.credenciado)>0);
-  const encOut = filtrados.filter(d => !isTipo3Comp(d.tipo) && !isAtivoOutros(d) && Number(d.credenciado)>0);
+  const enc3   = filtradosSec.filter(d => isTipo3Comp(d.tipo)  && !isAtivoOutros(d) && Number(d.credenciado)>0);
+  const encOut = filtradosSec.filter(d => !isTipo3Comp(d.tipo) && !isAtivoOutros(d) && Number(d.credenciado)>0);
 
   // Resumo
   const portarias = [...new Set([...enc3,...encOut].map(d=>d.portaria))];
@@ -2096,9 +2191,9 @@ function cardHomol(grupo, ativo = true) {
 function renderHomologacoes(ativo = true) {
   const chave = ativo ? 'homol-ativas' : 'homol-encerradas';
   const el = document.getElementById(`c-${chave}`);
-  if (!filtrados.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
+  if (!filtradosSec.length) { el.innerHTML = vazioHTML('🔍','Pesquise um município','Digite o nome do município ou use os filtros acima.'); return; }
 
-  const comCred = filtrados.filter(d => {
+  const comCred = filtradosSec.filter(d => {
     if (!Number(d.credenciado)) return false;
     return ativo ? isAtivoOutros(d) : !isAtivoOutros(d);
   });
@@ -2141,7 +2236,7 @@ function renderPortarias() {
   const el = document.getElementById('c-portarias');
 
   // Portarias vinculadas ao filtro atual
-  const portariasDoFiltro = [...new Set(filtrados.map(d => Number(d.portaria)))].filter(Boolean);
+  const portariasDoFiltro = [...new Set(filtradosSec.map(d => Number(d.portaria)))].filter(Boolean);
 
   if (municipioSel && portariasDoFiltro.length) {
     // ── Vista município: linha do tempo das portarias desse município ──
@@ -2302,10 +2397,10 @@ function fmt(d) {
 // ═══════════════════════════════════════
 function downloadCSV(tipo) {
   const base = tipo==='encerrados'
-    ? filtrados.filter(d => (isTipo3Comp(d.tipo)&&!isAtivo3Comp(d.data_portaria))||(d.selecao_credenciamento||'').toLowerCase()==='finalizado')
+    ? filtradosSec.filter(d => (isTipo3Comp(d.tipo)&&!isAtivo3Comp(d.data_portaria))||(d.selecao_credenciamento||'').toLowerCase()==='finalizado')
     : tipo==='homologacoes'
-    ? filtrados.filter(d => Number(d.credenciado)>0)
-    : filtrados.filter(d => (isTipo3Comp(d.tipo)&&isAtivo3Comp(d.data_portaria))||isAtivoOutros(d));
+    ? filtradosSec.filter(d => Number(d.credenciado)>0)
+    : filtradosSec.filter(d => (isTipo3Comp(d.tipo)&&isAtivo3Comp(d.data_portaria))||isAtivoOutros(d));
 
   const headers = ['Município','UF','Região','Macrorregião','Portaria','Data','Estratégia','Tipo','Credenciado','Homol1','Homol2','Homol3','Status Cred','Status Homol','Observação'];
   const rows = base.map(d => [
