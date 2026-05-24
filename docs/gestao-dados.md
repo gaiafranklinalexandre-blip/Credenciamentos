@@ -118,11 +118,11 @@ Atualizar este objeto ao adicionar portarias com data nula na base.
 | 2ª Parcela financeira | M+3 |
 | 3ª Parcela financeira | M+4 |
 
-**Regra do dia 15:** o painel é atualizado até dia 15-20 de cada mês. Zero em parcela:
-- Antes do dia 15 do mês da parcela → "Aguardando processamento" (normal).
-- Após o dia 15 → "Parcela processada — 0 homologados" (real zero).
+**Regra do dia 15:** Franklin atualiza o painel até o dia 15 de cada mês. Zero em parcela:
+- Antes do dia 15 do mês da parcela → "Aguardando processamento" (normal, esperado).
+- Após o dia 15 → "Parcela processada — 0 homologados" (real zero, problema de cadastro CNES).
 
-No código JS: `const homolDia20 = new Date(comp.aHomol, comp.homol - 1, 20)` — **pendente de confirmação se é dia 15 ou 20** (a conversa usou 20 no código e 15 nas medidas DAX).
+No código JS: `const homolDia20 = new Date(comp.aHomol, comp.homol - 1, 15)` — confirmado dia 15.
 
 ---
 

@@ -1918,7 +1918,7 @@ function cardHomol(grupo, ativo = true) {
     let gridHTML = '<div class="homol-comp-grid">';
     parcelas.forEach(({comp, hVal, idx}) => {
       const cnesStatus  = hoje > comp.fim    ? 'fechado'  : hoje >= comp.inicio ? 'aberto' : 'futuro';
-      const homolDia20  = new Date(comp.aHomol, comp.homol - 1, 20); // dia 20 do mês da parcela
+      const homolDia20  = new Date(comp.aHomol, comp.homol - 1, 15); // dia 15 do mês da parcela
       const homolPasta  = hoje >= homolDia20;
       const homolLabel  = `Parcela ${String(comp.homol).padStart(2,'0')}/${comp.aHomol}`;
 
@@ -2734,7 +2734,7 @@ function montarMapa(porUF, base) {
   }
 
   // GeoJSON das UFs brasileiras (simplificado, inline)
-  fetch('https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson')
+  fetch('docs/brazil-states.geojson')
     .then(r => r.json())
     .then(geo => {
       _geojsonLayer = L.geoJSON(geo, {

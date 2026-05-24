@@ -106,8 +106,9 @@ PAINEL CREDENCIAMENTO/
 
 ## Pendências e melhorias futuras
 
-- [ ] Hospedar GeoJSON das UFs localmente (evitar dependência externa).
-- [ ] Adicionar filtragem por portaria dentro do dashboard (foi removida a pedido).
+- [x] ~~Hospedar GeoJSON das UFs localmente~~ — feito, arquivo em `docs/brazil-states.geojson`.
+- [x] ~~Dia de corte para parcela~~ — confirmado **dia 15**. Código e docs atualizados.
+- [ ] Adicionar filtragem por portaria dentro do dashboard (foi removida a pedido — reavaliar futuramente).
 - [ ] Tooltip nativo do Leaflet com CSS customizado funciona mas pode quebrar em versões futuras da lib.
 - [ ] `DATA_PORTARIA_FALLBACK` deve crescer manualmente — avaliar lógica automática.
 - [ ] Power BI paralelo (`novo_painel.pbix`) ainda em desenvolvimento — medidas DAX sendo criadas em paralelo ao site.
