@@ -87,23 +87,29 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   z-index: 500;
 }
 
-/* Filtros secundários na capa */
-.capa-filtros {
-  position: relative; z-index: 0;
-  display: flex; flex-wrap: wrap; gap: 8px;
-  align-items: center; max-width: 580px; margin-bottom: 10px;
+/* Filtros do dashboard */
+.dash-filtros {
+  background: var(--gray-bg); border-bottom: 1px solid var(--gray-border);
+  padding: 10px 28px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
-.capa-filtros-label { font-size: 12px; color: #777; font-weight: 600; width: 100%; margin-bottom: 2px; }
-.capa-filtros select {
-  border: 1px solid rgba(19,81,180,0.2); border-radius: var(--radius);
-  padding: 8px 28px 8px 14px; font-size: 12px; font-family: inherit;
-  color: var(--text); background: rgba(255,255,255,0.85);
-  cursor: pointer; appearance: none;
+.dash-filtros-label {
+  font-size: 11px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
+}
+.dash-filtros select {
+  font-size: 13px; padding: 5px 28px 5px 10px; border: 1px solid var(--gray-border);
+  border-radius: 6px; background: var(--white); color: var(--text);
+  font-family: inherit; cursor: pointer; appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%231351B4' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 8px center;
-  backdrop-filter: blur(4px);
 }
-.capa-filtros select:focus { outline: 2px solid var(--blue); }
+.dash-filtros select:focus { outline: none; border-color: var(--blue); }
+.dash-filtros-limpar {
+  font-size: 12px; color: var(--blue); font-weight: 600; font-family: inherit;
+  background: none; border: none; cursor: pointer; padding: 4px 8px;
+  border-radius: 4px; display: none;
+}
+.dash-filtros-limpar:hover { background: var(--blue-bg); }
 .capa-erro { font-size: 13px; color: var(--red); font-weight: 600; display: none; position: relative; z-index:1; margin-top: 4px; }
 
 /* ── PAINEL ── */
@@ -965,17 +971,6 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <h1 class="capa-title">Novos <strong>Credenciamentos</strong> da APS</h1>
   <div class="capa-line"></div>
 
-  <!-- Filtros secundários -->
-  <div class="capa-filtros">
-    <div class="capa-filtros-label">Filtre por:</div>
-    <select id="fRegiao"   onchange="onSelectChange()"><option value="">Região</option></select>
-    <select id="fUF"       onchange="onSelectChange()"><option value="">UF</option></select>
-    <select id="fMacro"    onchange="onSelectChange()"><option value="">Macrorregião</option></select>
-    <select id="fPortaria" onchange="onSelectChange()"><option value="">Portaria</option></select>
-    <select id="fAno"      onchange="onSelectChange()"><option value="">Ano</option></select>
-    <button class="btn-limpar-sm" onclick="limparConsulta()" style="position:relative;z-index:1">✕ Limpar</button>
-  </div>
-
   <!-- Busca principal -->
   <div class="capa-busca">
     <div class="capa-busca-campo">
@@ -1014,6 +1009,17 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
       </div>
     </div>
   </div>
+  <!-- Filtros do dashboard -->
+  <div class="dash-filtros" id="dashFiltros">
+    <span class="dash-filtros-label">Filtrar:</span>
+    <select id="dashFRegiao"   onchange="aplicarFiltrosDash()"><option value="">Todas as regiões</option></select>
+    <select id="dashFUF"       onchange="aplicarFiltrosDash()"><option value="">Todas as UFs</option></select>
+    <select id="dashFMacro"    onchange="aplicarFiltrosDash()"><option value="">Todas as macrorregiões</option></select>
+    <select id="dashFPortaria" onchange="aplicarFiltrosDash()"><option value="">Todas as portarias</option></select>
+    <select id="dashFAno"      onchange="aplicarFiltrosDash()"><option value="">Todos os anos</option></select>
+    <button class="dash-filtros-limpar" id="dashFLimpar" onclick="limparFiltrosDash()">✕ Limpar</button>
+  </div>
+
   <div class="dash-body" id="dashBody">
     <div class="vazio"><div class="ico">⏳</div><h3>Carregando dashboard...</h3></div>
   </div>
@@ -1256,53 +1262,32 @@ function voltarConsulta() {
 }
 function executarConsulta() {
   const mun = document.getElementById('buscaInput').value.trim();
-  const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
   const erroEl = document.getElementById('consultaErro');
 
-  if (!mun && !r && !u && !m && !p && !a) {
+  if (!mun) {
     erroEl.style.display = 'block';
     return;
   }
   erroEl.style.display = 'none';
 
-  // Se dados ainda não carregaram, aguarda
   if (!dados.length) {
     erroEl.textContent = 'Aguarde, carregando dados...';
     erroEl.style.display = 'block';
     return;
   }
 
-  // Aplica filtros
-  if (mun) {
-    const partes = mun.split(' - ');
-    municipioSel = partes[0].trim();
-    const ufSel = partes[1] ? partes[1].trim() : '';
-    filtrados = dados.filter(d =>
-      d.municipio.toLowerCase() === municipioSel.toLowerCase() &&
-      (!ufSel || d.uf === ufSel)
-    );
-  } else {
-    municipioSel = '';
-    filtrados = dados.filter(d =>
-      (!r || d.regiao === r) && (!u || d.uf === u) &&
-      (!m || d.macrorregiao === m) && (!p || String(d.portaria) === String(p)) &&
-      (!a || String(d.ano) === String(a))
-    );
-  }
+  const partes = mun.split(' - ');
+  municipioSel = partes[0].trim();
+  const ufSel = partes[1] ? partes[1].trim() : '';
+  filtrados = dados.filter(d =>
+    d.municipio.toLowerCase() === municipioSel.toLowerCase() &&
+    (!ufSel || d.uf === ufSel)
+  );
 
   Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
 
-  // Monta título do resultado
-  const tituloEl = document.getElementById('resultadoTitulo');
-  const subEl    = document.getElementById('resultadoSub');
-  if (municipioSel) {
-    tituloEl.textContent = municipioSel;
-    subEl.textContent = `${filtrados.length} registro(s) encontrado(s)`;
-  } else {
-    const partesFiltro = [r&&`Região: ${r}`, u&&`UF: ${u}`, m&&`Macrorregião: ${m}`, p&&`Portaria: ${p}`, a&&`Ano: ${a}`].filter(Boolean);
-    tituloEl.textContent = partesFiltro.join(' · ');
-    subEl.textContent = `${filtrados.length} registro(s) encontrado(s)`;
-  }
+  document.getElementById('resultadoTitulo').textContent = municipioSel;
+  document.getElementById('resultadoSub').textContent = `${filtrados.length} registro(s) encontrado(s)`;
 
   abaAtiva = 'ativos';
   document.getElementById('capa').style.display = 'none';
@@ -1316,16 +1301,7 @@ function limparConsulta() {
   municipioSel = '';
   document.getElementById('buscaInput').value = '';
   document.getElementById('sugestoes').style.display = 'none';
-  const erroEl = document.getElementById('consultaErro');
-  erroEl.style.display = 'none';
-  erroEl.textContent = 'Selecione pelo menos um município ou filtro para consultar.';
-  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => {
-    const sel = document.getElementById(id);
-    sel.value = '';
-    sel.disabled = false;
-    sel.style.opacity = '';
-  });
-  if (dados.length) atualizarSelects(dados);
+  document.getElementById('consultaErro').style.display = 'none';
 }
 
 // ═══════════════════════════════════════
@@ -1403,24 +1379,20 @@ async function carregarDados() {
 }
 
 // ═══════════════════════════════════════
-// FILTROS — com hierarquia
+// FILTROS DA CAPA (removidos — apenas busca por município)
 // ═══════════════════════════════════════
-function popularFiltros() {
-  // Popula com todos os valores (estado inicial)
-  atualizarSelects(dados);
+function popularFiltros() { /* selects da capa removidos */ }
+function onSelectChange() {}
+function onMunicipioInput() {
+  document.getElementById('consultaErro').style.display = 'none';
 }
-
-function atualizarSelects(base) {
-  const cur = { fRegiao: v('fRegiao'), fUF: v('fUF'), fMacro: v('fMacro'), fPortaria: v('fPortaria'), fAno: v('fAno') };
-  fill('fRegiao',   [...new Set(base.map(d=>d.regiao).filter(Boolean))].sort(), cur.fRegiao);
-  fill('fUF',       [...new Set(base.map(d=>d.uf).filter(Boolean))].sort(), cur.fUF);
-  fill('fMacro',    [...new Set(base.map(d=>d.macrorregiao).filter(Boolean))].sort(), cur.fMacro);
-  fill('fPortaria', [...new Set(base.map(d=>d.portaria).filter(Boolean))].sort((a,b)=>b-a), cur.fPortaria);
-  fill('fAno',      [...new Set(base.map(d=>d.ano).filter(Boolean))].sort((a,b)=>b-a), cur.fAno);
-}
+function aplicarFiltros() {}
+function limparTudo() { voltarCapa(); limparConsulta(); }
+function v(id) { const el = document.getElementById(id); return el ? el.value : ''; }
 
 function fill(id, vals, curVal) {
   const sel = document.getElementById(id);
+  if (!sel) return;
   const ph = sel.options[0].text;
   sel.innerHTML = `<option value="">${ph}</option>`;
   vals.forEach(val => {
@@ -1431,45 +1403,40 @@ function fill(id, vals, curVal) {
   });
 }
 
-// Chamado quando qualquer select muda
-function onSelectChange() {
-  // Se há município digitado, limpa (select tem prioridade)
-  const inp = document.getElementById('buscaInput');
-  if (inp.value.trim()) {
-    inp.value = '';
-    document.getElementById('sugestoes').style.display = 'none';
-  }
-  // Recalcula os outros selects com base nos dados filtrados pelos selects ativos
-  const r = v('fRegiao'), u = v('fUF'), m = v('fMacro'), p = v('fPortaria'), a = v('fAno');
-  const base = dados.filter(d =>
+// ═══════════════════════════════════════
+// FILTROS DO DASHBOARD
+// ═══════════════════════════════════════
+let dadosDash = []; // base do dashboard após filtros
+
+function popularFiltrosDash(base) {
+  fill('dashFRegiao',   [...new Set(base.map(d=>d.regiao).filter(Boolean))].sort(),          v('dashFRegiao'));
+  fill('dashFUF',       [...new Set(base.map(d=>d.uf).filter(Boolean))].sort(),               v('dashFUF'));
+  fill('dashFMacro',    [...new Set(base.map(d=>d.macrorregiao).filter(Boolean))].sort(),     v('dashFMacro'));
+  fill('dashFPortaria', [...new Set(base.map(d=>d.portaria).filter(Boolean))].sort((a,b)=>b-a), v('dashFPortaria'));
+  fill('dashFAno',      [...new Set(base.map(d=>d.ano).filter(Boolean))].sort((a,b)=>b-a),   v('dashFAno'));
+}
+
+function aplicarFiltrosDash() {
+  const r = v('dashFRegiao'), u = v('dashFUF'), m = v('dashFMacro'),
+        p = v('dashFPortaria'), a = v('dashFAno');
+  const baseTodos = dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+  dadosDash = baseTodos.filter(d =>
     (!r || d.regiao === r) && (!u || d.uf === u) &&
     (!m || d.macrorregiao === m) && (!p || String(d.portaria) === String(p)) &&
     (!a || String(d.ano) === String(a))
   );
-  atualizarSelects(base);
-  // Esconde erro se estava visível
-  document.getElementById('consultaErro').style.display = 'none';
+  const temFiltro = r || u || m || p || a;
+  document.getElementById('dashFLimpar').style.display = temFiltro ? 'inline-block' : 'none';
+  montarDashboard(document.getElementById('dashBody'));
 }
 
-// Chamado quando digita no campo município
-function onMunicipioInput() {
-  // Desabilita selects enquanto há texto no município
-  const temTexto = document.getElementById('buscaInput').value.trim().length > 0;
-  ['fRegiao','fUF','fMacro','fPortaria','fAno'].forEach(id => {
+function limparFiltrosDash() {
+  ['dashFRegiao','dashFUF','dashFMacro','dashFPortaria','dashFAno'].forEach(id => {
     const sel = document.getElementById(id);
-    sel.disabled = temTexto;
-    sel.style.opacity = temTexto ? '.4' : '';
+    if (sel) sel.value = '';
   });
-  if (!temTexto) {
-    // Restaura selects com todos os valores
-    atualizarSelects(dados);
-  }
-  document.getElementById('consultaErro').style.display = 'none';
+  aplicarFiltrosDash();
 }
-
-function aplicarFiltros() { /* não usado no novo fluxo */ }
-function limparTudo() { voltarCapa(); limparConsulta(); }
-function v(id) { const el = document.getElementById(id); return el ? el.value : ''; }
 
 // ═══════════════════════════════════════
 // BUSCA
@@ -2639,17 +2606,24 @@ function renderDashboard() {
   const attEl = document.getElementById('dashAttTxt');
   if (attEl && datas.length) attEl.textContent = 'Atualizado em ' + fmt(datas[0]);
 
+  // Popula selects do dashboard na primeira abertura (preserva seleção se já populado)
+  const baseTodos = dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+  popularFiltrosDash(baseTodos);
+
+  // Inicializa dadosDash se ainda vazio
+  if (!dadosDash.length) dadosDash = baseTodos;
+
   carregarChartJs(() => montarDashboard(el));
 }
 
 function montarDashboard(el) {
   const hoje = new Date();
 
-  // ── Portarias disponíveis (detectadas dinamicamente dos dados) ──
-  const portsUnicas = [...new Set(dados.map(d => Number(d.portaria)).filter(Boolean))].sort((a,b) => b - a);
+  // ── Base: dadosDash (já filtrada pelos selects do dashboard) ──
+  const base = dadosDash.length ? dadosDash : dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
 
-  // ── Base: apenas ativos com credenciamento ──
-  const base = dados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+  // ── Portarias disponíveis na base filtrada ──
+  const portsUnicas = [...new Set(base.map(d => Number(d.portaria)).filter(Boolean))].sort((a,b) => b - a);
 
   // ── KPIs ──
   const totalMunicipiosBrasil = 5570;
