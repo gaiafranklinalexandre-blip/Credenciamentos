@@ -1078,7 +1078,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
         </div>
 
         <!-- Dropdown Refinar -->
-        <div class="refinar-wrap" id="refinarWrap">
+        <div class="refinar-wrap" id="refinarWrap" style="display:none">
           <button class="btn-refinar" id="btnRefinar" onclick="toggleRefinar(event)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
             Refinar
@@ -1621,7 +1621,7 @@ function popularFiltrosSec() {
 
   // Mostra o botão Refinar só se houver mais de uma opção para filtrar
   const temOpcoes = portarias.length > 1 || estrategias.length > 1;
-  document.getElementById('refinarWrap').style.display = temOpcoes ? 'inline-block' : 'none';
+  document.getElementById('refinarWrap').style.display = temOpcoes ? 'inline-flex' : 'none';
 }
 
 function aplicarFiltrosSec() {
@@ -2370,6 +2370,7 @@ function renderHomologacoes(ativo = true) {
 
   const comCred = filtradosSec.filter(d => {
     if (!Number(d.credenciado)) return false;
+    if (!isTipo3Comp(d.tipo)) return false;
     return ativo ? isAtivoOutros(d) : !isAtivoOutros(d);
   });
   if (!comCred.length) { el.innerHTML = vazioHTML('📊','Sem dados','Nenhum dado de homologação para o filtro selecionado.'); return; }
