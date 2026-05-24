@@ -1530,9 +1530,9 @@ function baseDeAba(aba) {
     case 'encerrados':
       return filtrados.filter(d => !isAtivoOutros(d) && Number(d.credenciado) > 0);
     case 'homol-ativas':
-      return filtrados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+      return filtrados.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado) > 0);
     case 'homol-encerradas':
-      return filtrados.filter(d => !isAtivoOutros(d) && Number(d.credenciado) > 0);
+      return filtrados.filter(d => isTipo3Comp(d.tipo) && !isAtivoOutros(d) && Number(d.credenciado) > 0);
     case 'portarias':
       return filtrados.filter(d => Number(d.credenciado) > 0);
     default:
