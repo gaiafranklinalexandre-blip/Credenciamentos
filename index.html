@@ -228,31 +228,61 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .aba.ativo { color: var(--blue); border-bottom-color: var(--blue); }
 .aba:hover:not(.ativo) { color: var(--blue); background: var(--blue-bg); }
 
-/* Filtros secundários (dentro do painel de resultados) */
-.filtros-sec {
-  background: var(--gray-bg); border-bottom: 1px solid var(--gray-border);
-  padding: 10px 24px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+/* Filtros secundários — botão flutuante + dropdown */
+.refinar-wrap {
+  position: relative; display: inline-block;
 }
-.filtros-sec-label {
-  font-size: 11px; font-weight: 700; color: var(--text-mid);
-  text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
+.btn-refinar {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  color: var(--blue); background: var(--white);
+  border: 1.5px solid var(--blue); border-radius: 6px;
+  padding: 5px 12px; cursor: pointer; white-space: nowrap;
+  transition: background .15s;
 }
-.filtros-sec select {
-  font-size: 13px; padding: 5px 10px; border: 1px solid var(--gray-border);
-  border-radius: 6px; background: var(--white); color: var(--text);
-  font-family: inherit; cursor: pointer; min-width: 140px; max-width: 240px;
+.btn-refinar:hover { background: var(--blue-bg); }
+.btn-refinar.ativo { background: var(--blue); color: var(--white); }
+.btn-refinar .badge-refinar {
+  background: var(--white); color: var(--blue);
+  font-size: 10px; font-weight: 800;
+  border-radius: 10px; padding: 1px 6px; margin-left: 2px;
 }
-.filtros-sec select:focus { outline: none; border-color: var(--blue); }
-.filtros-sec-limpar {
-  font-size: 12px; color: var(--blue); cursor: pointer; background: none;
-  border: none; font-family: inherit; font-weight: 600; padding: 4px 6px;
-  border-radius: 4px; white-space: nowrap;
-  display: none;
+.btn-refinar.ativo .badge-refinar { background: rgba(255,255,255,.25); color: var(--white); }
+
+.refinar-dropdown {
+  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 300;
+  background: var(--white); border: 1px solid var(--gray-border);
+  border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.13);
+  padding: 16px; min-width: 260px; max-width: 340px;
 }
-.filtros-sec-limpar:hover { background: var(--blue-bg); }
-.filtros-sec-contador {
-  font-size: 12px; color: var(--text-mid); margin-left: auto; white-space: nowrap;
+.refinar-dropdown.aberto { display: block; }
+.refinar-dropdown-titulo {
+  font-size: 10px; font-weight: 700; color: var(--text-mid);
+  text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px;
 }
+.refinar-grupo { margin-bottom: 12px; }
+.refinar-grupo label {
+  display: block; font-size: 11px; font-weight: 600; color: var(--text-mid);
+  margin-bottom: 4px;
+}
+.refinar-grupo select {
+  width: 100%; font-size: 13px; padding: 6px 10px;
+  border: 1px solid var(--gray-border); border-radius: 6px;
+  background: var(--white); color: var(--text);
+  font-family: inherit; cursor: pointer;
+}
+.refinar-grupo select:focus { outline: none; border-color: var(--blue); }
+.refinar-rodape {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 4px; padding-top: 10px; border-top: 1px solid var(--gray-border);
+}
+.refinar-contador { font-size: 12px; color: var(--text-mid); }
+.btn-refinar-limpar {
+  font-size: 12px; color: var(--blue); font-weight: 600; font-family: inherit;
+  background: none; border: none; cursor: pointer; padding: 2px 6px;
+  border-radius: 4px;
+}
+.btn-refinar-limpar:hover { background: var(--blue-bg); }
 
 /* Content */
 .content { padding: 24px; max-width: 1100px; margin: 0 auto; }
@@ -998,6 +1028,33 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
         <div class="resultado-sub" id="resultadoSub">—</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
+        <!-- Botão Refinar (dropdown suspenso) -->
+        <div class="refinar-wrap" id="refinarWrap">
+          <button class="btn-refinar" id="btnRefinar" onclick="toggleRefinar(event)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Refinar
+            <span class="badge-refinar" id="badgeRefinar" style="display:none">0</span>
+          </button>
+          <div class="refinar-dropdown" id="refinarDropdown">
+            <div class="refinar-dropdown-titulo">Filtrar dentro desta aba</div>
+            <div class="refinar-grupo">
+              <label>Portaria</label>
+              <select id="fsPortaria" onchange="aplicarFiltrosSec()">
+                <option value="">Todas</option>
+              </select>
+            </div>
+            <div class="refinar-grupo">
+              <label>Estratégia</label>
+              <select id="fsEstrategia" onchange="aplicarFiltrosSec()">
+                <option value="">Todas</option>
+              </select>
+            </div>
+            <div class="refinar-rodape">
+              <span class="refinar-contador" id="fsContador"></span>
+              <button class="btn-refinar-limpar" id="fsLimpar" onclick="limparFiltrosSec()" style="display:none">✕ Limpar</button>
+            </div>
+          </div>
+        </div>
         <button class="btn-limpar-sm" onclick="voltarCapa()">← Nova consulta</button>
       </div>
     </div>
@@ -1011,19 +1068,6 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
       <button class="aba"       id="aba-homol-encerradas" onclick="trocarAba('homol-encerradas')">Homologações Encerradas</button>
       <div class="aba-sep"></div>
       <button class="aba"       id="aba-portarias"        onclick="trocarAba('portarias')">Portarias</button>
-    </div>
-
-    <!-- Filtros secundários -->
-    <div class="filtros-sec" id="filtrosSec">
-      <span class="filtros-sec-label">Refinar:</span>
-      <select id="fsPortaria" onchange="aplicarFiltrosSec()">
-        <option value="">Todas as portarias</option>
-      </select>
-      <select id="fsEstrategia" onchange="aplicarFiltrosSec()">
-        <option value="">Todas as estratégias</option>
-      </select>
-      <button class="filtros-sec-limpar" id="fsLimpar" onclick="limparFiltrosSec()">✕ Limpar filtros</button>
-      <span class="filtros-sec-contador" id="fsContador"></span>
     </div>
 
     <div class="content">
@@ -1447,8 +1491,15 @@ const ABAS_CONTEUDO = ['ativos','encerrados','homol-ativas','homol-encerradas','
 function trocarAba(aba) {
   abaAtiva = aba;
   document.querySelectorAll('.aba-grupo').forEach(g => g.classList.remove('aberto'));
+  // Limpa filtros secundários ao trocar de aba (contexto muda)
+  const fsP = document.getElementById('fsPortaria');
+  const fsE = document.getElementById('fsEstrategia');
+  if (fsP) fsP.value = '';
+  if (fsE) fsE.value = '';
+  filtradosSec = filtrados;
   atualizarAba();
-  renderizar();
+  popularFiltrosSec();
+  aplicarFiltrosSec();
 }
 
 function atualizarAba() {
@@ -1468,43 +1519,85 @@ function atualizarAba() {
 }
 
 // ═══════════════════════════════════════
-// FILTROS SECUNDÁRIOS (portaria / estratégia)
+// FILTROS SECUNDÁRIOS — por aba
 // ═══════════════════════════════════════
+
+// Retorna o conjunto base de cada aba (antes dos filtros secundários)
+function baseDeAba(aba) {
+  switch (aba) {
+    case 'ativos':
+      return filtrados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+    case 'encerrados':
+      return filtrados.filter(d => !isAtivoOutros(d) && Number(d.credenciado) > 0);
+    case 'homol-ativas':
+      return filtrados.filter(d => isAtivoOutros(d) && Number(d.credenciado) > 0);
+    case 'homol-encerradas':
+      return filtrados.filter(d => !isAtivoOutros(d) && Number(d.credenciado) > 0);
+    case 'portarias':
+      return filtrados.filter(d => Number(d.credenciado) > 0);
+    default:
+      return filtrados;
+  }
+}
+
 function popularFiltrosSec() {
-  // Monta opções a partir de filtrados (resultado da consulta principal)
-  const portarias = [...new Set(filtrados.map(d => d.portaria).filter(Boolean))]
-    .map(Number).sort((a,b) => b - a);
-  const estrategias = [...new Set(filtrados.map(d => d.estrategia).filter(Boolean))].sort();
+  const base = baseDeAba(abaAtiva);
+  const portarias = [...new Set(base.map(d => d.portaria).filter(Boolean))]
+    .map(Number).sort((a, b) => b - a);
+  const estrategias = [...new Set(base.map(d => d.estrategia).filter(Boolean))].sort();
 
   const fsP = document.getElementById('fsPortaria');
   const fsE = document.getElementById('fsEstrategia');
 
-  fsP.innerHTML = '<option value="">Todas as portarias</option>' +
-    portarias.map(p => `<option value="${p}">Portaria Nº ${p}</option>`).join('');
-  fsE.innerHTML = '<option value="">Todas as estratégias</option>' +
-    estrategias.map(e => `<option value="${e}">${e}</option>`).join('');
+  // Preserva seleção atual se ainda for válida
+  const selP = fsP.value;
+  const selE = fsE.value;
 
-  // Só mostra a barra se houver mais de uma opção em pelo menos um select
-  const mostrar = portarias.length > 1 || estrategias.length > 1;
-  document.getElementById('filtrosSec').style.display = mostrar ? 'flex' : 'none';
+  fsP.innerHTML = '<option value="">Todas</option>' +
+    portarias.map(p => `<option value="${p}"${String(p)===selP?'selected':''}>Portaria Nº ${p}</option>`).join('');
+  fsE.innerHTML = '<option value="">Todas</option>' +
+    estrategias.map(e => `<option value="${e}"${e===selE?'selected':''}>  ${e}</option>`).join('');
+
+  // Mostra o botão Refinar só se houver mais de uma opção para filtrar
+  const temOpcoes = portarias.length > 1 || estrategias.length > 1;
+  document.getElementById('refinarWrap').style.display = temOpcoes ? 'inline-block' : 'none';
 }
 
 function aplicarFiltrosSec() {
   const p = document.getElementById('fsPortaria').value;
   const e = document.getElementById('fsEstrategia').value;
-
-  filtradosSec = filtrados.filter(d =>
-    (!p || String(Number(d.portaria)) === String(Number(p))) &&
-    (!e || d.estrategia === e)
-  );
-
   const temFiltro = p || e;
-  const btn = document.getElementById('fsLimpar');
-  btn.style.display = temFiltro ? 'inline-block' : 'none';
+
+  if (!temFiltro) {
+    // Sem filtro: render usa filtrados completo e aplica suas próprias regras
+    filtradosSec = filtrados;
+  } else {
+    // Com filtro: restringe pelo que existe na aba ativa
+    const base = baseDeAba(abaAtiva);
+    filtradosSec = base.filter(d =>
+      (!p || String(Number(d.portaria)) === String(Number(p))) &&
+      (!e || d.estrategia === e)
+    );
+    // Mensagens sem credenciado (aba Ativos) sempre aparecem independente do filtro
+    if (abaAtiva === 'ativos') {
+      const msgs = filtrados.filter(d => d.mensagem_painel && !Number(d.credenciado));
+      filtradosSec = [...filtradosSec, ...msgs];
+    }
+  }
+
+  document.getElementById('fsLimpar').style.display = temFiltro ? 'inline-block' : 'none';
+
+  const nFiltros = [p, e].filter(Boolean).length;
+  const badge = document.getElementById('badgeRefinar');
+  badge.textContent = nFiltros;
+  badge.style.display = nFiltros ? 'inline' : 'none';
+  document.getElementById('btnRefinar').classList.toggle('ativo', !!temFiltro);
 
   const contador = document.getElementById('fsContador');
   if (temFiltro) {
-    contador.textContent = `${filtradosSec.length} de ${filtrados.length} registro(s)`;
+    const base = baseDeAba(abaAtiva);
+    const exibidos = filtradosSec.filter(d => Number(d.credenciado) > 0).length;
+    contador.textContent = `${exibidos} de ${base.length} registro(s)`;
   } else {
     contador.textContent = '';
   }
@@ -1518,6 +1611,20 @@ function limparFiltrosSec() {
   document.getElementById('fsEstrategia').value = '';
   aplicarFiltrosSec();
 }
+
+function toggleRefinar(e) {
+  e.stopPropagation();
+  document.getElementById('refinarDropdown').classList.toggle('aberto');
+}
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('refinarWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const dd = document.getElementById('refinarDropdown');
+    if (dd) dd.classList.remove('aberto');
+  }
+});
 
 // ═══════════════════════════════════════
 // RENDER PRINCIPAL
