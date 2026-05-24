@@ -203,7 +203,7 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 
 /* Seletor de aba (dropdown no header) */
 .nav-controles {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
 .nav-dropdown-wrap {
   position: relative; display: inline-block;
@@ -223,7 +223,7 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
   display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 300;
   background: var(--white); border: 1px solid var(--gray-border);
   border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.13);
-  padding: 6px; min-width: 220px; overflow: hidden;
+  padding: 6px; width: 230px; overflow: hidden;
 }
 .nav-aba-dropdown.aberto { display: block; }
 .nav-aba-grupo-label {
@@ -269,10 +269,10 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 .btn-refinar.ativo .badge-refinar { background: rgba(255,255,255,.25); color: var(--white); }
 
 .refinar-dropdown {
-  display: none; position: absolute; top: calc(100% + 6px); left: 0; z-index: 300;
+  display: none; position: absolute; top: calc(100% + 6px); right: 0; z-index: 300;
   background: var(--white); border: 1px solid var(--gray-border);
   border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.13);
-  padding: 16px; min-width: 260px; max-width: 340px;
+  padding: 16px; width: 260px;
 }
 .refinar-dropdown.aberto { display: block; }
 .refinar-dropdown-titulo {
@@ -630,10 +630,12 @@ body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: va
 #resultado { display: none; }
 .resultado-header {
   background: var(--white); border-bottom: 1px solid var(--gray-border);
-  padding: 12px 24px; display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  padding: 10px 24px; display: flex; align-items: center;
+  justify-content: space-between; gap: 12px;
   position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+  overflow: visible;
 }
+.resultado-header > div:first-child { min-width: 0; flex: 1; }
 .resultado-titulo { font-size: 15px; font-weight: 700; color: var(--blue); }
 .resultado-sub { font-size: 11px; color: var(--text-mid); }
 

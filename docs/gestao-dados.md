@@ -93,12 +93,21 @@ n_portaria = int(raw)
 No front, a comparação é sempre `Number(p.n_portaria)` vs `Number(d.portaria)`.
 
 ### Tipo de credenciamento
+A coluna `Tipo` define o processo de cada registro. Só existem dois valores na base:
+
+| Valor na base | Descrição | Aparece em Homologações? |
+|---|---|---|
+| `'3 competêcias'` (typo sem "n") | Processo com 3 competências CNES + 3 parcelas financeiras | **Sim** |
+| `'Específicos'` | Incentivos específicos (CEO, LRPD, Residentes, SESB, Quilombola, PNAISARI, UBSF) | **Não** |
+
 A função `isTipo3Comp()` aceita variações e o typo da base:
 ```javascript
 // Aceita "3 competências", "3 competêcias" (typo), "3 comp", etc.
 return t.startsWith('3') && (t.includes('compet') || t.includes('comp'));
 ```
 **Não corrigir o typo na base sem atualizar esta função.**
+
+As abas **Homologações Ativas** e **Homologações Encerradas** só exibem registros onde `isTipo3Comp(d.tipo) === true`. Registros `Específicos` não possuem processo de competências/parcelas e nunca devem aparecer nessas abas — independente da estratégia.
 
 ### selecao_credenciamento
 - `'Ativo'` → credenciamento ativo (aparece nas abas Ativos, Homologações Ativas, Dashboard).
