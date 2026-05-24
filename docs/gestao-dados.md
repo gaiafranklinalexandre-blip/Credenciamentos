@@ -4,10 +4,19 @@
 
 | Arquivo | Aba/Sheet | Atualizado por |
 |---|---|---|
-| `base_credenciamentos_2026.xlsx` | `Base` | Franklin (manual, até dia 15-20 do mês) |
+| `base_credenciamentos_2026.xlsx` | `Base` | Franklin (manual, até dia 15 do mês) |
 | `Portarias_APS_Database.xlsx` | Aba ativa (primeira) | Franklin (manual, ao publicar portaria) |
 
 Ambos os arquivos **não são versionados** no GitHub (`.gitignore` ou omissão intencional).
+
+> ⚠️ **REGRA CRÍTICA — NÃO ALTERAR A ESTRUTURA DA BASE**
+>
+> Jamais renomear colunas, remover campos ou alterar a estrutura do arquivo `base_credenciamentos_2026.xlsx`.
+> Este arquivo é fonte de dados do **Power BI** (em uso ativo) e do **site** (via sync.py).
+> Qualquer mudança estrutural quebra o Power BI imediatamente — sem possibilidade de rollback automático.
+>
+> Permitido: adicionar linhas (novos registros).
+> Não permitido: renomear colunas, remover colunas, mudar tipos, alterar nome da aba `Base`.
 
 ---
 

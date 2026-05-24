@@ -74,6 +74,7 @@ index.html (Render) ← fetch API em tempo real
 - Não usar frameworks JS (React, Vue, etc.) — o projeto é vanilla JS intencional.
 - Não criar arquivos CSS ou JS separados — tudo permanece em `index.html`.
 - Não versionar arquivos `.xlsx`, `desktop.ini`, `~$*`, `.pbix`.
+- **NUNCA alterar a estrutura do `base_credenciamentos_2026.xlsx`** — renomear ou remover colunas quebra o Power BI em produção. Apenas adicionar linhas é permitido.
 - `sync.php` nunca vai para o GitHub — é atualizado manualmente no Hostinger.
 - Não alterar regras de negócio (competências, parcelas, dia 15) sem documentar impacto.
 - Ao editar `index.html`, sempre fazer commit e push para `main` — o Render faz o deploy automaticamente.
