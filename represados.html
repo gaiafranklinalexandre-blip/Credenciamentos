@@ -513,6 +513,12 @@
   <!-- KPI UF com Maior Demanda -->
   <div style="padding: 0 28px 28px 28px; background: var(--gray-bg);" id="kpiUFContainer"></div>
 
+  <!-- KPIs por Estratégia (Solicitadas) -->
+  <div style="padding: 28px 28px 0 28px; background: var(--gray-bg);">
+    <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Estratégias Aguardando Credenciamento</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;" id="kpiEstrategiasSolicitadasContainer"></div>
+  </div>
+
   <!-- Mapa -->
   <div id="mapa"></div>
 
@@ -778,6 +784,41 @@
     `;
   }
 
+  function renderKPIsEstrategiasSolicitadas() {
+    // Filtrar apenas SOLICITADA
+    const solicitadas = filtrados.filter(d => d.status === 'SOLICITADA');
+
+    // Agrupar por estratégia
+    const porEst = {};
+    solicitadas.forEach(d => {
+      if (!porEst[d.estrategia]) {
+        porEst[d.estrategia] = { qtd: 0, count: 0 };
+      }
+      porEst[d.estrategia].qtd += Number(d.quantidade) || 0;
+      porEst[d.estrategia].count += 1;
+    });
+
+    if (Object.keys(porEst).length === 0) {
+      return '<div style="padding: 20px; background: white; border-radius: 12px; text-align: center; grid-column: 1/-1;">Nenhuma estratégia aguardando credenciamento</div>';
+    }
+
+    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1'];
+    let idx = 0;
+
+    return Object.entries(porEst)
+      .sort((a, b) => b[1].qtd - a[1].qtd)
+      .map(([est, data]) => {
+        const cor = cores[idx++ % cores.length];
+        return `
+          <div style="background: white; border-radius: 12px; border-top: 4px solid ${cor}; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);">
+            <div style="font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.4px;">${est}</div>
+            <div style="font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 4px;">${data.qtd.toLocaleString('pt-BR')}</div>
+            <div style="font-size: 12px; color: #666;">${data.count} solicitação${data.count > 1 ? 's' : ''}</div>
+          </div>
+        `;
+      }).join('');
+  }
+
   function calcularTempoMedioFila() {
     if (!filtrados.length) return '—';
     const hoje = new Date();
@@ -933,6 +974,9 @@
 
     const kpiUF = document.getElementById('kpiUFContainer');
     if (kpiUF) kpiUF.innerHTML = renderKPIUFMaiorDemanda();
+
+    const kpiEst = document.getElementById('kpiEstrategiasSolicitadasContainer');
+    if (kpiEst) kpiEst.innerHTML = renderKPIsEstrategiasSolicitadas();
 
     const mapaEl = document.getElementById('mapa');
     if (mapaEl) renderMapa();
