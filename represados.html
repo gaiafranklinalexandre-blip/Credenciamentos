@@ -877,10 +877,13 @@
         </span>
       `).join('');
 
-    document.getElementById('tipoSolicitacaoContainer').innerHTML = `
-      <div style="font-weight: 700; margin-bottom: 12px; color: var(--text);">Distribuição por Tipo de Solicitação</div>
-      ${html}
-    `;
+    const tipoEl = document.getElementById('tipoSolicitacaoContainer');
+    if (tipoEl) {
+      tipoEl.innerHTML = `
+        <div style="font-weight: 700; margin-bottom: 12px; color: var(--text);">Distribuição por Tipo de Solicitação</div>
+        ${html}
+      `;
+    }
   }
 
   function renderChartEstrategia() {
@@ -955,9 +958,15 @@
 
   // ─── RENDER COMPLETO ──────────────────────────────────────
   function renderizarDashboard() {
-    document.getElementById('kpiPrincipaisContainer').innerHTML = renderKPIsPrincipais();
-    document.getElementById('kpiUFContainer').innerHTML = renderKPIUFMaiorDemanda();
-    renderMapa();
+    const kpiPrin = document.getElementById('kpiPrincipaisContainer');
+    if (kpiPrin) kpiPrin.innerHTML = renderKPIsPrincipais();
+
+    const kpiUF = document.getElementById('kpiUFContainer');
+    if (kpiUF) kpiUF.innerHTML = renderKPIUFMaiorDemanda();
+
+    const mapaEl = document.getElementById('mapa');
+    if (mapaEl) renderMapa();
+
     renderCharts();
   }
 </script>
