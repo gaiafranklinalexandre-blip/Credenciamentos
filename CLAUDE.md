@@ -123,22 +123,24 @@ Sempre que o contexto do projeto mudar:
 
 ---
 
-## Dois projetos em paralelo
+## Quatro projetos em paralelo
 
-Este repositório documenta **dois projetos simultâneos**:
+Este repositório documenta **quatro projetos simultâneos**:
 
-| Projeto | Status | Arquivo principal |
-|---|---|---|
-| **Site web** (substituto) | Em desenvolvimento e validação | `index.html` |
-| **Power BI** (legado ativo) | Em uso até validação completa do site | `novo_painel.pbix` (local) |
+| Projeto | Status | Arquivo principal | Repo |
+|---|---|---|---|
+| **Site web** (substituto) | Em desenvolvimento e validação | `index.html` | `Credenciamentos` |
+| **Power BI** (legado ativo) | Em uso até validação completa do site | `novo_painel.pbix` (local) | — |
+| **Wrapper com GA4** (novo) | Live | `index.html` | `Page_credenciamento` |
+| **Painel Represados** (novo) | Em desenvolvimento | `represados.html` | `Credenciamentos` |
 
-O Power BI será descontinuado quando o site estiver totalmente validado pela SAPS. Ambos compartilham a mesma base de dados Excel e as mesmas regras de negócio.
+O Power BI será descontinuado quando o site estiver totalmente validado pela SAPS. O wrapper com GA4 é uma página estática que embute o Power BI via iframe com rastreamento de acessos. O painel Represados monitora solicitações pendentes (represadas) com autenticação por senha.
 
 ---
 
 ## Documentos de referência
 
-### Site
+### Site web
 | Documento | Conteúdo |
 |---|---|
 | [`docs/contexto-do-projeto.md`](docs/contexto-do-projeto.md) | Objetivo, funcionalidades, decisões técnicas e visuais |
@@ -147,6 +149,18 @@ O Power BI será descontinuado quando o site estiver totalmente validado pela SA
 | [`docs/github-flow.md`](docs/github-flow.md) | Branches, commits, arquivos ignorados |
 | [`docs/deploy-render.md`](docs/deploy-render.md) | Deploy, validação, rollback |
 | [`docs/atualizacao-das-regras.md`](docs/atualizacao-das-regras.md) | Quando e como atualizar a documentação |
+
+### Wrapper com GA4
+| Documento | Conteúdo |
+|---|---|
+| [`docs/wrapper-ga4.md`](docs/wrapper-ga4.md) | Arquitetura, GA4, fluxo de desenvolvimento, repos e deploy |
+
+### Painel Represados
+| Documento | Conteúdo |
+|---|---|
+| [`docs/represados.md`](docs/represados.md) | Objetivo, estrutura de dados, arquitetura, frontend, backend |
+| [`docs/sync-php-represados.md`](docs/sync-php-represados.md) | Código PHP para Hostinger (CREATE TABLE, handlers), testes |
+| `represados.html` | Dashboard com autenticação, filtros cascata, KPIs, mapa, gráficos |
 
 ### Power BI
 | Documento | Conteúdo |
