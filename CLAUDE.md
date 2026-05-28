@@ -159,7 +159,8 @@ O Power BI será descontinuado quando o site estiver totalmente validado pela SA
 | Documento | Conteúdo |
 |---|---|
 | [`docs/represados.md`](docs/represados.md) | Objetivo, estrutura de dados, arquitetura, frontend, backend |
-| [`docs/sync-php-represados.md`](docs/sync-php-represados.md) | Código PHP para Hostinger (CREATE TABLE, handlers), testes |
+| [`docs/sync-php-completo.php`](docs/sync-php-completo.php) | Arquivo completo para substituir no Hostinger (pronto para usar) |
+| [`docs/INSTRUCOES-HOSTINGER.md`](docs/INSTRUCOES-HOSTINGER.md) | Passo a passo para upload e configuração |
 | `represados.html` | Dashboard com autenticação, filtros cascata, KPIs, mapa, gráficos |
 
 ### Power BI
