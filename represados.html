@@ -507,21 +507,23 @@
     <button class="btn-limpar" onclick="limparFiltros()">Limpar Filtros</button>
   </div>
 
-  <!-- KPIs -->
-  <div class="kpi-grid" id="kpiContainer"></div>
+  <!-- KPIs Principais (Total e Quantidade) -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 28px 28px; background: var(--gray-bg);" id="kpiPrincipaisContainer"></div>
+
+  <!-- KPI UF com Maior Demanda -->
+  <div style="padding: 0 28px 28px 28px; background: var(--gray-bg);" id="kpiUFContainer"></div>
 
   <!-- Mapa -->
   <div id="mapa"></div>
 
-  <!-- Charts -->
-  <div class="charts-grid">
+  <!-- Tipo de Solicitação (Badges) -->
+  <div style="padding: 24px 28px; background: var(--gray-bg);" id="tipoSolicitacaoContainer"></div>
+
+  <!-- Top 5 Estratégias -->
+  <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
-      <div class="chart-titulo">Represados por Estratégia</div>
+      <div class="chart-titulo">Top 5 Estratégias com Maior Demanda</div>
       <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-titulo">Distribuição por Tipo de Solicitação</div>
-      <div class="chart-wrap"><canvas id="chartRequestType"></canvas></div>
     </div>
   </div>
 
@@ -727,40 +729,48 @@
   }
 
   // ─── KPIs ─────────────────────────────────────────────────
-  function renderKPIs() {
+  function renderKPIsPrincipais() {
     const total = filtrados.length;
     const totalQtd = filtrados.reduce((s, d) => s + (Number(d.quantidade) || 0), 0);
-    const ufs = new Set(filtrados.map(d => d.uf)).size;
-    const muns = new Set(filtrados.map(d => d.municipio)).size;
-    const avgDias = calcularTempoMedioFila();
 
     return `
-      <div class="kpi">
+      <div class="kpi" style="grid-column: span 1; border-top-width: 6px; padding: 28px; min-height: 160px;">
         <div class="kpi-label">Total de Represados</div>
-        <div class="kpi-valor">${total.toLocaleString('pt-BR')}</div>
+        <div class="kpi-valor" style="font-size: 48px;">${total.toLocaleString('pt-BR')}</div>
         <div class="kpi-sub">solicitações em fila</div>
-        <div class="kpi-ico">📋</div>
+        <div class="kpi-ico" style="font-size: 56px;">📋</div>
       </div>
 
-      <div class="kpi verde">
+      <div class="kpi verde" style="grid-column: span 1; border-top-width: 6px; padding: 28px; min-height: 160px;">
         <div class="kpi-label">Quantidade Acumulada</div>
-        <div class="kpi-valor">${totalQtd.toLocaleString('pt-BR')}</div>
+        <div class="kpi-valor" style="font-size: 48px;">${totalQtd.toLocaleString('pt-BR')}</div>
         <div class="kpi-sub">equipes/serviços em espera</div>
-        <div class="kpi-ico">👥</div>
+        <div class="kpi-ico" style="font-size: 56px;">👥</div>
       </div>
+    `;
+  }
 
-      <div class="kpi amarelo">
-        <div class="kpi-label">Distribuição Geográfica</div>
-        <div class="kpi-valor">${ufs}/${muns}</div>
-        <div class="kpi-sub">estados/municípios</div>
-        <div class="kpi-ico">🗺️</div>
-      </div>
+  function renderKPIUFMaiorDemanda() {
+    const porUF = {};
+    filtrados.forEach(d => {
+      const uf = d.uf || 'Desconhecido';
+      porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0);
+    });
 
-      <div class="kpi roxo">
-        <div class="kpi-label">Tempo Médio em Fila</div>
-        <div class="kpi-valor">${avgDias}</div>
-        <div class="kpi-sub">dias desde solicitação</div>
-        <div class="kpi-ico">⏱️</div>
+    const ufMaior = Object.entries(porUF)
+      .filter(([uf]) => uf !== 'Desconhecido')
+      .sort((a, b) => b[1] - a[1])[0];
+
+    if (!ufMaior) {
+      return '<div style="padding: 20px; background: white; border-radius: 12px; text-align: center;">Sem dados</div>';
+    }
+
+    return `
+      <div class="kpi amarelo" style="max-width: 400px;">
+        <div class="kpi-label">UF com Maior Demanda</div>
+        <div class="kpi-valor" style="font-size: 40px;">${ufMaior[0]}</div>
+        <div class="kpi-sub">${ufMaior[1].toLocaleString('pt-BR')} represados</div>
+        <div class="kpi-ico" style="font-size: 50px;">🗺️</div>
       </div>
     `;
   }
@@ -840,8 +850,37 @@
 
   // ─── CHARTS ───────────────────────────────────────────────
   function renderCharts() {
+    renderTipoSolicitacao();
     renderChartEstrategia();
-    renderChartRequestType();
+  }
+
+  function renderTipoSolicitacao() {
+    const porTipo = {};
+    filtrados.forEach(d => {
+      const tipo = d.request_type || 'OUTRO';
+      porTipo[tipo] = (porTipo[tipo] || 0) + 1;
+    });
+
+    const tiposNomes = {
+      'CRED': 'Credenciamento',
+      'AMPL': 'Ampliação',
+      'TIPO': 'Alteração de Tipo',
+      'ADESAO': 'Adesão',
+      'OUTRO': 'Outro'
+    };
+
+    const html = Object.entries(porTipo)
+      .sort((a, b) => b[1] - a[1])
+      .map(([tipo, qtd]) => `
+        <span style="display: inline-block; background: var(--blue-bg); color: var(--blue); padding: 8px 16px; border-radius: 20px; margin-right: 12px; margin-bottom: 8px; font-weight: 600;">
+          ${tiposNomes[tipo] || tipo}: ${qtd}
+        </span>
+      `).join('');
+
+    document.getElementById('tipoSolicitacaoContainer').innerHTML = `
+      <div style="font-weight: 700; margin-bottom: 12px; color: var(--text);">Distribuição por Tipo de Solicitação</div>
+      ${html}
+    `;
   }
 
   function renderChartEstrategia() {
@@ -850,8 +889,13 @@
       porEst[d.estrategia] = (porEst[d.estrategia] || 0) + (Number(d.quantidade) || 0);
     });
 
-    const labels = Object.keys(porEst).sort();
-    const data = labels.map(e => porEst[e]);
+    // Top 5 apenas
+    const top5 = Object.entries(porEst)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    const labels = top5.map(([est]) => est);
+    const data = top5.map(([, qtd]) => qtd);
 
     if (_charts.estrategia) _charts.estrategia.destroy();
 
@@ -868,47 +912,14 @@
         }]
       },
       options: {
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
-          x: { grid: { display: false } }
+          x: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          y: { grid: { display: false } }
         }
-      }
-    });
-  }
-
-
-  function renderChartRequestType() {
-    const porTipo = {};
-    filtrados.forEach(d => {
-      const tipo = d.request_type || 'OUTRO';
-      porTipo[tipo] = (porTipo[tipo] || 0) + (Number(d.quantidade) || 0);
-    });
-
-    const labels = Object.keys(porTipo);
-    const data = labels.map(t => porTipo[t]);
-    const colors = ['var(--blue)', 'var(--green)', 'var(--yellow)', 'var(--red)', 'var(--purple)'];
-
-    if (_charts.requestType) _charts.requestType.destroy();
-
-    const ctx = document.getElementById('chartRequestType');
-    _charts.requestType = new Chart(ctx, {
-      type: 'pie',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: colors.slice(0, labels.length),
-          borderWidth: 3,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } }
       }
     });
   }
@@ -944,7 +955,8 @@
 
   // ─── RENDER COMPLETO ──────────────────────────────────────
   function renderizarDashboard() {
-    document.getElementById('kpiContainer').innerHTML = renderKPIs();
+    document.getElementById('kpiPrincipaisContainer').innerHTML = renderKPIsPrincipais();
+    document.getElementById('kpiUFContainer').innerHTML = renderKPIUFMaiorDemanda();
     renderMapa();
     renderCharts();
   }
