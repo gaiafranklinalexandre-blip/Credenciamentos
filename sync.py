@@ -6,6 +6,7 @@ from datetime import datetime
 # Configurações
 EXCEL_PATH          = os.path.join(os.path.dirname(__file__), 'base_credenciamentos_2026.xlsx')
 PORTARIAS_EXCEL     = os.path.join(os.path.dirname(__file__), 'Portarias_APS_Database.xlsx')
+REPRESADOS_EXCEL    = os.path.join(os.path.dirname(__file__), 'REPRESADO_2.xlsx')
 API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php'
 API_KEY = 'painel_cred_2026_key'
 
@@ -155,8 +156,94 @@ def sync_portarias(records):
     result = resp.json()
     print(f'Portarias sincronizadas: {result.get("inserted", 0)} registros.')
 
+def build_ibge_map(records):
+    ibge_map = {}
+    for r in records:
+        ibge = r.get('ibge', 0)
+        if ibge and ibge not in ibge_map:
+            ibge_map[ibge] = {
+                'uf': r.get('uf', ''),
+                'municipio': r.get('municipio', '')
+            }
+    return ibge_map
+
+def load_represados(ibge_map):
+    if not os.path.exists(REPRESADOS_EXCEL):
+        print(f'Arquivo {REPRESADOS_EXCEL} não encontrado. Pulando represados.')
+        return []
+
+    print(f'Lendo {REPRESADOS_EXCEL}...')
+    wb = openpyxl.load_workbook(REPRESADOS_EXCEL, data_only=True)
+    ws = wb.active
+
+    headers = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+    print(f'Colunas represados: {headers}')
+
+    records = []
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        if all(v is None for v in row):
+            continue
+        r = dict(zip(headers, row))
+
+        ibge_code = to_int(r.get('IBGE'))
+        uf = ''
+        municipio = ''
+        if ibge_code in ibge_map:
+            uf = ibge_map[ibge_code].get('uf', '')
+            municipio = ibge_map[ibge_code].get('municipio', '')
+
+        nro_solicitacao = to_str(r.get('Nº Solicitação'))
+        request_type = 'OUTRO'
+        if nro_solicitacao:
+            parts = nro_solicitacao.split('.')
+            if parts:
+                request_type = parts[0]
+
+        data_sol_raw = to_str(r.get('Data da Solicitação'))
+        data_solicitacao = None
+        if data_sol_raw:
+            try:
+                data_solicitacao = datetime.strptime(data_sol_raw, '%d/%m/%Y').strftime('%Y-%m-%d')
+            except:
+                pass
+
+        records.append({
+            'ibge':               ibge_code,
+            'uf':                 uf,
+            'municipio':          municipio,
+            'nro_solicitacao':    nro_solicitacao,
+            'data_solicitacao':   data_solicitacao,
+            'estrategia':         to_str(r.get('Estratégia')),
+            'status':             to_str(r.get('Status')),
+            'quantidade':         to_int(r.get('Quantidade')),
+            'request_type':       request_type,
+            'obs':                to_str(r.get('OBS')),
+        })
+
+    print(f'{len(records)} represados carregados.')
+    return records
+
+def sync_represados(records):
+    if not records:
+        print('Nenhum represado para sincronizar.')
+        return
+
+    print('Enviando represados para o servidor...')
+    resp = requests.post(
+        f'{API_URL}?action=sync_represados',
+        json={'records': records},
+        headers={'X-Api-Key': API_KEY},
+        timeout=60
+    )
+    resp.raise_for_status()
+    result = resp.json()
+    print(f'Represados sincronizados: {result.get("inserted", 0)} registros.')
+
 if __name__ == '__main__':
     records = load_excel()
     sync(records)
     portarias = load_portarias()
     sync_portarias(portarias)
+    ibge_map = build_ibge_map(records)
+    represados = load_represados(ibge_map)
+    sync_represados(represados)

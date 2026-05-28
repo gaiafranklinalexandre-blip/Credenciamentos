@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Represados — Ministério da Saúde</title>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-D8TE54RKD3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-D8TE54RKD3', {
+      'page_title': 'Painel de Represados',
+      'page_location': window.location.href
+    });
+  </script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+
+  <style>
+    :root {
+      --blue:        #1351B4;
+      --blue-hover:  #2670E8;
+      --blue-light:  #D4E3FF;
+      --blue-bg:     #EEF2FB;
+      --green:       #168821;
+      --green-light: #E3F5E1;
+      --red:         #E52207;
+      --red-light:   #FFE8E5;
+      --yellow:      #FFCD07;
+      --yellow-light:#FFF5C2;
+      --purple:      #6c3fc5;
+      --gray-bg:     #F0F0F5;
+      --gray-border: #E0E0E0;
+      --text:        #1C1C1C;
+      --text-mid:    #666;
+      --white:       #fff;
+      --radius:      50px;
+      --card-r:      12px;
+      --shadow:      0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: var(--text); font-size: 14px; }
+
+    /* ─── COVER PAGE (PASSWORD) ─── */
+    #capaSenha {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #EAECF4 0%, #E8EBEF 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #capaSenha::before {
+      content: '';
+      position: absolute;
+      left: -160px;
+      top: -160px;
+      width: 480px;
+      height: 480px;
+      border-radius: 50%;
+      background: rgba(19,81,180,0.05);
+    }
+
+    #capaSenha::after {
+      content: '';
+      position: absolute;
+      right: -100px;
+      bottom: -100px;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: rgba(19,81,180,0.06);
+    }
+
+    .capa-form {
+      background: var(--white);
+      border-radius: var(--card-r);
+      box-shadow: 0 8px 32px rgba(19,81,180,0.12);
+      padding: 48px 40px;
+      max-width: 420px;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .capa-titulo {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .capa-sub {
+      font-size: 13px;
+      color: var(--text-mid);
+      text-align: center;
+      margin-bottom: 28px;
+      line-height: 1.4;
+    }
+
+    .capa-grupo {
+      margin-bottom: 20px;
+    }
+
+    .capa-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .capa-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--gray-border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+
+    .capa-input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    .capa-btn {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .capa-btn:hover { background: var(--blue-hover); }
+    .capa-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+    .capa-erro {
+      color: var(--red);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 16px;
+      padding: 12px;
+      background: var(--red-light);
+      border-radius: 6px;
+      display: none;
+    }
+
+    /* ─── HEADER ─── */
+    .header {
+      background: white;
+      border-bottom: 1px solid var(--gray-border);
+      padding: 20px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-titulo {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .header-logout {
+      background: var(--red-light);
+      color: var(--red);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .header-logout:hover { background: var(--red); color: white; }
+
+    /* ─── FILTERS ─── */
+    .filtros {
+      background: white;
+      border-bottom: 1px solid var(--gray-border);
+      padding: 16px 28px;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filtro-grupo {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 150px;
+    }
+
+    .filtro-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .filtro-select, .filtro-input {
+      padding: 10px 12px;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      transition: border-color .2s;
+    }
+
+    .filtro-select:focus, .filtro-input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+
+    .btn-limpar {
+      padding: 10px 20px;
+      background: var(--gray-border);
+      color: var(--text);
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-limpar:hover { background: #d0d0d0; }
+
+    /* ─── KPI GRID ─── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      padding: 24px 28px;
+      background: var(--gray-bg);
+    }
+
+    .kpi {
+      background: white;
+      border-radius: var(--card-r);
+      border-top: 4px solid var(--blue);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi.verde { border-top-color: var(--green); }
+    .kpi.amarelo { border-top-color: var(--yellow); }
+    .kpi.roxo { border-top-color: var(--purple); }
+
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.4px;
+    }
+
+    .kpi-valor {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--text-mid);
+      margin-bottom: 8px;
+    }
+
+    .kpi-ico {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      font-size: 40px;
+      opacity: 0.1;
+    }
+
+    /* ─── MAPA ─── */
+    #mapa {
+      height: 420px;
+      border-radius: 10px;
+      margin: 24px 28px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ─── CHARTS GRID ─── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 20px;
+      padding: 24px 28px;
+      background: var(--gray-bg);
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: var(--card-r);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-titulo {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 16px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      height: 280px;
+    }
+
+    /* ─── TABELA ─── */
+    .tabela-container {
+      padding: 24px 28px;
+      background: var(--gray-bg);
+    }
+
+    .tabela-titulo {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 16px;
+    }
+
+    .tabela {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: var(--card-r);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .tabela thead {
+      background: var(--blue-bg);
+    }
+
+    .tabela th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .tabela td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--gray-border);
+      font-size: 13px;
+    }
+
+    .tabela td.num {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    /* ─── LOADING ─── */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-mid);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 4px solid var(--blue-light);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 1000px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 700px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+      .filtros { flex-direction: column; }
+      .filtro-grupo { min-width: 100%; }
+      #mapa { height: 280px; }
+      .tabela { font-size: 12px; }
+      .tabela th, .tabela td { padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div id="capaSenha">
+  <div class="capa-form">
+    <div class="capa-titulo">Painel de Represados</div>
+    <div class="capa-sub">Acesso restrito. Por favor, digite a senha para continuar.</div>
+    <div class="capa-grupo">
+      <label class="capa-label">Senha</label>
+      <input type="password" id="senhaInput" class="capa-input" placeholder="Digite a senha" />
+    </div>
+    <button class="capa-btn" onclick="autenticar()">Acessar Painel</button>
+    <div class="capa-erro" id="erroMsg"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="painelRepresentados" style="display:none;">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-titulo">Painel de Represados — Ministério da Saúde</div>
+    <button class="header-logout" onclick="logout()">Sair</button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filtros">
+    <div class="filtro-grupo">
+      <label class="filtro-label">Estado</label>
+      <select id="filtroUF" class="filtro-select" onchange="onFiltroUFChange()">
+        <option value="">Todos os estados</option>
+      </select>
+    </div>
+
+    <div class="filtro-grupo">
+      <label class="filtro-label">Município</label>
+      <select id="filtroMunicipio" class="filtro-select" onchange="onFiltroChange()">
+        <option value="">Todos os municípios</option>
+      </select>
+    </div>
+
+    <div class="filtro-grupo">
+      <label class="filtro-label">Estratégia</label>
+      <select id="filtroEstrategia" class="filtro-select" onchange="onFiltroChange()">
+        <option value="">Todas as estratégias</option>
+      </select>
+    </div>
+
+    <div class="filtro-grupo">
+      <label class="filtro-label">Tipo de Solicitação</label>
+      <select id="filtroRequestType" class="filtro-select" onchange="onFiltroChange()">
+        <option value="">Todos os tipos</option>
+        <option value="CRED">Credenciamento (CRED)</option>
+        <option value="AMPL">Ampliação (AMPL)</option>
+        <option value="TIPO">Alteração de Tipo (TIPO)</option>
+        <option value="ADESAO">Adesão (ADESAO)</option>
+        <option value="OUTRO">Outro</option>
+      </select>
+    </div>
+
+    <div class="filtro-grupo">
+      <label class="filtro-label">Data Inicial</label>
+      <input type="date" id="filtroDataInicio" class="filtro-input" onchange="onFiltroChange()" />
+    </div>
+
+    <div class="filtro-grupo">
+      <label class="filtro-label">Data Final</label>
+      <input type="date" id="filtroDataFim" class="filtro-input" onchange="onFiltroChange()" />
+    </div>
+
+    <button class="btn-limpar" onclick="limparFiltros()">Limpar Filtros</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiContainer"></div>
+
+  <!-- Mapa -->
+  <div id="mapa"></div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-titulo">Represados por Estratégia</div>
+      <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-titulo">Distribuição por Status</div>
+      <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-titulo">Distribuição por Tipo</div>
+      <div class="chart-wrap"><canvas id="chartRequestType"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="tabela-container">
+    <div class="tabela-titulo">Represados por Município</div>
+    <div id="tabelaContainer"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+
+<script>
+  // ─── CONFIGURAÇÃO ─────────────────────────────────────────
+  const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=represados';
+  const GEOJSON_URL = 'docs/brazil-states.geojson';
+  const SENHA_HASH = '5f4dcc3b5aa765d61d8327deb882cf99'; // MD5 de "password" (mude conforme necessário)
+
+  // ─── STATE ────────────────────────────────────────────────
+  let representados = [];
+  let filtrados = [];
+  let _mapaInst = null;
+  let _charts = {};
+
+  // ─── AUTENTICAÇÃO ─────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    const autenticado = sessionStorage.getItem('representadosAuth');
+    if (autenticado === 'true') {
+      document.getElementById('capaSenha').style.display = 'none';
+      document.getElementById('painelRepresentados').style.display = 'block';
+      carregarDados();
+    }
+
+    document.getElementById('senhaInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') autenticar();
+    });
+  });
+
+  function md5(string) {
+    // Fallback simples: usar SHA256 ou bcryptjs em produção
+    // Por ora, usar https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
+    // Para simplicidade, vamos aceitar qualquer entrada que match o hash
+    return string;
+  }
+
+  function autenticar() {
+    const senha = document.getElementById('senhaInput').value;
+    const btn = document.querySelector('.capa-btn');
+
+    if (!senha.trim()) {
+      mostrarErroAuth('Digite a senha');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    // Simular verificação (em produção, usar biblioteca de hash)
+    // Para testes: senha = "password" (hash MD5: 5f4dcc3b5aa765d61d8327deb882cf99)
+    if (senha === 'password') {
+      sessionStorage.setItem('representadosAuth', 'true');
+      document.getElementById('capaSenha').style.display = 'none';
+      document.getElementById('painelRepresentados').style.display = 'block';
+      carregarDados();
+    } else {
+      mostrarErroAuth('Senha incorreta. Tente novamente.');
+      btn.disabled = false;
+      btn.textContent = 'Acessar Painel';
+    }
+  }
+
+  function mostrarErroAuth(msg) {
+    const erroEl = document.getElementById('erroMsg');
+    erroEl.textContent = msg;
+    erroEl.style.display = 'block';
+    setTimeout(() => { erroEl.style.display = 'none'; }, 3000);
+  }
+
+  function logout() {
+    sessionStorage.removeItem('representadosAuth');
+    document.getElementById('painelRepresentados').style.display = 'none';
+    document.getElementById('capaSenha').style.display = 'flex';
+    document.getElementById('senhaInput').value = '';
+    document.getElementById('senhaInput').focus();
+  }
+
+  // ─── CARREGAR DADOS ───────────────────────────────────────
+  async function carregarDados() {
+    document.getElementById('kpiContainer').innerHTML = '<div class="loading"><div class="spinner"></div> Carregando dados...</div>';
+
+    try {
+      const resp = await fetch(API_URL);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      const data = await resp.json();
+      representados = Array.isArray(data) ? data : [];
+      console.log(`Carregados ${representados.length} represados`);
+
+      popularFiltros();
+      onFiltroChange();
+    } catch (err) {
+      console.error('Erro ao carregar dados:', err);
+      document.getElementById('kpiContainer').innerHTML = `<div class="loading" style="color: var(--red);">Erro ao carregar dados. Verifique sua conexão.</div>`;
+    }
+  }
+
+  // ─── FILTROS ──────────────────────────────────────────────
+  function popularFiltros() {
+    const ufs = [...new Set(representados.map(d => d.uf || 'Desconhecido'))].filter(Boolean).sort();
+    const selectUF = document.getElementById('filtroUF');
+    selectUF.innerHTML = '<option value="">Todos os estados</option>';
+    ufs.forEach(uf => {
+      const opt = document.createElement('option');
+      opt.value = uf;
+      opt.textContent = uf;
+      selectUF.appendChild(opt);
+    });
+
+    const estrategias = [...new Set(representados.map(d => d.estrategia || ''))].filter(Boolean).sort();
+    const selectEst = document.getElementById('filtroEstrategia');
+    selectEst.innerHTML = '<option value="">Todas as estratégias</option>';
+    estrategias.forEach(est => {
+      const opt = document.createElement('option');
+      opt.value = est;
+      opt.textContent = est;
+      selectEst.appendChild(opt);
+    });
+  }
+
+  function onFiltroUFChange() {
+    popularMunicipios();
+    onFiltroChange();
+  }
+
+  function popularMunicipios() {
+    const ufSel = document.getElementById('filtroUF').value;
+    let muns = representados;
+    if (ufSel) {
+      muns = muns.filter(d => d.uf === ufSel);
+    }
+
+    const munList = [...new Set(muns.map(d => d.municipio || 'Desconhecido'))].filter(Boolean).sort();
+    const selectMun = document.getElementById('filtroMunicipio');
+    selectMun.innerHTML = '<option value="">Todos os municípios</option>';
+    munList.forEach(mun => {
+      const opt = document.createElement('option');
+      opt.value = mun;
+      opt.textContent = mun;
+      selectMun.appendChild(opt);
+    });
+  }
+
+  function onFiltroChange() {
+    aplicarFiltros();
+    renderizarDashboard();
+  }
+
+  function aplicarFiltros() {
+    const uf = document.getElementById('filtroUF').value;
+    const municipio = document.getElementById('filtroMunicipio').value;
+    const estrategia = document.getElementById('filtroEstrategia').value;
+    const requestType = document.getElementById('filtroRequestType').value;
+    const dataInicio = document.getElementById('filtroDataInicio').value;
+    const dataFim = document.getElementById('filtroDataFim').value;
+
+    filtrados = representados.filter(d => {
+      if (uf && d.uf !== uf) return false;
+      if (municipio && d.municipio !== municipio) return false;
+      if (estrategia && d.estrategia !== estrategia) return false;
+      if (requestType && d.request_type !== requestType) return false;
+
+      if (dataInicio || dataFim) {
+        const dataSol = new Date(d.data_solicitacao || '2026-01-01');
+        if (dataInicio && dataSol < new Date(dataInicio)) return false;
+        if (dataFim && dataSol > new Date(dataFim)) return false;
+      }
+
+      return true;
+    });
+  }
+
+  function limparFiltros() {
+    document.getElementById('filtroUF').value = '';
+    document.getElementById('filtroMunicipio').value = '';
+    document.getElementById('filtroEstrategia').value = '';
+    document.getElementById('filtroRequestType').value = '';
+    document.getElementById('filtroDataInicio').value = '';
+    document.getElementById('filtroDataFim').value = '';
+    onFiltroChange();
+  }
+
+  // ─── KPIs ─────────────────────────────────────────────────
+  function renderKPIs() {
+    const total = filtrados.length;
+    const totalQtd = filtrados.reduce((s, d) => s + (Number(d.quantidade) || 0), 0);
+    const ufs = new Set(filtrados.map(d => d.uf)).size;
+    const muns = new Set(filtrados.map(d => d.municipio)).size;
+    const avgDias = calcularTempoMedioFila();
+
+    return `
+      <div class="kpi">
+        <div class="kpi-label">Total de Represados</div>
+        <div class="kpi-valor">${total.toLocaleString('pt-BR')}</div>
+        <div class="kpi-sub">solicitações em fila</div>
+        <div class="kpi-ico">📋</div>
+      </div>
+
+      <div class="kpi verde">
+        <div class="kpi-label">Quantidade Acumulada</div>
+        <div class="kpi-valor">${totalQtd.toLocaleString('pt-BR')}</div>
+        <div class="kpi-sub">equipes/serviços em espera</div>
+        <div class="kpi-ico">👥</div>
+      </div>
+
+      <div class="kpi amarelo">
+        <div class="kpi-label">Distribuição Geográfica</div>
+        <div class="kpi-valor">${ufs}/${muns}</div>
+        <div class="kpi-sub">estados/municípios</div>
+        <div class="kpi-ico">🗺️</div>
+      </div>
+
+      <div class="kpi roxo">
+        <div class="kpi-label">Tempo Médio em Fila</div>
+        <div class="kpi-valor">${avgDias}</div>
+        <div class="kpi-sub">dias desde solicitação</div>
+        <div class="kpi-ico">⏱️</div>
+      </div>
+    `;
+  }
+
+  function calcularTempoMedioFila() {
+    if (!filtrados.length) return '—';
+    const hoje = new Date();
+    const dias = filtrados.map(d => {
+      const dataSol = new Date(d.data_solicitacao || '2026-01-01');
+      return Math.floor((hoje - dataSol) / (1000 * 60 * 60 * 24));
+    });
+    const media = Math.round(dias.reduce((a, b) => a + b) / dias.length);
+    return `${media} dias`;
+  }
+
+  // ─── MAPA ─────────────────────────────────────────────────
+  function renderMapa() {
+    const porUF = {};
+    filtrados.forEach(d => {
+      const uf = d.uf || 'Desconhecido';
+      porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    if (_mapaInst) _mapaInst.remove();
+
+    _mapaInst = L.map('mapa', {
+      center: [-14.5, -51.9],
+      zoom: 4,
+      zoomControl: true,
+      attributionControl: false,
+      scrollWheelZoom: false
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 10
+    }).addTo(_mapaInst);
+
+    function corUF(uf) {
+      const v = porUF[uf] || 0;
+      const maxVal = Math.max(...Object.values(porUF), 1);
+      const p = v / maxVal;
+
+      if (p === 0) return '#f0f4ff';
+      if (p < 0.2) return '#dbeafe';
+      if (p < 0.4) return '#93c5fd';
+      if (p < 0.6) return '#3b82f6';
+      if (p < 0.8) return '#1351B4';
+      return '#1e3a8a';
+    }
+
+    fetch(GEOJSON_URL)
+      .then(r => r.json())
+      .then(geo => {
+        L.geoJSON(geo, {
+          style: feat => {
+            const uf = feat.properties.sigla;
+            return {
+              fillColor: corUF(uf),
+              weight: 1.5,
+              color: '#fff',
+              fillOpacity: 0.85
+            };
+          },
+          onEachFeature: (feat, layer) => {
+            const uf = feat.properties.sigla;
+            const qtd = porUF[uf] || 0;
+            layer.bindTooltip(`<strong>${uf}</strong><br>${qtd} represados`);
+            layer.on({
+              mouseover: (e) => e.target.setStyle({ weight: 3, fillOpacity: 1 }),
+              mouseout: (e) => { _mapaInst.removeLayer(layer); _mapaInst.addLayer(layer); }
+            });
+          }
+        }).addTo(_mapaInst);
+      })
+      .catch(err => console.error('Erro ao carregar GeoJSON:', err));
+  }
+
+  // ─── CHARTS ───────────────────────────────────────────────
+  function renderCharts() {
+    renderChartEstrategia();
+    renderChartStatus();
+    renderChartRequestType();
+  }
+
+  function renderChartEstrategia() {
+    const porEst = {};
+    filtrados.forEach(d => {
+      porEst[d.estrategia] = (porEst[d.estrategia] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    const labels = Object.keys(porEst).sort();
+    const data = labels.map(e => porEst[e]);
+
+    if (_charts.estrategia) _charts.estrategia.destroy();
+
+    const ctx = document.getElementById('chartEstrategia');
+    _charts.estrategia = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: 'var(--blue)',
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function renderChartStatus() {
+    const porStatus = {};
+    filtrados.forEach(d => {
+      porStatus[d.status] = (porStatus[d.status] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    const labels = Object.keys(porStatus);
+    const data = labels.map(s => porStatus[s]);
+    const colors = ['var(--green)', 'var(--yellow)', 'var(--red)'];
+
+    if (_charts.status) _charts.status.destroy();
+
+    const ctx = document.getElementById('chartStatus');
+    _charts.status = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderWidth: 3,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } },
+        cutout: '62%'
+      }
+    });
+  }
+
+  function renderChartRequestType() {
+    const porTipo = {};
+    filtrados.forEach(d => {
+      const tipo = d.request_type || 'OUTRO';
+      porTipo[tipo] = (porTipo[tipo] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    const labels = Object.keys(porTipo);
+    const data = labels.map(t => porTipo[t]);
+    const colors = ['var(--blue)', 'var(--green)', 'var(--yellow)', 'var(--red)', 'var(--purple)'];
+
+    if (_charts.requestType) _charts.requestType.destroy();
+
+    const ctx = document.getElementById('chartRequestType');
+    _charts.requestType = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors.slice(0, labels.length),
+          borderWidth: 3,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  }
+
+  // ─── TABELA ───────────────────────────────────────────────
+  function renderTabela() {
+    const porMun = {};
+    filtrados.forEach(d => {
+      const key = `${d.municipio}||${d.uf}`;
+      if (!porMun[key]) {
+        porMun[key] = {
+          municipio: d.municipio,
+          uf: d.uf,
+          qtd: 0,
+          status: new Set(),
+          tipos: new Set()
+        };
+      }
+      porMun[key].qtd += Number(d.quantidade) || 0;
+      porMun[key].status.add(d.status);
+      porMun[key].tipos.add(d.request_type);
+    });
+
+    const rows = Object.values(porMun)
+      .sort((a, b) => b.qtd - a.qtd)
+      .map(m => `
+        <tr>
+          <td>${m.municipio}</td>
+          <td>${m.uf}</td>
+          <td class="num">${m.qtd}</td>
+          <td>${Array.from(m.status).join(', ')}</td>
+          <td>${Array.from(m.tipos).join(', ')}</td>
+        </tr>
+      `).join('');
+
+    const tabela = `
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Município</th>
+            <th>Estado</th>
+            <th>Quantidade</th>
+            <th>Status</th>
+            <th>Tipos</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+
+    document.getElementById('tabelaContainer').innerHTML = tabela;
+  }
+
+  // ─── RENDER COMPLETO ──────────────────────────────────────
+  function renderizarDashboard() {
+    document.getElementById('kpiContainer').innerHTML = renderKPIs();
+    renderMapa();
+    renderCharts();
+    renderTabela();
+  }
+</script>
+
+</body>
+</html>
