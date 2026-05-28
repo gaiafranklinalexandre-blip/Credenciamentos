@@ -495,13 +495,10 @@
     </div>
 
     <div class="filtro-grupo">
-      <label class="filtro-label">Data Inicial</label>
-      <input type="date" id="filtroDataInicio" class="filtro-input" onchange="onFiltroChange()" />
-    </div>
-
-    <div class="filtro-grupo">
-      <label class="filtro-label">Data Final</label>
-      <input type="date" id="filtroDataFim" class="filtro-input" onchange="onFiltroChange()" />
+      <label class="filtro-label">Ano</label>
+      <select id="filtroAno" class="filtro-select" onchange="onFiltroChange()">
+        <option value="">Todos os anos</option>
+      </select>
     </div>
 
     <button class="btn-limpar" onclick="limparFiltros()">Limpar Filtros</button>
@@ -652,6 +649,27 @@
       selectUF.appendChild(opt);
     });
 
+    // Anos — extrair anos únicos da data_solicitacao
+    const anos = [...new Set(representados
+      .map(d => {
+        if (d.data_solicitacao) {
+          const ano = new Date(d.data_solicitacao).getFullYear();
+          return ano > 2000 ? ano : null; // filtrar anos inválidos
+        }
+        return null;
+      })
+      .filter(Boolean)
+    )].sort((a, b) => b - a);
+
+    const selectAno = document.getElementById('filtroAno');
+    selectAno.innerHTML = '<option value="">Todos os anos</option>';
+    anos.forEach(ano => {
+      const opt = document.createElement('option');
+      opt.value = ano;
+      opt.textContent = ano;
+      selectAno.appendChild(opt);
+    });
+
     // Estratégias — atualizar ao mudar tipo
     document.getElementById('filtroRequestType').addEventListener('change', popularEstrategias);
     popularEstrategias();
@@ -677,6 +695,7 @@
 
   function onFiltroUFChange() {
     popularMunicipios();
+    document.getElementById('filtroMunicipio').value = ''; // limpar município ao mudar UF
     onFiltroChange();
   }
 
@@ -708,8 +727,7 @@
     const municipio = document.getElementById('filtroMunicipio').value;
     const estrategia = document.getElementById('filtroEstrategia').value;
     const requestType = document.getElementById('filtroRequestType').value;
-    const dataInicio = document.getElementById('filtroDataInicio').value;
-    const dataFim = document.getElementById('filtroDataFim').value;
+    const anoSel = document.getElementById('filtroAno').value;
 
     filtrados = representados.filter(d => {
       if (uf && d.uf !== uf) return false;
@@ -717,10 +735,9 @@
       if (estrategia && d.estrategia !== estrategia) return false;
       if (requestType && d.request_type !== requestType) return false;
 
-      if (dataInicio || dataFim) {
-        const dataSol = new Date(d.data_solicitacao || '2026-01-01');
-        if (dataInicio && dataSol < new Date(dataInicio)) return false;
-        if (dataFim && dataSol > new Date(dataFim)) return false;
+      if (anoSel) {
+        const anoData = new Date(d.data_solicitacao || '2026-01-01').getFullYear();
+        if (anoData !== parseInt(anoSel)) return false;
       }
 
       return true;
@@ -732,8 +749,7 @@
     document.getElementById('filtroMunicipio').value = '';
     document.getElementById('filtroEstrategia').value = '';
     document.getElementById('filtroRequestType').value = '';
-    document.getElementById('filtroDataInicio').value = '';
-    document.getElementById('filtroDataFim').value = '';
+    document.getElementById('filtroAno').value = '';
     onFiltroChange();
   }
 
