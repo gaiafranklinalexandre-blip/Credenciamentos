@@ -468,11 +468,17 @@
       </select>
     </div>
 
-    <div class="filtro-grupo">
+    <div class="filtro-grupo" style="position: relative;">
       <label class="filtro-label">Município</label>
-      <select id="filtroMunicipio" class="filtro-select" onchange="onFiltroChange()">
-        <option value="">Todos os municípios</option>
-      </select>
+      <input
+        type="text"
+        id="filtroMunicipio"
+        class="filtro-input"
+        placeholder="Digite o município..."
+        oninput="buscarMunicipios()"
+        style="width: 100%; padding: 8px 12px; border: 1px solid var(--gray-border); border-radius: 6px; font-size: 14px;"
+      />
+      <div id="listaMunicipios" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--gray-border); border-top: none; border-radius: 0 0 6px 6px; max-height: 200px; overflow-y: auto; display: none; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"></div>
     </div>
 
     <div class="filtro-grupo">
@@ -699,6 +705,8 @@
     onFiltroChange();
   }
 
+  let municipiosDisponiveis = [];
+
   function popularMunicipios() {
     const ufSel = document.getElementById('filtroUF').value;
     let muns = representados;
@@ -706,15 +714,39 @@
       muns = muns.filter(d => d.uf === ufSel);
     }
 
-    const munList = [...new Set(muns.map(d => d.municipio || 'Desconhecido'))].filter(Boolean).sort();
-    const selectMun = document.getElementById('filtroMunicipio');
-    selectMun.innerHTML = '<option value="">Todos os municípios</option>';
-    munList.forEach(mun => {
-      const opt = document.createElement('option');
-      opt.value = mun;
-      opt.textContent = mun;
-      selectMun.appendChild(opt);
-    });
+    municipiosDisponiveis = [...new Set(muns.map(d => d.municipio || 'Desconhecido'))].filter(Boolean).sort();
+  }
+
+  function buscarMunicipios() {
+    const termo = document.getElementById('filtroMunicipio').value.toLowerCase();
+    const listaEl = document.getElementById('listaMunicipios');
+
+    if (!termo) {
+      listaEl.style.display = 'none';
+      return;
+    }
+
+    const filtrados = municipiosDisponiveis.filter(m => m.toLowerCase().includes(termo));
+
+    if (filtrados.length === 0) {
+      listaEl.innerHTML = '<div style="padding: 8px 12px; color: #999; font-size: 12px;">Nenhum município encontrado</div>';
+      listaEl.style.display = 'block';
+      return;
+    }
+
+    listaEl.innerHTML = filtrados
+      .map(mun => `
+        <div style="padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--gray-border); font-size: 13px;" onclick="selecionarMunicipio('${mun}')">
+          ${mun}
+        </div>
+      `).join('');
+    listaEl.style.display = 'block';
+  }
+
+  function selecionarMunicipio(mun) {
+    document.getElementById('filtroMunicipio').value = mun;
+    document.getElementById('listaMunicipios').style.display = 'none';
+    onFiltroChange();
   }
 
   function onFiltroChange() {
