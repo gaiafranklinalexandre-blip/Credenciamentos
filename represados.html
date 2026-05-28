@@ -612,7 +612,8 @@
 
   // ─── CARREGAR DADOS ───────────────────────────────────────
   async function carregarDados() {
-    document.getElementById('kpiContainer').innerHTML = '<div class="loading"><div class="spinner"></div> Carregando dados...</div>';
+    const kpiEl = document.getElementById('kpiPrincipaisContainer');
+    if (kpiEl) kpiEl.innerHTML = '<div class="loading"><div class="spinner"></div> Carregando dados...</div>';
 
     try {
       const resp = await fetch(API_URL);
@@ -620,13 +621,18 @@
 
       const data = await resp.json();
       representados = Array.isArray(data) ? data : [];
-      console.log(`Carregados ${representados.length} represados`);
+      console.log(`✅ Carregados ${representados.length} represados`);
+
+      if (representados.length === 0) {
+        throw new Error('Nenhum represado retornado da API');
+      }
 
       popularFiltros();
       onFiltroChange();
     } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-      document.getElementById('kpiContainer').innerHTML = `<div class="loading" style="color: var(--red);">Erro ao carregar dados. Verifique sua conexão.</div>`;
+      console.error('❌ Erro ao carregar dados:', err);
+      const kpiPrin = document.getElementById('kpiPrincipaisContainer');
+      if (kpiPrin) kpiPrin.innerHTML = `<div class="loading" style="color: var(--red); padding: 40px;">Erro ao carregar dados:<br>${err.message}</div>`;
     }
   }
 
