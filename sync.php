@@ -19,7 +19,7 @@ header('Content-Type: application/json');
 $action = $_GET['action'] ?? '';
 
 // Ações de escrita exigem chave — leitura é pública
-if (in_array($action, ['sync', 'append', 'sync_portarias'])) {
+if (in_array($action, ['sync', 'append', 'sync_portarias', 'sync_represados'])) {
     $headers = getallheaders();
     if (!isset($headers['X-Api-Key']) || $headers['X-Api-Key'] !== API_KEY) {
         http_response_code(401);
@@ -78,6 +78,24 @@ $conn->query("CREATE TABLE IF NOT EXISTS credenciamentos (
     mensagem_painel TEXT,
     ano INT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)");
+
+$conn->query("CREATE TABLE IF NOT EXISTS represados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ibge INT,
+    uf VARCHAR(5),
+    municipio VARCHAR(100),
+    nro_solicitacao VARCHAR(50),
+    data_solicitacao DATE,
+    estrategia VARCHAR(150),
+    status VARCHAR(50),
+    quantidade INT DEFAULT 0,
+    request_type VARCHAR(20),
+    obs TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_ibge (ibge),
+    INDEX idx_status (status),
+    INDEX idx_estrategia (estrategia)
 )");
 
 if ($action === 'sync' || $action === 'append') {
@@ -148,9 +166,48 @@ if ($action === 'sync' || $action === 'append') {
     }
     echo json_encode(['success' => true, 'inserted' => $count]);
 
+} elseif ($action === 'sync_represados') {
+    $body = file_get_contents('php://input');
+    $data = json_decode($body, true);
+    if (!$data || !isset($data['records'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid payload']);
+        exit;
+    }
+    $conn->query("TRUNCATE TABLE represados");
+    $stmt = $conn->prepare("INSERT INTO represados
+        (ibge, uf, municipio, nro_solicitacao, data_solicitacao, estrategia, status, quantidade, request_type, obs)
+        VALUES (?,?,?,?,?,?,?,?,?,?)");
+    $count = 0;
+    foreach ($data['records'] as $r) {
+        $ibge = (int)($r['ibge'] ?? 0);
+        $uf = (string)($r['uf'] ?? '');
+        $mun = (string)($r['municipio'] ?? '');
+        $nro = (string)($r['nro_solicitacao'] ?? '');
+        $data_sol = $r['data_solicitacao'] ?: null;
+        $est = (string)($r['estrategia'] ?? '');
+        $stat = (string)($r['status'] ?? '');
+        $qtd = (int)($r['quantidade'] ?? 0);
+        $req_type = (string)($r['request_type'] ?? '');
+        $obs = (string)($r['obs'] ?? '');
+        $stmt->bind_param('isssssssss', $ibge, $uf, $mun, $nro, $data_sol, $est, $stat, $qtd, $req_type, $obs);
+        $stmt->execute();
+        $count++;
+    }
+    echo json_encode(['success' => true, 'inserted' => $count]);
+
 } elseif ($action === 'portarias') {
     // Retorna todas as portarias da base para o painel
     $result = $conn->query("SELECT * FROM portarias_aps ORDER BY data_portaria DESC");
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = $row;
+    }
+    echo json_encode($rows);
+
+} elseif ($action === 'represados') {
+    // Retorna todos os represados para o painel
+    $result = $conn->query("SELECT * FROM represados ORDER BY data_solicitacao DESC");
     $rows = [];
     while ($row = $result->fetch_assoc()) {
         $rows[] = $row;

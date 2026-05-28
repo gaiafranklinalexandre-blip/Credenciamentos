@@ -250,6 +250,20 @@
 
     .btn-limpar:hover { background: #d0d0d0; }
 
+    .btn-download {
+      padding: 12px 24px;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+
+    .btn-download:hover { background: var(--blue-hover); }
+
     /* ─── KPI GRID ─── */
     .kpi-grid {
       display: grid;
@@ -470,7 +484,7 @@
 
     <div class="filtro-grupo">
       <label class="filtro-label">Tipo de Solicitação</label>
-      <select id="filtroRequestType" class="filtro-select" onchange="onFiltroChange()">
+      <select id="filtroRequestType" class="filtro-select" onchange="popularEstrategias(); onFiltroChange();">
         <option value="">Todos os tipos</option>
         <option value="CRED">Credenciamento (CRED)</option>
         <option value="AMPL">Ampliação (AMPL)</option>
@@ -506,19 +520,14 @@
       <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-titulo">Distribuição por Status</div>
-      <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-titulo">Distribuição por Tipo</div>
+      <div class="chart-titulo">Distribuição por Tipo de Solicitação</div>
       <div class="chart-wrap"><canvas id="chartRequestType"></canvas></div>
     </div>
   </div>
 
-  <!-- Tabela -->
-  <div class="tabela-container">
-    <div class="tabela-titulo">Represados por Município</div>
-    <div id="tabelaContainer"></div>
+  <!-- Download -->
+  <div style="padding: 24px 28px; background: var(--gray-bg); text-align: center;">
+    <button class="btn-download" onclick="downloadCSV()">⬇ Baixar CSV (com filtros aplicados)</button>
   </div>
 </div>
 
@@ -621,7 +630,8 @@
 
   // ─── FILTROS ──────────────────────────────────────────────
   function popularFiltros() {
-    const ufs = [...new Set(representados.map(d => d.uf || 'Desconhecido'))].filter(Boolean).sort();
+    // UFs — filtrar vazio e "Desconhecido"
+    const ufs = [...new Set(representados.map(d => d.uf).filter(u => u && u !== 'Desconhecido'))].sort();
     const selectUF = document.getElementById('filtroUF');
     selectUF.innerHTML = '<option value="">Todos os estados</option>';
     ufs.forEach(uf => {
@@ -631,7 +641,19 @@
       selectUF.appendChild(opt);
     });
 
-    const estrategias = [...new Set(representados.map(d => d.estrategia || ''))].filter(Boolean).sort();
+    // Estratégias — atualizar ao mudar tipo
+    document.getElementById('filtroRequestType').addEventListener('change', popularEstrategias);
+    popularEstrategias();
+  }
+
+  function popularEstrategias() {
+    const tipoSel = document.getElementById('filtroRequestType').value;
+    let dados = representados;
+    if (tipoSel) {
+      dados = dados.filter(d => d.request_type === tipoSel);
+    }
+
+    const estrategias = [...new Set(dados.map(d => d.estrategia).filter(Boolean))].sort();
     const selectEst = document.getElementById('filtroEstrategia');
     selectEst.innerHTML = '<option value="">Todas as estratégias</option>';
     estrategias.forEach(est => {
@@ -819,7 +841,6 @@
   // ─── CHARTS ───────────────────────────────────────────────
   function renderCharts() {
     renderChartEstrategia();
-    renderChartStatus();
     renderChartRequestType();
   }
 
@@ -858,38 +879,6 @@
     });
   }
 
-  function renderChartStatus() {
-    const porStatus = {};
-    filtrados.forEach(d => {
-      porStatus[d.status] = (porStatus[d.status] || 0) + (Number(d.quantidade) || 0);
-    });
-
-    const labels = Object.keys(porStatus);
-    const data = labels.map(s => porStatus[s]);
-    const colors = ['var(--green)', 'var(--yellow)', 'var(--red)'];
-
-    if (_charts.status) _charts.status.destroy();
-
-    const ctx = document.getElementById('chartStatus');
-    _charts.status = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: colors.slice(0, labels.length),
-          borderWidth: 3,
-          borderColor: '#fff'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom' } },
-        cutout: '62%'
-      }
-    });
-  }
 
   function renderChartRequestType() {
     const porTipo = {};
@@ -924,53 +913,33 @@
     });
   }
 
-  // ─── TABELA ───────────────────────────────────────────────
-  function renderTabela() {
-    const porMun = {};
-    filtrados.forEach(d => {
-      const key = `${d.municipio}||${d.uf}`;
-      if (!porMun[key]) {
-        porMun[key] = {
-          municipio: d.municipio,
-          uf: d.uf,
-          qtd: 0,
-          status: new Set(),
-          tipos: new Set()
-        };
-      }
-      porMun[key].qtd += Number(d.quantidade) || 0;
-      porMun[key].status.add(d.status);
-      porMun[key].tipos.add(d.request_type);
-    });
+  // ─── DOWNLOAD CSV ────────────────────────────────────────
+  function downloadCSV() {
+    if (!filtrados.length) {
+      alert('Nenhum represado para exportar com os filtros aplicados');
+      return;
+    }
 
-    const rows = Object.values(porMun)
-      .sort((a, b) => b.qtd - a.qtd)
-      .map(m => `
-        <tr>
-          <td>${m.municipio}</td>
-          <td>${m.uf}</td>
-          <td class="num">${m.qtd}</td>
-          <td>${Array.from(m.status).join(', ')}</td>
-          <td>${Array.from(m.tipos).join(', ')}</td>
-        </tr>
-      `).join('');
+    const headers = ['Município', 'Estado', 'Nº Solicitação', 'Data', 'Estratégia', 'Status', 'Quantidade', 'Tipo'];
+    const rows = filtrados.map(d => [
+      d.municipio || '',
+      d.uf || '',
+      d.nro_solicitacao || '',
+      d.data_solicitacao || '',
+      d.estrategia || '',
+      d.status || '',
+      d.quantidade || 0,
+      d.request_type || ''
+    ]);
 
-    const tabela = `
-      <table class="tabela">
-        <thead>
-          <tr>
-            <th>Município</th>
-            <th>Estado</th>
-            <th>Quantidade</th>
-            <th>Status</th>
-            <th>Tipos</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    `;
+    const csv = [headers, ...rows]
+      .map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
 
-    document.getElementById('tabelaContainer').innerHTML = tabela;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `represados_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
   }
 
   // ─── RENDER COMPLETO ──────────────────────────────────────
@@ -978,7 +947,6 @@
     document.getElementById('kpiContainer').innerHTML = renderKPIs();
     renderMapa();
     renderCharts();
-    renderTabela();
   }
 </script>
 
