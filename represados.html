@@ -833,18 +833,20 @@
     const totalQtd = filtrados.reduce((s, d) => s + (Number(d.quantidade) || 0), 0);
 
     return `
-      <div class="kpi" style="grid-column: span 1; border-top-width: 6px; padding: 28px; min-height: 160px;">
-        <div class="kpi-label">Total de Represados</div>
-        <div class="kpi-valor" style="font-size: 48px;">${total.toLocaleString('pt-BR')}</div>
-        <div class="kpi-sub">solicitações em fila</div>
-        <div class="kpi-ico" style="font-size: 56px;">📋</div>
-      </div>
+      <div style="grid-column: 1/-1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="kpi" style="border-top-width: 6px; padding: 28px; min-height: 160px;">
+          <div class="kpi-label">Total de Solicitações</div>
+          <div class="kpi-valor" style="font-size: 48px;">${total.toLocaleString('pt-BR')}</div>
+          <div class="kpi-sub">represados em fila</div>
+          <div class="kpi-ico" style="font-size: 56px;">📋</div>
+        </div>
 
-      <div class="kpi verde" style="grid-column: span 1; border-top-width: 6px; padding: 28px; min-height: 160px;">
-        <div class="kpi-label">Quantidade Acumulada</div>
-        <div class="kpi-valor" style="font-size: 48px;">${totalQtd.toLocaleString('pt-BR')}</div>
-        <div class="kpi-sub">equipes/serviços em espera</div>
-        <div class="kpi-ico" style="font-size: 56px;">👥</div>
+        <div class="kpi verde" style="border-top-width: 6px; padding: 28px; min-height: 160px;">
+          <div class="kpi-label">Quantidade Acumulada</div>
+          <div class="kpi-valor" style="font-size: 48px;">${totalQtd.toLocaleString('pt-BR')}</div>
+          <div class="kpi-sub">equipes/serviços em espera</div>
+          <div class="kpi-ico" style="font-size: 56px;">👥</div>
+        </div>
       </div>
     `;
   }
