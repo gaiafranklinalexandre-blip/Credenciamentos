@@ -553,6 +553,13 @@
     </div>
   </div>
 
+  <div class="charts-grid" style="grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+    <div class="chart-card">
+      <div class="chart-titulo">Distribuição por Status</div>
+      <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+    </div>
+  </div>
+
   <!-- Download -->
   <div style="padding: 24px 28px; background: var(--gray-bg); text-align: center;">
     <button class="btn-download" onclick="downloadCSV()">⬇ Baixar CSV (com filtros aplicados)</button>
@@ -990,6 +997,7 @@
     renderChartTipoSolicitacao();
     renderChartDistribuicaoUF();
     renderChartEvolucaoTemporal();
+    renderChartStatus();
   }
 
   function renderChartEstrategia() {
@@ -1162,6 +1170,41 @@
             grid: { color: '#f0f0f5' },
             ticks: { maxRotation: 45, minRotation: 0 }
           }
+        }
+      }
+    });
+  }
+
+  function renderChartStatus() {
+    const porStatus = {};
+    filtrados.forEach(d => {
+      const status = d.status || 'Desconhecido';
+      porStatus[status] = (porStatus[status] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    const labels = Object.keys(porStatus).sort();
+    const data = labels.map(status => porStatus[status]);
+    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4'];
+
+    if (_charts.status) _charts.status.destroy();
+
+    const ctx = document.getElementById('chartStatus');
+    _charts.status = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: cores,
+          borderColor: 'white',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { usePointStyle: true, padding: 15 } }
         }
       }
     });
