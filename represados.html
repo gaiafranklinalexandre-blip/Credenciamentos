@@ -1119,12 +1119,16 @@
   }
 
   function renderChartEvolucaoTemporal() {
-    // Agrupar por mês
+    // Agrupar por mês - contar solicitações E somar quantidade
     const porMes = {};
     filtrados.forEach(d => {
       if (d.data_solicitacao) {
         const mes = d.data_solicitacao.substring(0, 7); // YYYY-MM
-        porMes[mes] = (porMes[mes] || 0) + (Number(d.quantidade) || 0);
+        if (!porMes[mes]) {
+          porMes[mes] = { qtd_solicitacoes: 0, qtd_acumulada: 0 };
+        }
+        porMes[mes].qtd_solicitacoes += 1;
+        porMes[mes].qtd_acumulada += Number(d.quantidade) || 0;
       }
     });
 
@@ -1134,7 +1138,8 @@
       const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       return meses[parseInt(m) - 1] + '/' + ano.substring(2);
     });
-    const data = mesesOrdenados.map(mes => porMes[mes]);
+    const dataSolicitacoes = mesesOrdenados.map(mes => porMes[mes].qtd_solicitacoes);
+    const dataQuantidade = mesesOrdenados.map(mes => porMes[mes].qtd_acumulada);
 
     if (_charts.evolucaoTemporal) _charts.evolucaoTemporal.destroy();
 
@@ -1143,29 +1148,58 @@
       type: 'line',
       data: {
         labels: labels,
-        datasets: [{
-          label: 'Quantidade de Represados',
-          data: data,
-          borderColor: 'var(--blue)',
-          backgroundColor: 'rgba(19, 81, 180, 0.05)',
-          borderWidth: 3,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 5,
-          pointBackgroundColor: 'var(--blue)',
-          pointBorderColor: 'white',
-          pointBorderWidth: 2
-        }]
+        datasets: [
+          {
+            label: 'Solicitações por mês',
+            data: dataSolicitacoes,
+            borderColor: 'var(--blue)',
+            backgroundColor: 'rgba(19, 81, 180, 0.05)',
+            borderWidth: 3,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'var(--blue)',
+            pointBorderColor: 'white',
+            pointBorderWidth: 2
+          },
+          {
+            label: 'Quantidade acumulada',
+            data: dataQuantidade,
+            borderColor: 'var(--green)',
+            backgroundColor: 'rgba(22, 136, 33, 0.05)',
+            borderWidth: 3,
+            fill: false,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: 'var(--green)',
+            pointBorderColor: 'white',
+            pointBorderWidth: 2,
+            yAxisID: 'y1'
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
         plugins: {
-          legend: { display: true, labels: { usePointStyle: true } },
-          filler: { propagate: true }
+          legend: { display: true, labels: { usePointStyle: true } }
         },
         scales: {
-          y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            title: { display: true, text: 'Solicitações' },
+            grid: { color: '#f0f0f5' }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            title: { display: true, text: 'Quantidade' },
+            grid: { drawOnChartArea: false }
+          },
           x: {
             grid: { color: '#f0f0f5' },
             ticks: { maxRotation: 45, minRotation: 0 }
