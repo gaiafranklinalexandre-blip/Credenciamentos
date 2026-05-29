@@ -1138,8 +1138,18 @@
       const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       return meses[parseInt(m) - 1] + '/' + ano.substring(2);
     });
-    const dataSolicitacoes = mesesOrdenados.map(mes => porMes[mes].qtd_solicitacoes);
-    const dataQuantidade = mesesOrdenados.map(mes => porMes[mes].qtd_acumulada);
+
+    // Calcular acumulado ao longo dos meses
+    let acumSolicitacoes = 0;
+    let acumQuantidade = 0;
+    const dataSolicitacoes = mesesOrdenados.map(mes => {
+      acumSolicitacoes += porMes[mes].qtd_solicitacoes;
+      return acumSolicitacoes;
+    });
+    const dataQuantidade = mesesOrdenados.map(mes => {
+      acumQuantidade += porMes[mes].qtd_acumulada;
+      return acumQuantidade;
+    });
 
     if (_charts.evolucaoTemporal) _charts.evolucaoTemporal.destroy();
 
@@ -1150,28 +1160,28 @@
         labels: labels,
         datasets: [
           {
-            label: 'Solicitações por mês',
+            label: 'Solicitações (Acumulado)',
             data: dataSolicitacoes,
-            borderColor: 'var(--blue)',
-            backgroundColor: 'rgba(19, 81, 180, 0.05)',
+            borderColor: '#E52207',
+            backgroundColor: 'rgba(229, 34, 7, 0.08)',
             borderWidth: 3,
-            fill: false,
+            fill: true,
             tension: 0.4,
             pointRadius: 4,
-            pointBackgroundColor: 'var(--blue)',
+            pointBackgroundColor: '#E52207',
             pointBorderColor: 'white',
             pointBorderWidth: 2
           },
           {
-            label: 'Quantidade acumulada',
+            label: 'Quantidade (Acumulado)',
             data: dataQuantidade,
-            borderColor: 'var(--green)',
-            backgroundColor: 'rgba(22, 136, 33, 0.05)',
+            borderColor: '#6c3fc5',
+            backgroundColor: 'rgba(108, 63, 197, 0.08)',
             borderWidth: 3,
-            fill: false,
+            fill: true,
             tension: 0.4,
             pointRadius: 4,
-            pointBackgroundColor: 'var(--green)',
+            pointBackgroundColor: '#6c3fc5',
             pointBorderColor: 'white',
             pointBorderWidth: 2,
             yAxisID: 'y1'
