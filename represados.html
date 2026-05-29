@@ -526,11 +526,30 @@
   <!-- Mapa -->
   <div id="mapa"></div>
 
-  <!-- Top 5 Estratégias -->
+  <!-- Gráficos -->
   <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
       <div class="chart-titulo">Top 5 Estratégias com Maior Demanda</div>
       <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-grid" style="grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px;">
+    <div class="chart-card">
+      <div class="chart-titulo">Represados por Tipo de Solicitação</div>
+      <div class="chart-wrap"><canvas id="chartTipoSolicitacao"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-titulo">Distribuição por UF</div>
+      <div class="chart-wrap"><canvas id="chartDistribuicaoUF"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-grid" style="grid-template-columns: 1fr;">
+    <div class="chart-card">
+      <div class="chart-titulo">Evolução Temporal de Represados</div>
+      <div class="chart-wrap"><canvas id="chartEvolucaoTemporal"></canvas></div>
     </div>
   </div>
 
@@ -966,6 +985,9 @@
   // ─── CHARTS ───────────────────────────────────────────────
   function renderCharts() {
     renderChartEstrategia();
+    renderChartTipoSolicitacao();
+    renderChartDistribuicaoUF();
+    renderChartEvolucaoTemporal();
   }
 
   function renderChartEstrategia() {
@@ -974,7 +996,6 @@
       porEst[d.estrategia] = (porEst[d.estrategia] || 0) + (Number(d.quantidade) || 0);
     });
 
-    // Top 5 apenas
     const top5 = Object.entries(porEst)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
@@ -1004,6 +1025,137 @@
         scales: {
           x: { beginAtZero: true, grid: { color: '#f0f0f5' } },
           y: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function renderChartTipoSolicitacao() {
+    const porTipo = {};
+    filtrados.forEach(d => {
+      const tipo = d.request_type || 'OUTRO';
+      porTipo[tipo] = (porTipo[tipo] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    const labels = Object.keys(porTipo).sort();
+    const data = labels.map(tipo => porTipo[tipo]);
+    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5'];
+
+    if (_charts.tipoSolicitacao) _charts.tipoSolicitacao.destroy();
+
+    const ctx = document.getElementById('chartTipoSolicitacao');
+    _charts.tipoSolicitacao = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: cores,
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function renderChartDistribuicaoUF() {
+    const porUF = {};
+    filtrados.forEach(d => {
+      const uf = d.uf || 'Desconhecido';
+      porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0);
+    });
+
+    const sorted = Object.entries(porUF)
+      .filter(([uf]) => uf !== 'Desconhecido')
+      .sort((a, b) => b[1] - a[1]);
+
+    const labels = sorted.map(([uf]) => uf);
+    const data = sorted.map(([, qtd]) => qtd);
+
+    if (_charts.distribuicaoUF) _charts.distribuicaoUF.destroy();
+
+    const ctx = document.getElementById('chartDistribuicaoUF');
+    _charts.distribuicaoUF = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: 'var(--green)',
+          borderRadius: 6,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+  }
+
+  function renderChartEvolucaoTemporal() {
+    // Agrupar por mês
+    const porMes = {};
+    filtrados.forEach(d => {
+      if (d.data_solicitacao) {
+        const mes = d.data_solicitacao.substring(0, 7); // YYYY-MM
+        porMes[mes] = (porMes[mes] || 0) + (Number(d.quantidade) || 0);
+      }
+    });
+
+    const mesesOrdenados = Object.keys(porMes).sort();
+    const labels = mesesOrdenados.map(mes => {
+      const [ano, m] = mes.split('-');
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      return meses[parseInt(m) - 1] + '/' + ano.substring(2);
+    });
+    const data = mesesOrdenados.map(mes => porMes[mes]);
+
+    if (_charts.evolucaoTemporal) _charts.evolucaoTemporal.destroy();
+
+    const ctx = document.getElementById('chartEvolucaoTemporal');
+    _charts.evolucaoTemporal = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Quantidade de Represados',
+          data: data,
+          borderColor: 'var(--blue)',
+          backgroundColor: 'rgba(19, 81, 180, 0.05)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 5,
+          pointBackgroundColor: 'var(--blue)',
+          pointBorderColor: 'white',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, labels: { usePointStyle: true } }
+        },
+        scales: {
+          y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          x: { grid: { color: '#f0f0f5' } }
         }
       }
     });
