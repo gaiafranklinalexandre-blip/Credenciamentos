@@ -549,7 +549,7 @@
   <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
       <div class="chart-titulo">Evolução Temporal de Represados</div>
-      <div class="chart-wrap"><canvas id="chartEvolucaoTemporal"></canvas></div>
+      <div class="chart-wrap" style="height: 400px;"><canvas id="chartEvolucaoTemporal"></canvas></div>
     </div>
   </div>
 
@@ -1153,11 +1153,15 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: true, labels: { usePointStyle: true } }
+          legend: { display: true, labels: { usePointStyle: true } },
+          filler: { propagate: true }
         },
         scales: {
           y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
-          x: { grid: { color: '#f0f0f5' } }
+          x: {
+            grid: { color: '#f0f0f5' },
+            ticks: { maxRotation: 45, minRotation: 0 }
+          }
         }
       }
     });
