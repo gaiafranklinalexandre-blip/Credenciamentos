@@ -90,7 +90,7 @@ def sync(records):
         f'{API_URL}?action=sync',
         json={'records': first_batch},
         headers={'X-Api-Key': API_KEY},
-        timeout=60
+        timeout=120
     )
     resp.raise_for_status()
     result = resp.json()
@@ -104,7 +104,7 @@ def sync(records):
             f'{API_URL}?action=append',
             json={'records': batch},
             headers={'X-Api-Key': API_KEY},
-            timeout=60
+            timeout=120
         )
         resp.raise_for_status()
         result = resp.json()
@@ -150,7 +150,7 @@ def sync_portarias(records):
         f'{API_URL}?action=sync_portarias',
         json={'records': records},
         headers={'X-Api-Key': API_KEY},
-        timeout=60
+        timeout=120
     )
     resp.raise_for_status()
     result = resp.json()
@@ -233,7 +233,7 @@ def sync_represados(records):
         f'{API_URL}?action=sync_represados',
         json={'records': records},
         headers={'X-Api-Key': API_KEY},
-        timeout=60
+        timeout=120
     )
     resp.raise_for_status()
     result = resp.json()
