@@ -423,6 +423,42 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ─── SEÇÕES DE KPI ─── */
+    .secao-kpi-principal {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      padding: 28px;
+      background: var(--gray-bg);
+    }
+
+    .secao-kpi {
+      padding: 28px 28px 0 28px;
+      background: var(--gray-bg);
+    }
+
+    .secao-titulo {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+
+    .secao-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .secao-kpi-grid--uf {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    /* ─── GRÁFICOS ─── */
+    .chart-estrategia { height: auto; min-height: 600px; }
+    .chart-evolucao   { height: 400px; }
+
     /* ─── RESPONSIVE ─── */
     @media (max-width: 1000px) {
       .charts-grid { grid-template-columns: 1fr; }
@@ -430,12 +466,45 @@
     }
 
     @media (max-width: 700px) {
-      .kpi-grid { grid-template-columns: 1fr; }
-      .filtros { flex-direction: column; }
+      /* Header */
+      .header { padding: 12px 16px; gap: 8px; flex-wrap: wrap; }
+      .header-titulo { font-size: 14px; line-height: 1.3; flex: 1; min-width: 0; }
+
+      /* Filtros */
+      .filtros { flex-direction: column; padding: 12px 16px; gap: 10px; }
       .filtro-grupo { min-width: 100%; }
-      #mapa { height: 280px; }
+      .btn-limpar { width: 100%; text-align: center; }
+
+      /* KPIs */
+      .kpi-grid { grid-template-columns: 1fr; padding: 16px 12px; }
+      .secao-kpi-principal { grid-template-columns: 1fr; padding: 16px 12px; gap: 12px; }
+      .secao-kpi { padding: 16px 12px 0 12px; }
+      .secao-kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .secao-kpi-grid--uf { grid-template-columns: repeat(2, 1fr); }
+
+      /* Mapa */
+      #mapa { height: 240px; margin: 16px 12px; }
+
+      /* Gráficos */
+      .charts-grid { padding: 12px; }
+      .chart-card { padding: 16px 12px; }
+      .chart-estrategia { min-height: 400px; }
+      .chart-evolucao { height: 280px; }
+
+      /* Tabela */
+      .tabela-container { padding: 16px 12px; }
       .tabela { font-size: 12px; }
-      .tabela th, .tabela td { padding: 8px 12px; }
+      .tabela th, .tabela td { padding: 8px 10px; white-space: nowrap; }
+      .tabela-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+      /* Download */
+      .btn-download { width: calc(100% - 24px); margin: 0 12px; padding: 14px 20px; font-size: 13px; }
+    }
+
+    @media (max-width: 400px) {
+      .secao-kpi-grid { grid-template-columns: 1fr; }
+      .secao-kpi-grid--uf { grid-template-columns: 1fr; }
+      .header-titulo { font-size: 13px; }
     }
   </style>
 </head>
@@ -516,35 +585,35 @@
   </div>
 
   <!-- KPIs Principais (Total e Quantidade) -->
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 28px 28px; background: var(--gray-bg);" id="kpiPrincipaisContainer"></div>
+  <div class="secao-kpi-principal" id="kpiPrincipaisContainer"></div>
 
   <!-- KPIs por Estratégia (Solicitadas) -->
-  <div style="padding: 28px 28px 0 28px; background: var(--gray-bg);">
-    <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Estratégias Aguardando Credenciamento</div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;" id="kpiEstrategiasSolicitadasContainer"></div>
+  <div class="secao-kpi">
+    <div class="secao-titulo">Estratégias Aguardando Credenciamento</div>
+    <div class="secao-kpi-grid" id="kpiEstrategiasSolicitadasContainer"></div>
   </div>
 
   <!-- KPIs por UF (Distribuição) -->
-  <div style="padding: 28px 28px 0 28px; background: var(--gray-bg);">
-    <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Represados por Estado</div>
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px;" id="kpiDistribuicaoUFContainer"></div>
+  <div class="secao-kpi">
+    <div class="secao-titulo">Represados por Estado</div>
+    <div class="secao-kpi-grid secao-kpi-grid--uf" id="kpiDistribuicaoUFContainer"></div>
   </div>
 
   <!-- Mapa -->
   <div id="mapa"></div>
 
   <!-- Gráficos -->
-  <div class="charts-grid" style="grid-template-columns: 1fr;">
+  <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-titulo">Represados por Estratégia</div>
-      <div class="chart-wrap" style="height: auto; min-height: 600px;"><canvas id="chartTipoSolicitacao"></canvas></div>
+      <div class="chart-wrap chart-estrategia"><canvas id="chartTipoSolicitacao"></canvas></div>
     </div>
   </div>
 
-  <div class="charts-grid" style="grid-template-columns: 1fr;">
+  <div class="charts-grid">
     <div class="chart-card">
       <div class="chart-titulo">Evolução Temporal de Represados</div>
-      <div class="chart-wrap" style="height: 400px;"><canvas id="chartEvolucaoTemporal"></canvas></div>
+      <div class="chart-wrap chart-evolucao"><canvas id="chartEvolucaoTemporal"></canvas></div>
     </div>
   </div>
 
