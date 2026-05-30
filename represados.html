@@ -518,9 +518,6 @@
   <!-- KPIs Principais (Total e Quantidade) -->
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 28px 28px; background: var(--gray-bg);" id="kpiPrincipaisContainer"></div>
 
-  <!-- KPI UF com Maior Demanda -->
-  <div style="padding: 0 28px 28px 28px; background: var(--gray-bg);" id="kpiUFContainer"></div>
-
   <!-- KPIs por Estratégia (Solicitadas) -->
   <div style="padding: 28px 28px 0 28px; background: var(--gray-bg);">
     <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Estratégias Aguardando Credenciamento</div>
@@ -846,53 +843,6 @@
           <div class="kpi-sub">equipes/serviços em espera</div>
           <div class="kpi-ico" style="font-size: 56px;">👥</div>
         </div>
-      </div>
-    `;
-  }
-
-  function renderKPIUFMaiorDemanda() {
-    const porUF = {};
-    filtrados.forEach(d => {
-      const uf = d.uf || 'Desconhecido';
-      porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0);
-    });
-
-    const ufMaior = Object.entries(porUF)
-      .filter(([uf]) => uf !== 'Desconhecido')
-      .sort((a, b) => b[1] - a[1])[0];
-
-    const porMunicipio = {};
-    filtrados.forEach(d => {
-      const municipio = d.municipio || 'Desconhecido';
-      porMunicipio[municipio] = (porMunicipio[municipio] || 0) + (Number(d.quantidade) || 0);
-    });
-
-    const munMaior = Object.entries(porMunicipio)
-      .filter(([mun]) => mun !== 'Desconhecido')
-      .sort((a, b) => b[1] - a[1])[0];
-
-    if (!ufMaior && !munMaior) {
-      return '<div style="padding: 20px; background: white; border-radius: 12px; text-align: center;">Sem dados</div>';
-    }
-
-    return `
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-        ${ufMaior ? `
-          <div class="kpi amarelo">
-            <div class="kpi-label">UF com Maior Demanda</div>
-            <div class="kpi-valor" style="font-size: 40px;">${ufMaior[0]}</div>
-            <div class="kpi-sub">${ufMaior[1].toLocaleString('pt-BR')} represados</div>
-            <div class="kpi-ico" style="font-size: 50px;">🗺️</div>
-          </div>
-        ` : ''}
-        ${munMaior ? `
-          <div class="kpi" style="border-top-color: var(--red); background: rgba(229, 34, 7, 0.04);">
-            <div class="kpi-label">Município com Maior Demanda</div>
-            <div class="kpi-valor" style="font-size: 40px; color: var(--red);">${munMaior[0]}</div>
-            <div class="kpi-sub">${munMaior[1].toLocaleString('pt-BR')} represados</div>
-            <div class="kpi-ico" style="font-size: 50px;">🏢</div>
-          </div>
-        ` : ''}
       </div>
     `;
   }
@@ -1243,9 +1193,6 @@
   function renderizarDashboard() {
     const kpiPrin = document.getElementById('kpiPrincipaisContainer');
     if (kpiPrin) kpiPrin.innerHTML = renderKPIsPrincipais();
-
-    const kpiUF = document.getElementById('kpiUFContainer');
-    if (kpiUF) kpiUF.innerHTML = renderKPIUFMaiorDemanda();
 
     const kpiEst = document.getElementById('kpiEstrategiasSolicitadasContainer');
     if (kpiEst) kpiEst.innerHTML = renderKPIsEstrategiasSolicitadas();
