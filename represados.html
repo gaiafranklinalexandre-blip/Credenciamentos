@@ -524,6 +524,12 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px;" id="kpiEstrategiasSolicitadasContainer"></div>
   </div>
 
+  <!-- KPIs por UF (Distribuição) -->
+  <div style="padding: 28px 28px 0 28px; background: var(--gray-bg);">
+    <div style="font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 16px;">Represados por Estado</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px;" id="kpiDistribuicaoUFContainer"></div>
+  </div>
+
   <!-- Mapa -->
   <div id="mapa"></div>
 
@@ -532,13 +538,6 @@
     <div class="chart-card">
       <div class="chart-titulo">Represados por Estratégia</div>
       <div class="chart-wrap" style="height: auto; min-height: 600px;"><canvas id="chartTipoSolicitacao"></canvas></div>
-    </div>
-  </div>
-
-  <div class="charts-grid" style="grid-template-columns: 1fr;">
-    <div class="chart-card">
-      <div class="chart-titulo">Distribuição por UF</div>
-      <div class="chart-wrap" style="height: 1000px;"><canvas id="chartDistribuicaoUF"></canvas></div>
     </div>
   </div>
 
@@ -926,6 +925,40 @@
       }).join('');
   }
 
+  function renderKPIsDistribuicaoUF() {
+    const porUF = {};
+    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FF8C42', '#00D4AA', '#FF1744', '#00BCD4', '#FF9800', '#673AB7'];
+
+    filtrados.forEach(d => {
+      const uf = d.uf || 'Desconhecido';
+      if (!porUF[uf]) {
+        porUF[uf] = { qtd: 0, estrategias: new Set() };
+      }
+      porUF[uf].qtd += Number(d.quantidade) || 0;
+      porUF[uf].estrategias.add(d.estrategia);
+    });
+
+    if (Object.keys(porUF).length === 0) {
+      return '<div style="padding: 20px; background: white; border-radius: 12px; text-align: center; grid-column: 1/-1;">Nenhum represado encontrado</div>';
+    }
+
+    let idx = 0;
+    return Object.entries(porUF)
+      .filter(([uf]) => uf !== 'Desconhecido')
+      .sort((a, b) => b[1].qtd - a[1].qtd)
+      .map(([uf, data]) => {
+        const cor = cores[idx++ % cores.length];
+        const numEstrategias = data.estrategias.size;
+        return `
+          <div style="background: white; border-radius: 12px; border-top: 4px solid ${cor}; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text); margin-bottom: 8px;">${uf}</div>
+            <div style="font-size: 32px; font-weight: 800; color: var(--text); margin-bottom: 4px;">${data.qtd.toLocaleString('pt-BR')}</div>
+            <div style="font-size: 11px; color: #666;">${numEstrategias} estratégia${numEstrategias > 1 ? 's' : ''}</div>
+          </div>
+        `;
+      }).join('');
+  }
+
   function calcularTempoMedioFila() {
     if (!filtrados.length) return '—';
     const hoje = new Date();
@@ -1005,11 +1038,6 @@
       renderChartTipoSolicitacao();
     } catch (e) {
       console.error('Erro ao renderizar gráfico de estratégia:', e);
-    }
-    try {
-      renderChartDistribuicaoUF();
-    } catch (e) {
-      console.error('Erro ao renderizar gráfico de distribuição UF:', e);
     }
     try {
       renderChartEvolucaoTemporal();
@@ -1280,6 +1308,9 @@
 
     const kpiEst = document.getElementById('kpiEstrategiasSolicitadasContainer');
     if (kpiEst) kpiEst.innerHTML = renderKPIsEstrategiasSolicitadas();
+
+    const kpiUF = document.getElementById('kpiDistribuicaoUFContainer');
+    if (kpiUF) kpiUF.innerHTML = renderKPIsDistribuicaoUF();
 
     const mapaEl = document.getElementById('mapa');
     if (mapaEl) renderMapa();
