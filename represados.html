@@ -557,6 +557,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
 <script>
   // ─── CONFIGURAÇÃO ─────────────────────────────────────────
@@ -1008,7 +1009,7 @@
   function renderChartTipoSolicitacao() {
     const porEstrategia = {};
     const hoje = new Date();
-    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FF8C42', '#00D4AA'];
+    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FF8C42', '#00D4AA', '#FF1744', '#00BCD4', '#FF9800', '#673AB7'];
 
     filtrados.forEach(d => {
       const estrategia = d.estrategia || 'Desconhecida';
@@ -1029,55 +1030,29 @@
     const sorted = Object.entries(porEstrategia)
       .sort((a, b) => b[1].qtd - a[1].qtd);
 
-    const datasets = sorted.map(([est, data], idx) => {
-      const tempoMedio = data.diasCount > 0 ? Math.round(data.totalDias / data.diasCount) : 0;
-      return {
-        label: est,
-        data: [{
-          x: tempoMedio,
-          y: data.qtd,
-          r: Math.sqrt(data.count) * 4 // raio baseado em número de solicitações
-        }],
-        backgroundColor: cores[idx % cores.length],
-        borderColor: 'white',
-        borderWidth: 2,
-        hoverBorderWidth: 3
-      };
-    });
+    const labels = sorted.map(([est]) => est);
+    const valores = sorted.map(([, data]) => data.qtd);
+    const tempos = sorted.map(([, data]) => data.diasCount > 0 ? Math.round(data.totalDias / data.diasCount) : 0);
+    const cores_sorted = sorted.map((_, idx) => cores[idx % cores.length]);
 
-    if (_charts.tipoSolicitacao) _charts.tipoSolicitacao.destroy();
+    const data = [{
+      labels: labels,
+      values: valores,
+      marker: { colors: cores_sorted, line: { color: 'white', width: 2 } },
+      text: labels.map((l, i) => `${l}<br>Qtd: ${valores[i].toLocaleString('pt-BR')}<br>Tempo: ${tempos[i]}d`),
+      hovertext: labels.map((l, i) => `${l}<br>Quantidade: ${valores[i].toLocaleString('pt-BR')}<br>Tempo médio: ${tempos[i]} dias`),
+      hoverinfo: 'text',
+      type: 'treemap',
+      textposition: 'middle center',
+      textfont: { size: 12, color: 'white', family: 'Raleway' }
+    }];
 
-    const ctx = document.getElementById('chartTipoSolicitacao');
-    _charts.tipoSolicitacao = new Chart(ctx, {
-      type: 'bubble',
-      data: { datasets: datasets },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: true, labels: { usePointStyle: true, padding: 15 } },
-          tooltip: {
-            callbacks: {
-              label: (context) => {
-                const data = context.raw;
-                return `Tempo: ${data.x}d | Quantidade: ${data.y.toLocaleString('pt-BR')}`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            title: { display: true, text: 'Tempo Médio de Espera (dias)', color: '#666', font: { weight: 'bold' } },
-            grid: { color: '#f0f0f5' }
-          },
-          y: {
-            title: { display: true, text: 'Quantidade', color: '#666', font: { weight: 'bold' } },
-            grid: { color: '#f0f0f5' },
-            ticks: { callback: (v) => v.toLocaleString('pt-BR') }
-          }
-        }
-      }
-    });
+    const layout = {
+      margin: { t: 20, l: 0, r: 0, b: 0 },
+      font: { family: 'Raleway' }
+    };
+
+    Plotly.newPlot('chartTipoSolicitacao', data, layout, { responsive: true });
   }
 
   function renderChartDistribuicaoUF() {
