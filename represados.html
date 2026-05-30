@@ -1032,18 +1032,33 @@
   }
 
   function renderChartDistribuicaoUF() {
+    // Para cada UF: contar quantidade total E quantidade de tipos diferentes
     const porUF = {};
     filtrados.forEach(d => {
       const uf = d.uf || 'Desconhecido';
-      porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0);
+      if (!porUF[uf]) {
+        porUF[uf] = { qtd: 0, tipos: new Set() };
+      }
+      porUF[uf].qtd += Number(d.quantidade) || 0;
+      porUF[uf].tipos.add(d.estrategia); // Add estratégia única
     });
 
-    const sorted = Object.entries(porUF)
-      .filter(([uf]) => uf !== 'Desconhecido')
-      .sort((a, b) => b[1] - a[1]);
+    // Converter tipos Set para número e ordenar por quantidade
+    const porUFObj = {};
+    Object.entries(porUF).forEach(([uf, data]) => {
+      porUFObj[uf] = {
+        qtd: data.qtd,
+        numTipos: data.tipos.size,
+        tipos: Array.from(data.tipos)
+      };
+    });
 
-    const labels = sorted.map(([uf]) => uf);
-    const data = sorted.map(([, qtd]) => qtd);
+    const sorted = Object.entries(porUFObj)
+      .filter(([uf]) => uf !== 'Desconhecido')
+      .sort((a, b) => b[1].qtd - a[1].qtd);
+
+    const labels = sorted.map(([uf, data]) => `${uf} (${data.numTipos} tipos)`);
+    const data = sorted.map(([, uData]) => uData.qtd);
 
     if (_charts.distribuicaoUF) _charts.distribuicaoUF.destroy();
 
