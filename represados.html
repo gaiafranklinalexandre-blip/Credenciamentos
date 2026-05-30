@@ -1001,12 +1001,30 @@
 
   // ─── CHARTS ───────────────────────────────────────────────
   function renderCharts() {
-    renderChartTipoSolicitacao();
-    renderChartDistribuicaoUF();
-    renderChartEvolucaoTemporal();
+    try {
+      renderChartTipoSolicitacao();
+    } catch (e) {
+      console.error('Erro ao renderizar gráfico de estratégia:', e);
+    }
+    try {
+      renderChartDistribuicaoUF();
+    } catch (e) {
+      console.error('Erro ao renderizar gráfico de distribuição UF:', e);
+    }
+    try {
+      renderChartEvolucaoTemporal();
+    } catch (e) {
+      console.error('Erro ao renderizar gráfico de evolução temporal:', e);
+    }
   }
 
   function renderChartTipoSolicitacao() {
+    const chartEl = document.getElementById('chartTipoSolicitacao');
+    if (!chartEl) {
+      console.warn('Elemento chartTipoSolicitacao não encontrado');
+      return;
+    }
+
     const porEstrategia = {};
     const hoje = new Date();
     const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FF8C42', '#00D4AA', '#FF1744', '#00BCD4', '#FF9800', '#673AB7'];
@@ -1035,7 +1053,7 @@
     const tempos = sorted.map(([, data]) => data.diasCount > 0 ? Math.round(data.totalDias / data.diasCount) : 0);
     const cores_sorted = sorted.map((_, idx) => cores[idx % cores.length]);
 
-    const ctx = document.getElementById('chartTipoSolicitacao').getContext('2d');
+    const ctx = chartEl.getContext('2d');
     if (window.chartTipoSolicitacaoInst) window.chartTipoSolicitacaoInst.destroy();
 
     window.chartTipoSolicitacaoInst = new Chart(ctx, {
