@@ -531,7 +531,7 @@
   <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
       <div class="chart-titulo">Represados por Estratégia</div>
-      <div class="chart-wrap" style="height: 600px;"><div id="chartTipoSolicitacao"></div></div>
+      <div class="chart-wrap" style="height: auto; min-height: 600px;"><canvas id="chartTipoSolicitacao"></canvas></div>
     </div>
   </div>
 
@@ -1035,24 +1035,38 @@
     const tempos = sorted.map(([, data]) => data.diasCount > 0 ? Math.round(data.totalDias / data.diasCount) : 0);
     const cores_sorted = sorted.map((_, idx) => cores[idx % cores.length]);
 
-    const data = [{
-      labels: labels,
-      values: valores,
-      marker: { colors: cores_sorted, line: { color: 'white', width: 2 } },
-      text: labels.map((l, i) => `${l}<br>Qtd: ${valores[i].toLocaleString('pt-BR')}<br>Tempo: ${tempos[i]}d`),
-      hovertext: labels.map((l, i) => `${l}<br>Quantidade: ${valores[i].toLocaleString('pt-BR')}<br>Tempo médio: ${tempos[i]} dias`),
-      hoverinfo: 'text',
-      type: 'treemap',
-      textposition: 'middle center',
-      textfont: { size: 12, color: 'white', family: 'Raleway' }
-    }];
+    const ctx = document.getElementById('chartTipoSolicitacao').getContext('2d');
+    if (window.chartTipoSolicitacaoInst) window.chartTipoSolicitacaoInst.destroy();
 
-    const layout = {
-      margin: { t: 20, l: 0, r: 0, b: 0 },
-      font: { family: 'Raleway' }
-    };
-
-    Plotly.newPlot('chartTipoSolicitacao', data, layout, { responsive: true });
+    window.chartTipoSolicitacaoInst = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Quantidade',
+          data: valores,
+          backgroundColor: cores_sorted,
+          borderColor: '#fff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              afterLabel: (ctx) => `Tempo médio: ${tempos[ctx.dataIndex]} dias`
+            }
+          }
+        },
+        scales: {
+          x: { beginAtZero: true }
+        }
+      }
+    });
   }
 
   function renderChartDistribuicaoUF() {
