@@ -883,14 +883,23 @@
     // Filtrar apenas SOLICITADA
     const solicitadas = filtrados.filter(d => d.status === 'SOLICITADA');
 
-    // Agrupar por estratégia
+    // Agrupar por estratégia com tempo médio de espera
     const porEst = {};
+    const hoje = new Date();
+
     solicitadas.forEach(d => {
       if (!porEst[d.estrategia]) {
-        porEst[d.estrategia] = { qtd: 0, count: 0 };
+        porEst[d.estrategia] = { qtd: 0, count: 0, totalDias: 0, diasCount: 0 };
       }
       porEst[d.estrategia].qtd += Number(d.quantidade) || 0;
       porEst[d.estrategia].count += 1;
+
+      if (d.data_solicitacao) {
+        const dataSolicitacao = new Date(d.data_solicitacao);
+        const dias = Math.floor((hoje - dataSolicitacao) / (1000 * 60 * 60 * 24));
+        porEst[d.estrategia].totalDias += dias;
+        porEst[d.estrategia].diasCount += 1;
+      }
     });
 
     if (Object.keys(porEst).length === 0) {
@@ -904,11 +913,13 @@
       .sort((a, b) => b[1].qtd - a[1].qtd)
       .map(([est, data]) => {
         const cor = cores[idx++ % cores.length];
+        const tempoMedio = data.diasCount > 0 ? Math.round(data.totalDias / data.diasCount) : 0;
         return `
           <div style="background: white; border-radius: 12px; border-top: 4px solid ${cor}; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.07);">
             <div style="font-size: 11px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.4px;">${est}</div>
             <div style="font-size: 36px; font-weight: 800; color: var(--text); margin-bottom: 4px;">${data.qtd.toLocaleString('pt-BR')}</div>
-            <div style="font-size: 12px; color: #666;">${data.count} solicitação${data.count > 1 ? 's' : ''}</div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">${data.count} solicitação${data.count > 1 ? 's' : ''}</div>
+            <div style="font-size: 11px; color: #999; border-top: 1px solid #f0f0f0; padding-top: 8px; margin-top: 8px;">Tempo médio: ${tempoMedio} dias</div>
           </div>
         `;
       }).join('');
