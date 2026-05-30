@@ -538,12 +538,14 @@
     </div>
   </div>
 
-  <div class="charts-grid" style="grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px;">
+  <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
-      <div class="chart-titulo">Represados por Tipo de Solicitação</div>
-      <div class="chart-wrap"><canvas id="chartTipoSolicitacao"></canvas></div>
+      <div class="chart-titulo">Represados por Estratégia</div>
+      <div class="chart-wrap" style="height: auto; min-height: 600px;"><canvas id="chartTipoSolicitacao"></canvas></div>
     </div>
+  </div>
 
+  <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
       <div class="chart-titulo">Distribuição por UF</div>
       <div class="chart-wrap"><canvas id="chartDistribuicaoUF"></canvas></div>
@@ -1056,7 +1058,7 @@
 
     const labels = sorted.map(([est]) => est);
     const data = sorted.map(([, qtd]) => qtd);
-    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1'];
+    const cores = ['#1351B4', '#168821', '#FFCD07', '#E52207', '#6c3fc5', '#FF6B6B', '#4ECDC4', '#45B7D1', '#FF8C42', '#00D4AA'];
 
     if (_charts.tipoSolicitacao) _charts.tipoSolicitacao.destroy();
 
@@ -1067,18 +1069,19 @@
         labels: labels,
         datasets: [{
           data: data,
-          backgroundColor: cores,
+          backgroundColor: cores.map((_, i) => cores[i % cores.length]),
           borderRadius: 6,
           borderSkipped: false
         }]
       },
       options: {
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
-          x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 0 } }
+          x: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+          y: { grid: { display: false }, ticks: { autoSkipPadding: 100 } }
         }
       }
     });
