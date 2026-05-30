@@ -533,13 +533,6 @@
   <!-- Gráficos -->
   <div class="charts-grid" style="grid-template-columns: 1fr;">
     <div class="chart-card">
-      <div class="chart-titulo">Top 5 Estratégias com Maior Demanda</div>
-      <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
-    </div>
-  </div>
-
-  <div class="charts-grid" style="grid-template-columns: 1fr;">
-    <div class="chart-card">
       <div class="chart-titulo">Represados por Estratégia</div>
       <div class="chart-wrap" style="height: auto; min-height: 600px;"><canvas id="chartTipoSolicitacao"></canvas></div>
     </div>
@@ -992,50 +985,9 @@
 
   // ─── CHARTS ───────────────────────────────────────────────
   function renderCharts() {
-    renderChartEstrategia();
     renderChartTipoSolicitacao();
     renderChartDistribuicaoUF();
     renderChartEvolucaoTemporal();
-  }
-
-  function renderChartEstrategia() {
-    const porEst = {};
-    filtrados.forEach(d => {
-      porEst[d.estrategia] = (porEst[d.estrategia] || 0) + (Number(d.quantidade) || 0);
-    });
-
-    const top5 = Object.entries(porEst)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
-
-    const labels = top5.map(([est]) => est);
-    const data = top5.map(([, qtd]) => qtd);
-
-    if (_charts.estrategia) _charts.estrategia.destroy();
-
-    const ctx = document.getElementById('chartEstrategia');
-    _charts.estrategia = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: 'var(--blue)',
-          borderRadius: 6,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { beginAtZero: true, grid: { color: '#f0f0f5' } },
-          y: { grid: { display: false } }
-        }
-      }
-    });
   }
 
   function renderChartTipoSolicitacao() {
