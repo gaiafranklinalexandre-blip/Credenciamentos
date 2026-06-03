@@ -50,35 +50,11 @@
     /* ─── ACESSO NEGADO ─── */
     #acessoNegado {
       min-height: 100vh;
-      background: linear-gradient(135deg, #EAECF4 0%, #E8EBEF 100%);
       display: none;
       align-items: center;
       justify-content: center;
-    }
-
-    .acesso-negado-box {
-      background: var(--white);
-      border-radius: var(--card-r);
-      box-shadow: 0 8px 32px rgba(229,34,7,0.10);
-      padding: 48px 40px;
-      max-width: 440px;
-      width: 100%;
-      text-align: center;
-    }
-
-    .acesso-negado-ico { font-size: 48px; margin-bottom: 16px; }
-
-    .acesso-negado-titulo {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--red);
-      margin-bottom: 12px;
-    }
-
-    .acesso-negado-sub {
-      font-size: 13px;
+      font-size: 18px;
       color: var(--text-mid);
-      line-height: 1.6;
     }
 
     /* ─── HEADER ─── */
@@ -429,16 +405,7 @@
 <body>
 
 <!-- ACESSO NEGADO -->
-<div id="acessoNegado">
-  <div class="acesso-negado-box">
-    <div class="acesso-negado-ico">🔒</div>
-    <div class="acesso-negado-titulo">Acesso restrito</div>
-    <div class="acesso-negado-sub">
-      Este painel está disponível apenas na rede do Ministério da Saúde.<br><br>
-      Conecte-se à rede interna ou à VPN do MS para acessar.
-    </div>
-  </div>
-</div>
+<div id="acessoNegado">Indisponível</div>
 
 <!-- DASHBOARD -->
 <div id="painelRepresentados" style="display:none;">
