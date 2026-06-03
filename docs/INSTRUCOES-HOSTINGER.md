@@ -1,15 +1,20 @@
 # Instruções de Deploy — sync.php no Hostinger
 
-## O que fazer
+## Dois arquivos PHP no projeto — qual subir?
 
-Substituir o arquivo `sync.php` no Hostinger pelo arquivo completo: `docs/sync-php-completo.php`
+| Arquivo | Onde fica | O que é |
+|---|---|---|
+| `sync.php` (raiz) | Local + Hostinger | **Arquivo real** com credenciais do banco. É esse que sobe no Hostinger. |
+| `docs/sync-php-completo.php` | GitHub | Cópia de referência sem credenciais reais. Só para documentação/versionamento. |
+
+**Sempre suba o `sync.php` da raiz do projeto.** Nunca o `docs/sync-php-completo.php`.
 
 ---
 
 ## Passo a Passo
 
-### 1. Fazer Download do Arquivo
-- Fazer download de `docs/sync-php-completo.php` para seu computador
+### 1. Localizar o arquivo correto
+- O arquivo a subir é `sync.php` na **raiz** do projeto local
 
 ### 2. Acessar Hostinger
 1. Acessar: https://hpanel.hostinger.com/
@@ -24,9 +29,8 @@ Substituir o arquivo `sync.php` no Hostinger pelo arquivo completo: `docs/sync-p
 
 ### 4. Upload do Novo Arquivo
 1. Clicar em **Upload** (ou arrastar o arquivo)
-2. Selecionar `sync-php-completo.php`
-3. **Renomear após upload** para `sync.php`
-   - Ou fazer upload direto como `sync.php` se o gerenciador permitir
+2. Selecionar **`sync.php`** (da raiz do projeto local)
+3. Confirmar que o arquivo no Hostinger ficou com o nome `sync.php`
 
 ### 5. Verificar Permissões
 1. Clicar com botão direito em `sync.php`
@@ -109,7 +113,7 @@ $api_key = 'painel_cred_2026_key'; // Chave de autenticação
 
 ## Próximos Passos
 
-1. ✅ Upload de `sync-php-completo.php` para Hostinger
+1. ✅ Upload de `sync.php` para Hostinger
 2. ✅ Rodar `python sync.py`
 3. ✅ Testar endpoints GET (`?action=data`, `?action=portarias`, `?action=represados`)
 4. ✅ Acessar dashboards e validar dados
