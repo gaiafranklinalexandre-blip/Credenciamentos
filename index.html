@@ -978,7 +978,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <nav class="capa-nav">
     <a href="#" onclick="abrirDashboard();return false">Dashboard</a>
     <a href="#" onclick="abrirPainel('portarias');return false">Legislação</a>
-    <a href="#" onclick="alert('Painel de Novos Credenciamentos da APS\nSAPS — Ministério da Saúde, 2026');return false">Sobre o Painel</a>
+    <a href="#" onclick="alert('Painel de Novos Credenciamentos da APS\n2026');return false">Sobre o Painel</a>
   </nav>
   <div class="capa-pre">P a i n e l</div>
   <h1 class="capa-title">Novos <strong>Credenciamentos</strong> da APS</h1>
@@ -1001,7 +1001,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
 
   <div class="capa-erro" id="consultaErro">Selecione pelo menos um município ou filtro para consultar.</div>
 
-  <div class="capa-logos">MINISTÉRIO DA SAÚDE · SAPS · 2026</div>
+  <div class="capa-logos">2026</div>
   <div class="capa-att" id="attTxt"></div>
 </div>
 
@@ -1010,7 +1010,6 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <div class="dash-header">
     <div class="dash-header-inner">
       <div class="dash-titulo">
-        <h2>Ministério da Saúde · SAPS</h2>
         <h1>Dashboard — Novos Credenciamentos da APS</h1>
       </div>
       <div style="display:flex;gap:10px;align-items:center">
@@ -1045,7 +1044,6 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
   <div class="header">
     <div class="header-inner">
       <div class="header-titulo">
-        <h2>Ministério da Saúde · SAPS</h2>
         <h1>Credenciamentos da Atenção Primária à Saúde</h1>
       </div>
       <div class="header-right">
@@ -1138,7 +1136,7 @@ footer { text-align: center; padding: 20px; font-size: 11px; color: var(--text-m
       <div id="c-portarias"         style="display:none"></div>
     </div>
 
-    <footer>Ministério da Saúde | SAPS &copy; 2026</footer>
+    <footer>&copy; 2026</footer>
   </div>
 </div>
 
@@ -2160,7 +2158,7 @@ function cardHomol(grupo, ativo = true) {
       </div>`;
     } else {
       alertaHTML = `<div class="homol-alerta homol-alerta-cinza"
-        title="A janela de cadastro no CNES foi encerrada. As homologações refletem o que foi registrado. O painel está atualizado — valores zerados indicam que a parcela financeira ainda não foi processada pelo Ministério.">
+        title="A janela de cadastro no CNES foi encerrada. As homologações refletem o que foi registrado. O painel está atualizado — valores zerados indicam que a parcela financeira ainda não foi processada.">
         🔒 Janela de cadastro encerrada. Aguardando processamento das parcelas financeiras.
         <span class="homol-alerta-dica">?</span>
       </div>`;
@@ -2187,7 +2185,7 @@ function cardHomol(grupo, ativo = true) {
         ? `${hVal} equipe(s) homologada(s) nesta parcela. Pagamento a partir de ${homolLabel}.`
         : homolPasta
         ? `A parcela ${homolLabel} foi processada e o resultado foi zero equipes homologadas. Isso pode ter ocorrido porque o cadastro no CNES não estava completo ou correto na ${idx}ª competência (${comp.label}).`
-        : `A parcela ${homolLabel} ainda não foi processada — o Ministério emite após o dia 20 do mês da parcela. O painel está atualizado; o zero é esperado até lá.`;
+        : `A parcela ${homolLabel} ainda não foi processada — a emissão ocorre após o dia 20 do mês da parcela. O painel está atualizado; o zero é esperado até lá.`;
 
       gridHTML += `
       <div class="homol-comp-item">
@@ -2215,7 +2213,7 @@ function cardHomol(grupo, ativo = true) {
 
     // Resumo financeiro
     const corPct = pct>=80?'var(--green)':pct>=40?'var(--yellow)':'var(--red)';
-    const resumoTitle = `O painel está atualizado. Valores zerados nas parcelas indicam que a homologação financeira ainda não foi emitida pelo Ministério — não significa ausência de cadastro no CNES.`;
+    const resumoTitle = `O painel está atualizado. Valores zerados nas parcelas indicam que a homologação financeira ainda não foi emitida — não significa ausência de cadastro no CNES.`;
     const resumoHTML = `
     <div class="homol-resumo" title="${resumoTitle}">
       <div class="homol-resumo-item">
