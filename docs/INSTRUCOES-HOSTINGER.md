@@ -2,12 +2,7 @@
 
 ## Dois arquivos PHP no projeto — qual subir?
 
-| Arquivo | Onde fica | O que é |
-|---|---|---|
-| `sync.php` (raiz) | Local + Hostinger | **Arquivo real** com credenciais do banco. É esse que sobe no Hostinger. |
-| `docs/sync-php-completo.php` | GitHub | Cópia de referência sem credenciais reais. Só para documentação/versionamento. |
-
-**Sempre suba o `sync.php` da raiz do projeto.** Nunca o `docs/sync-php-completo.php`.
+O arquivo a subir no Hostinger é sempre o **`sync.php`** da raiz do projeto local — ele contém as credenciais reais do banco e toda a lógica da API.
 
 ---
 
