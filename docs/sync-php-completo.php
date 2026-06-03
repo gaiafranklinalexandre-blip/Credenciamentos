@@ -402,8 +402,35 @@ elseif ($action === 'portarias') {
     echo json_encode($rows);
 }
 
-// ─── GET REPRESADOS (GET) ──────────────────────────────
+// ─── GET REPRESADOS (GET) — restrito à rede do MS ─────
 elseif ($action === 'represados') {
+    // Verifica se o IP do cliente está na faixa autorizada do Ministério da Saúde
+    $client_ip = $_SERVER['REMOTE_ADDR'];
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $client_ip = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR'])[0]);
+    }
+
+    $redes_autorizadas = [
+        '189.9.35.0/24',   // Rede MS — adicione outros blocos aqui se necessário
+    ];
+
+    function ip_em_rede($ip, $cidr) {
+        list($subnet, $bits) = explode('/', $cidr);
+        $mask = ~((1 << (32 - (int)$bits)) - 1);
+        return (ip2long($ip) & $mask) === (ip2long($subnet) & $mask);
+    }
+
+    $autorizado = false;
+    foreach ($redes_autorizadas as $rede) {
+        if (ip_em_rede($client_ip, $rede)) { $autorizado = true; break; }
+    }
+
+    if (!$autorizado) {
+        http_response_code(403);
+        echo json_encode(['erro' => 'Acesso restrito à rede do Ministério da Saúde']);
+        exit;
+    }
+
     $result = $conn->query("SELECT * FROM represados ORDER BY data_solicitacao DESC");
 
     if (!$result) {

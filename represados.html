@@ -47,120 +47,38 @@
     html, body { height: 100%; }
     body { font-family: 'Raleway', sans-serif; background: var(--gray-bg); color: var(--text); font-size: 14px; }
 
-    /* ─── COVER PAGE (PASSWORD) ─── */
-    #capaSenha {
+    /* ─── ACESSO NEGADO ─── */
+    #acessoNegado {
       min-height: 100vh;
       background: linear-gradient(135deg, #EAECF4 0%, #E8EBEF 100%);
-      display: flex;
+      display: none;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
 
-    #capaSenha::before {
-      content: '';
-      position: absolute;
-      left: -160px;
-      top: -160px;
-      width: 480px;
-      height: 480px;
-      border-radius: 50%;
-      background: rgba(19,81,180,0.05);
-    }
-
-    #capaSenha::after {
-      content: '';
-      position: absolute;
-      right: -100px;
-      bottom: -100px;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background: rgba(19,81,180,0.06);
-    }
-
-    .capa-form {
+    .acesso-negado-box {
       background: var(--white);
       border-radius: var(--card-r);
-      box-shadow: 0 8px 32px rgba(19,81,180,0.12);
+      box-shadow: 0 8px 32px rgba(229,34,7,0.10);
       padding: 48px 40px;
-      max-width: 420px;
+      max-width: 440px;
       width: 100%;
-      position: relative;
-      z-index: 10;
-    }
-
-    .capa-titulo {
-      font-size: 26px;
-      font-weight: 700;
-      color: var(--blue);
-      margin-bottom: 12px;
       text-align: center;
     }
 
-    .capa-sub {
+    .acesso-negado-ico { font-size: 48px; margin-bottom: 16px; }
+
+    .acesso-negado-titulo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+
+    .acesso-negado-sub {
       font-size: 13px;
       color: var(--text-mid);
-      text-align: center;
-      margin-bottom: 28px;
-      line-height: 1.4;
-    }
-
-    .capa-grupo {
-      margin-bottom: 20px;
-    }
-
-    .capa-label {
-      display: block;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      letter-spacing: 0.5px;
-    }
-
-    .capa-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid var(--gray-border);
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-family: inherit;
-      transition: border-color .2s;
-    }
-
-    .capa-input:focus {
-      outline: none;
-      border-color: var(--blue);
-    }
-
-    .capa-btn {
-      width: 100%;
-      padding: 14px 16px;
-      background: var(--blue);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background .2s;
-    }
-
-    .capa-btn:hover { background: var(--blue-hover); }
-    .capa-btn:disabled { background: #ccc; cursor: not-allowed; }
-
-    .capa-erro {
-      color: var(--red);
-      font-size: 13px;
-      text-align: center;
-      margin-top: 16px;
-      padding: 12px;
-      background: var(--red-light);
-      border-radius: 6px;
-      display: none;
+      line-height: 1.6;
     }
 
     /* ─── HEADER ─── */
@@ -510,17 +428,15 @@
 </head>
 <body>
 
-<!-- COVER PAGE -->
-<div id="capaSenha">
-  <div class="capa-form">
-    <div class="capa-titulo">Painel de Represados</div>
-    <div class="capa-sub">Acesso restrito. Por favor, digite a senha para continuar.</div>
-    <div class="capa-grupo">
-      <label class="capa-label">Senha</label>
-      <input type="password" id="senhaInput" class="capa-input" placeholder="Digite a senha" />
+<!-- ACESSO NEGADO -->
+<div id="acessoNegado">
+  <div class="acesso-negado-box">
+    <div class="acesso-negado-ico">🔒</div>
+    <div class="acesso-negado-titulo">Acesso restrito</div>
+    <div class="acesso-negado-sub">
+      Este painel está disponível apenas na rede do Ministério da Saúde.<br><br>
+      Conecte-se à rede interna ou à VPN do MS para acessar.
     </div>
-    <button class="capa-btn" onclick="autenticar()">Acessar Painel</button>
-    <div class="capa-erro" id="erroMsg"></div>
   </div>
 </div>
 
@@ -529,7 +445,6 @@
   <!-- Header -->
   <div class="header">
     <div class="header-titulo">Painel de Represados — Ministério da Saúde</div>
-    <button class="header-logout" onclick="logout()">Sair</button>
   </div>
 
   <!-- Filtros -->
@@ -631,7 +546,6 @@
   // ─── CONFIGURAÇÃO ─────────────────────────────────────────
   const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=represados';
   const GEOJSON_URL = 'docs/brazil-states.geojson';
-  const SENHA_HASH = '5f4dcc3b5aa765d61d8327deb882cf99'; // MD5 de "password" (mude conforme necessário)
 
   // ─── STATE ────────────────────────────────────────────────
   let representados = [];
@@ -639,67 +553,8 @@
   let _mapaInst = null;
   let _charts = {};
 
-  // ─── AUTENTICAÇÃO ─────────────────────────────────────────
-  window.addEventListener('DOMContentLoaded', () => {
-    const autenticado = sessionStorage.getItem('representadosAuth');
-    if (autenticado === 'true') {
-      document.getElementById('capaSenha').style.display = 'none';
-      document.getElementById('painelRepresentados').style.display = 'block';
-      carregarDados();
-    }
-
-    document.getElementById('senhaInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') autenticar();
-    });
-  });
-
-  function md5(string) {
-    // Fallback simples: usar SHA256 ou bcryptjs em produção
-    // Por ora, usar https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
-    // Para simplicidade, vamos aceitar qualquer entrada que match o hash
-    return string;
-  }
-
-  function autenticar() {
-    const senha = document.getElementById('senhaInput').value;
-    const btn = document.querySelector('.capa-btn');
-
-    if (!senha.trim()) {
-      mostrarErroAuth('Digite a senha');
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Verificando...';
-
-    // Simular verificação (em produção, usar biblioteca de hash)
-    // Para testes: senha = "password" (hash MD5: 5f4dcc3b5aa765d61d8327deb882cf99)
-    if (senha === 'password') {
-      sessionStorage.setItem('representadosAuth', 'true');
-      document.getElementById('capaSenha').style.display = 'none';
-      document.getElementById('painelRepresentados').style.display = 'block';
-      carregarDados();
-    } else {
-      mostrarErroAuth('Senha incorreta. Tente novamente.');
-      btn.disabled = false;
-      btn.textContent = 'Acessar Painel';
-    }
-  }
-
-  function mostrarErroAuth(msg) {
-    const erroEl = document.getElementById('erroMsg');
-    erroEl.textContent = msg;
-    erroEl.style.display = 'block';
-    setTimeout(() => { erroEl.style.display = 'none'; }, 3000);
-  }
-
-  function logout() {
-    sessionStorage.removeItem('representadosAuth');
-    document.getElementById('painelRepresentados').style.display = 'none';
-    document.getElementById('capaSenha').style.display = 'flex';
-    document.getElementById('senhaInput').value = '';
-    document.getElementById('senhaInput').focus();
-  }
+  // ─── INICIALIZAÇÃO ────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => { carregarDados(); });
 
   // ─── CARREGAR DADOS ───────────────────────────────────────
   async function carregarDados() {
@@ -708,11 +563,21 @@
 
     try {
       const resp = await fetch(API_URL);
+
+      if (resp.status === 403) {
+        document.getElementById('painelRepresentados').style.display = 'none';
+        const neg = document.getElementById('acessoNegado');
+        neg.style.display = 'flex';
+        return;
+      }
+
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      document.getElementById('acessoNegado').style.display = 'none';
+      document.getElementById('painelRepresentados').style.display = 'block';
 
       const data = await resp.json();
       representados = Array.isArray(data) ? data : [];
-      console.log(`✅ Carregados ${representados.length} represados`);
 
       if (representados.length === 0) {
         throw new Error('Nenhum represado retornado da API');
