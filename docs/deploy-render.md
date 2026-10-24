@@ -1,5 +1,11 @@
 # Deploy no Render
 
+## Acompanhamento integrado — 24/10/2026
+
+A consulta passa a reunir credenciamento e homologação, com prioridades, situação, saldo e orientação no próprio cartão. Dashboard e abas separadas foram removidos por solicitação do usuário. Portarias seguem acessíveis. Datas e quantitativos vêm exclusivamente das bases da API, sem fallback fixo. Regras, limites e validação atuais: [acompanhamento-integrado.md](acompanhamento-integrado.md). O teste vigente desta experiência é `tests/integrado.cjs`; instruções abaixo sobre dashboard e cinco abas descrevem a experiência anterior e não se aplicam à nova consulta.
+
+
+
 ## Identidade compartilhada — 24/10/2026
 
 Frontend enviado ao repositório Credenciamentos/main no commit `9654b7a`. CSS, JS de navegação, consentimento e favicon ficam incorporados no index.html: não há dependências locais novas a enviar. Manter dados e backend separados; esta revisão não publica sync.php, sync.py ou planilhas.

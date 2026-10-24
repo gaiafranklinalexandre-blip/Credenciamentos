@@ -1,5 +1,11 @@
 # Design
 
+## Acompanhamento integrado — 24/10/2026
+
+A consulta passa a reunir credenciamento e homologação, com prioridades, situação, saldo e orientação no próprio cartão. Dashboard e abas separadas foram removidos por solicitação do usuário. Portarias seguem acessíveis. Datas e quantitativos vêm exclusivamente das bases da API, sem fallback fixo. Regras, limites e validação atuais: [acompanhamento-integrado.md](acompanhamento-integrado.md). O teste vigente desta experiência é `tests/integrado.cjs`; instruções abaixo sobre dashboard e cinco abas descrevem a experiência anterior e não se aplicam à nova consulta.
+
+
+
 ## Identidade compartilhada dos painéis — 24/10/2026
 
 Logo SUS padrão atualizado pelo usuário: `APS 360/LadingPage_Notas/sus-logo.png`. PNG integral incorporado no cabeçalho e no favicon como data URI, mantendo o frontend em arquivo único. Exibir com proporção original (76 px no computador, 58 px no celular), sem distorção ou fundo adicionado. Layout conferido em 320, 390, 768 e 1440 px.

@@ -1,5 +1,11 @@
 # Contexto do Projeto
 
+## Acompanhamento integrado — 24/10/2026
+
+A consulta passa a reunir credenciamento e homologação, com prioridades, situação, saldo e orientação no próprio cartão. Dashboard e abas separadas foram removidos por solicitação do usuário. Portarias seguem acessíveis. Datas e quantitativos vêm exclusivamente das bases da API, sem fallback fixo. Regras, limites e validação atuais: [acompanhamento-integrado.md](acompanhamento-integrado.md). O teste vigente desta experiência é `tests/integrado.cjs`; instruções abaixo sobre dashboard e cinco abas descrevem a experiência anterior e não se aplicam à nova consulta.
+
+
+
 ## Atualização visual — 24/10/2026
 
 Aplicado o estilo aprovado em notas técnicas/landing page: cabeçalho branco, menu lateral, sombras/degradês e fonte legível na consulta, resultados e dashboard. Todo CSS/JS continua incorporado em index.html. API, sincronização e planilhas não foram alteradas. O JavaScript original de regras de negócio foi preservado; a única correção funcional foi um guard em selecionarMun para ignorar selects antigos da capa que já não existem, evitando erro no autocomplete.
