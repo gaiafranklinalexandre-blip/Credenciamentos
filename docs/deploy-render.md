@@ -2,7 +2,9 @@
 
 ## Identidade compartilhada — 24/10/2026
 
-Publicar a revisão de frontend em `https://painel-credenciamentos.onrender.com/`, conforme fluxo automático deste projeto. CSS, JS de navegação, consentimento e favicon ficam incorporados no index.html: não há dependências locais novas a enviar. Manter dados e backend separados; esta revisão não publica sync.php, sync.py ou planilhas.
+Frontend enviado ao repositório Credenciamentos/main no commit `9654b7a`. CSS, JS de navegação, consentimento e favicon ficam incorporados no index.html: não há dependências locais novas a enviar. Manter dados e backend separados; esta revisão não publica sync.php, sync.py ou planilhas.
+
+**Atenção ao endereço:** `https://painel-credenciamentos.onrender.com/` serve o wrapper antigo de Power BI, do repositório Page_credenciamento (ver wrapper-ga4.md), e não este frontend. Em 24/10/2026 a página de 1.277 bytes foi conferida e contém apenas o iframe de Power BI. O endereço de hospedagem do frontend nativo ainda não foi identificado; o usuário foi consultado. GitHub deste frontend não registra homepage, Pages, deployments ou checks que identifiquem o serviço. Não declarar a revisão nativa no ar nesse endereço nem substituir o wrapper sem esclarecer a relação de publicação.
 
 Validação: `node tests/visual_aps.cjs`, com Playwright disponível no ambiente, servidor HTTP local na porta 8963 ou `CRED_TEST_URL` para o Render. O teste usa dados públicos reais, abre Salvador pelo autocomplete, verifica cinco abas, CSV, filtros do dashboard, carregamento tardio de Chart.js/Leaflet, mapa e 21 combinações (sete larguras × três áreas). Testa ainda recusa/aceite/revogação de GA; a tag é interceptada no aceite para não coletar QA. Capturas e resumo ficam em validacao_visual/. Não confundir o site principal com o wrapper Power BI (`index-wrapper.html`) ou com represados.html.
 
