@@ -6,7 +6,7 @@ Aplicado o estilo aprovado em notas técnicas/landing page: cabeçalho branco, m
 
 Consentimento de Analytics integrado: nenhuma tag Google antes da escolha/na recusa; aceite opcional, revisão pelo rodapé e revogação com bloqueio e recarga. Chave local específica `aps.credenciamentos.privacidade.v1`. Teste com 16.582 registros/34 portarias públicos, consulta Salvador, cinco abas, CSV, filtros, mapa e gráficos, sete larguras e consentimento. Evidências locais em validacao_visual/. Arquivos de backend e dados com alterações preexistentes foram preservados e não fazem parte deste commit.
 
-Push concluído em Credenciamentos/main (`9654b7a`). Conferência de hospedagem encontrou que painel-credenciamentos.onrender.com pertence ao wrapper Power BI (Page_credenciamento), e não ao index.html nativo. URL pública do frontend nativo pendente de informação do usuário; não afirmar deploy público antes dessa confirmação. Documentação de deploy registra a distinção.
+Push concluído em Credenciamentos/main (`9654b7a`). Usuário confirmou a URL pública do frontend nativo: https://credenciamentos.onrender.com/. HTML HTTP 200 conferido contra o local. painel-credenciamentos.onrender.com pertence ao wrapper Power BI (Page_credenciamento), que permanece separado. Documentação de deploy registra a distinção; validação funcional pública é executada no endereço nativo.
 
 ## Objetivo
 
