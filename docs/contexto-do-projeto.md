@@ -1,5 +1,11 @@
 # Contexto do Projeto
 
+## Atualização visual — 24/10/2026
+
+Aplicado o estilo aprovado em notas técnicas/landing page: cabeçalho branco, menu lateral, sombras/degradês e fonte legível na consulta, resultados e dashboard. Todo CSS/JS continua incorporado em index.html. API, sincronização e planilhas não foram alteradas. O JavaScript original de regras de negócio foi preservado; a única correção funcional foi um guard em selecionarMun para ignorar selects antigos da capa que já não existem, evitando erro no autocomplete.
+
+Consentimento de Analytics integrado: nenhuma tag Google antes da escolha/na recusa; aceite opcional, revisão pelo rodapé e revogação com bloqueio e recarga. Chave local específica `aps.credenciamentos.privacidade.v1`. Teste com 16.582 registros/34 portarias públicos, consulta Salvador, cinco abas, CSV, filtros, mapa e gráficos, sete larguras e consentimento. Evidências locais em validacao_visual/. Arquivos de backend e dados com alterações preexistentes foram preservados e não fazem parte deste commit.
+
 ## Objetivo
 
 Painel web público de monitoramento dos **Novos Credenciamentos da Atenção Primária à Saúde (APS)**. Substitui o painel Power BI anterior. Desenvolvido por Franklin Santos (SAPS/Ministério da Saúde, 2026).

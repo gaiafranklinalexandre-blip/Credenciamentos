@@ -1,5 +1,13 @@
 # Deploy no Render
 
+## Identidade compartilhada — 24/10/2026
+
+Publicar a revisão de frontend em `https://painel-credenciamentos.onrender.com/`, conforme fluxo automático deste projeto. CSS, JS de navegação, consentimento e favicon ficam incorporados no index.html: não há dependências locais novas a enviar. Manter dados e backend separados; esta revisão não publica sync.php, sync.py ou planilhas.
+
+Validação: `node tests/visual_aps.cjs`, com Playwright disponível no ambiente, servidor HTTP local na porta 8963 ou `CRED_TEST_URL` para o Render. O teste usa dados públicos reais, abre Salvador pelo autocomplete, verifica cinco abas, CSV, filtros do dashboard, carregamento tardio de Chart.js/Leaflet, mapa e 21 combinações (sete larguras × três áreas). Testa ainda recusa/aceite/revogação de GA; a tag é interceptada no aceite para não coletar QA. Capturas e resumo ficam em validacao_visual/. Não confundir o site principal com o wrapper Power BI (`index-wrapper.html`) ou com represados.html.
+
+O checkout tem alterações preexistentes em sync.php/sync.py e documentos de dados, além de arquivos locais não versionados. Adicionar ao commit somente index.html, documentação visual/deploy/contexto e o teste desta revisão. Nunca usar git add . nesta entrega. A conferência final deve comparar o HTML servido com o local e repetir o teste no Render.
+
 ## Fluxo de deploy
 
 O deploy é **automático** — não há nenhuma ação manual necessária além do push:

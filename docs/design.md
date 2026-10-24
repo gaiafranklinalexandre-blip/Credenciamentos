@@ -1,5 +1,13 @@
 # Design
 
+## Identidade compartilhada dos painéis — 24/10/2026
+
+Objetivo: aplicar o visual aprovado no painel de notas e landing page, mantendo as informações de credenciamento. Escopo: capa/consulta, resultados, homologações, portarias e dashboard, somente em index.html. Cabeçalho branco, azuis #1351b4/#071d41, sombras em camadas, degradês discretos, navegação lateral recolhível e campos/botões de filtros com altura efetiva de 48 px. Ícone SUS incorporado como favicon, sem novo arquivo remoto. Mantidas as identificações textuais atuais do projeto, sem reintroduzir referências institucionais removidas na revisão anterior.
+
+No computador o menu ocupa 250 px (215 px em telas intermediárias), pode recolher e no celular vira gaveta. O cabeçalho antigo dos resultados fica oculto para evitar títulos duplicados. O dropdown existente continua oferecendo as cinco abas. As cores temporais e semânticas de status permanecem intactas; os KPIs de negócio do dashboard são preservados. Exemplos corretos: input e ações alinhados em 48 px, labels associados, contraste legível e regras responsivas para o conteúdo real. Evitar encolhimento por flex, campos menores que os botões e grades que esmagam nomes no celular.
+
+Validação com dados reais e captura de resultados/mapa/gráficos em tests/visual_aps.cjs (requer Playwright/Edge no ambiente). Fontes do teste e documentação acompanham o commit; capturas locais em validacao_visual/ não são necessárias ao deploy.
+
 ## Paleta de cores (variáveis CSS)
 
 ```css
@@ -25,15 +33,15 @@
 }
 ```
 
-**Regra:** nunca usar cores hardcoded fora das variáveis. Sempre referenciar via `var(--nome)`.
+**Regra:** usar variáveis para as cores principais e semânticas. O bloco `estilo-integrado-aps` define também tons fixos dos degradês e sombras aprovados; manter esses tons centralizados no tema, sem reinterpretar as cores de status dos dados.
 
 ---
 
 ## Tipografia
 
-- Fonte: **Raleway** (Google Fonts) — pesos 400, 500, 600, 700, 800.
-- Tamanho base: `14px` no `body`.
-- Títulos principais: `clamp(32px, 5vw, 64px)` na capa.
+- Fonte da interface: **Segoe UI, Arial, sans-serif**. Raleway permanece na configuração legada dos gráficos e tooltips, preservada nesta revisão.
+- Tamanho base: `15px` no `body`.
+- Títulos principais: 27–30 px na capa, adaptados ao celular; cabeçalho em 19–23 px.
 - Labels de cards: `11px`, uppercase, `letter-spacing: .5px`.
 - Valores de KPI: `28–36px`, `font-weight: 800`.
 
@@ -51,9 +59,9 @@ box-shadow: var(--shadow);
 - Cards de credenciamento: `overflow: hidden`, header com borda inferior.
 
 ### Botões
-- **Primário:** `background: var(--blue)`, `border-radius: var(--radius)`, `color: #fff`.
+- **Primário:** degradê azul do tema, `border-radius:30px`, texto branco; 48 px nas ações de consulta.
 - **Outline:** `border: 2px solid var(--blue)`, `background: transparent`.
-- **Limpar:** `background: none`, `color: var(--red)`, apenas texto.
+- **Limpar:** superfície branca, contorno azul discreto e texto azul, alinhado aos demais controles.
 
 ### Filtros / Selects
 - Aparência personalizada com `appearance: none` + ícone SVG inline como `background-image`.
@@ -83,9 +91,8 @@ box-shadow: var(--shadow);
 ```
 
 ### Abas
-- Barra fixa com `border-bottom: 2px solid var(--gray-border)`.
-- Aba ativa: `border-bottom: 3px solid var(--blue)`, `color: var(--blue)`.
-- Separadores com `.aba-sep` (linha vertical de 1px).
+- Cinco abas funcionais no dropdown do cabeçalho de resultados; opções existentes e regras de seleção preservadas.
+- Menu lateral: consulta municipal, dashboard e portarias/legislação; seleção acompanha a área exibida.
 
 ### Animações
 ```css
@@ -139,8 +146,8 @@ Breakpoint principal: `max-width: 700px`.
 
 ## Identidade visual institucional
 
-- Sempre incluir "MINISTÉRIO DA SAÚDE · SAPS · 2026" no rodapé da capa.
-- Não usar outras fontes além de Raleway.
-- Não usar cores fora da paleta definida.
+- Preservar os textos atuais de identificação do projeto e o rodapé 2026, conforme a revisão anterior; não reintroduzir cabeçalhos removidos sem solicitação.
+- Usar as fontes de interface e gráficos documentadas acima.
+- Preservar a paleta semântica e o tema compartilhado aprovado.
 - Manter o tom institucional: sem gradientes chamativos, sem animações excessivas.
 - O painel deve parecer uma extensão digital do Governo Federal.
