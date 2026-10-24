@@ -2,6 +2,8 @@
 
 ## Identidade compartilhada dos painéis — 24/10/2026
 
+Logo SUS padrão atualizado pelo usuário: `APS 360/LadingPage_Notas/sus-logo.png`. PNG integral incorporado no cabeçalho e no favicon como data URI, mantendo o frontend em arquivo único. Exibir com proporção original (76 px no computador, 58 px no celular), sem distorção ou fundo adicionado. Layout conferido em 320, 390, 768 e 1440 px.
+
 Objetivo: aplicar o visual aprovado no painel de notas e landing page, mantendo as informações de credenciamento. Escopo: capa/consulta, resultados, homologações, portarias e dashboard, somente em index.html. Cabeçalho branco, azuis #1351b4/#071d41, sombras em camadas, degradês discretos, navegação lateral recolhível e campos/botões de filtros com altura efetiva de 48 px. Ícone SUS incorporado como favicon, sem novo arquivo remoto. Mantidas as identificações textuais atuais do projeto, sem reintroduzir referências institucionais removidas na revisão anterior.
 
 No computador o menu ocupa 250 px (215 px em telas intermediárias), pode recolher e no celular vira gaveta. O cabeçalho antigo dos resultados fica oculto para evitar títulos duplicados. O dropdown existente continua oferecendo as cinco abas. As cores temporais e semânticas de status permanecem intactas; os KPIs de negócio do dashboard são preservados. Exemplos corretos: input e ações alinhados em 48 px, labels associados, contraste legível e regras responsivas para o conteúdo real. Evitar encolhimento por flex, campos menores que os botões e grades que esmagam nomes no celular.
