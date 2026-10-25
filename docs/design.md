@@ -163,3 +163,7 @@ Breakpoint principal: `max-width: 700px`.
 ## Favicon e logo SUS - 24/10/2026
 
 Preservar o favicon anterior (PNG de 13.108 bytes). O logo SUS aprovado pertence ao cabecalho e nao deve substituir o favicon. Recursos separados; redimensionamento visual do logo preserva a proporcao. Correcao confirmada nos tres sites publicados.
+
+## Etapas de homologação — 25/10/2026
+
+Indicador de três etapas na situação consolidada e no detalhe municipal, com ordinal, CNES, parcela e quantidade. Verde identifica resultado informado; azul identifica corte de calendário atingido; borda tracejada indica parcela prevista. Textos acompanham as cores. Específicos mostra Somente credenciamento, sem indicador ou métricas de homologação. Regras completas em acompanhamento-integrado.md.
