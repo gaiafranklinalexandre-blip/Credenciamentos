@@ -2,7 +2,7 @@
 
 ## Panorama e estados independentes — 24/10/2026
 
-A navegação usa menu lateral (gaveta no celular), com Credenciamentos ativos como área padrão. A busca inicial foi removida. O botão Filtros abre diálogo lateral com Região, UF, Município, Portaria, Estratégia e, em Homologações, situação do processamento. Aplicar confirma o rascunho; fechar descarta. Os filtros aplicados aparecem em chips removíveis. O detalhe municipal mostra o caminho Consolidado → Município / UF e o retorno explícito no cabeçalho fixo. Voltar restaura contexto/paginação; a troca de área preserva filtros. O histórico do navegador e o recarregamento preservam a consulta. O botão da linha do tempo se chama Explicar. Permanecem o consolidado por portaria/estratégia, apenas o KPI de ativos, conclusão abreviada e regras U/V. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste: `tests/navegacao.cjs`. Esta revisão não altera backend ou bases. Descrições posteriores de cinco abas e dashboard são históricas.
+A navegação usa menu lateral (gaveta no celular), com Credenciamentos ativos como área padrão, além de Encerrados e Portarias; as homologações estão integradas, sem área própria. A busca inicial foi removida. O botão Filtros abre diálogo lateral com Região, UF, Município, Portaria, Estratégia. Aplicar confirma o rascunho; fechar descarta. Os filtros aplicados aparecem em chips removíveis. O detalhe municipal mostra o caminho Consolidado → Município / UF e o retorno explícito no cabeçalho fixo. Voltar restaura contexto/paginação; a troca de área preserva filtros. O histórico do navegador e o recarregamento preservam a consulta. O botão da linha do tempo se chama Explicar. Após Saldo, a tabela e o detalhe municipal exibem % de implantação (homologadas ÷ credenciadas × 100); no consolidado, usa-se a razão entre somas. Permanecem o consolidado por portaria/estratégia, apenas o KPI de ativos, conclusão abreviada e regras U/V. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste: `tests/navegacao.cjs`. Esta revisão não altera backend ou bases. Descrições posteriores de cinco abas e dashboard são históricas.
 
 
 ## Identidade compartilhada dos painéis — 24/10/2026
@@ -158,3 +158,8 @@ Breakpoint principal: `max-width: 700px`.
 - Preservar a paleta semântica e o tema compartilhado aprovado.
 - Manter o tom institucional: sem gradientes chamativos, sem animações excessivas.
 - O painel deve parecer uma extensão digital do Governo Federal.
+
+
+## Favicon e logo SUS - 24/10/2026
+
+Preservar o favicon anterior (PNG de 13.108 bytes). O logo SUS aprovado pertence ao cabecalho e nao deve substituir o favicon. Recursos separados; redimensionamento visual do logo preserva a proporcao. Correcao confirmada nos tres sites publicados.

@@ -2,7 +2,7 @@
 
 ## Panorama e estados independentes — 24/10/2026
 
-A navegação usa menu lateral (gaveta no celular), com Credenciamentos ativos como área padrão. A busca inicial foi removida. O botão Filtros abre diálogo lateral com Região, UF, Município, Portaria, Estratégia e, em Homologações, situação do processamento. Aplicar confirma o rascunho; fechar descarta. Os filtros aplicados aparecem em chips removíveis. O detalhe municipal mostra o caminho Consolidado → Município / UF e o retorno explícito no cabeçalho fixo. Voltar restaura contexto/paginação; a troca de área preserva filtros. O histórico do navegador e o recarregamento preservam a consulta. O botão da linha do tempo se chama Explicar. Permanecem o consolidado por portaria/estratégia, apenas o KPI de ativos, conclusão abreviada e regras U/V. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste: `tests/navegacao.cjs`. Esta revisão não altera backend ou bases. Descrições posteriores de cinco abas e dashboard são históricas.
+A navegação usa menu lateral (gaveta no celular), com Credenciamentos ativos como área padrão, além de Encerrados e Portarias; as homologações estão integradas, sem área própria. A busca inicial foi removida. O botão Filtros abre diálogo lateral com Região, UF, Município, Portaria, Estratégia. Aplicar confirma o rascunho; fechar descarta. Os filtros aplicados aparecem em chips removíveis. O detalhe municipal mostra o caminho Consolidado → Município / UF e o retorno explícito no cabeçalho fixo. Voltar restaura contexto/paginação; a troca de área preserva filtros. O histórico do navegador e o recarregamento preservam a consulta. O botão da linha do tempo se chama Explicar. Após Saldo, a tabela e o detalhe municipal exibem % de implantação (homologadas ÷ credenciadas × 100); no consolidado, usa-se a razão entre somas. Permanecem o consolidado por portaria/estratégia, apenas o KPI de ativos, conclusão abreviada e regras U/V. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste: `tests/navegacao.cjs`. Esta revisão não altera backend ou bases. Descrições posteriores de cinco abas e dashboard são históricas.
 
 
 ## Identidade compartilhada — 24/10/2026
@@ -11,7 +11,7 @@ Frontend enviado ao repositório Credenciamentos/main no commit `9654b7a`. CSS, 
 
 **Endereços confirmados pelo usuário em 24/10/2026:** o frontend nativo deste projeto está em `https://credenciamentos.onrender.com/`. `https://painel-credenciamentos.onrender.com/` serve o wrapper antigo de Power BI, do repositório Page_credenciamento (ver wrapper-ga4.md), e não este frontend. Não confundir os dois produtos nem substituir o wrapper ao publicar este projeto. O HTML de credenciamentos.onrender.com retornou HTTP 200 e foi comparado ao index.html local, normalizando quebras de linha.
 
-Validação: `node tests/visual_aps.cjs`, com Playwright disponível no ambiente, servidor HTTP local na porta 8963 ou `CRED_TEST_URL` para o Render. O teste usa dados públicos reais, abre Salvador pelo autocomplete, verifica cinco abas, CSV, filtros do dashboard, carregamento tardio de Chart.js/Leaflet, mapa e 21 combinações (sete larguras × três áreas). Testa ainda recusa/aceite/revogação de GA; a tag é interceptada no aceite para não coletar QA. Capturas e resumo ficam em validacao_visual/. Não confundir o site principal com o wrapper Power BI (`index-wrapper.html`) ou com represados.html.
+Validação vigente: `node tests/navegacao.cjs` (ou a entrada compatível `tests/visual_aps.cjs`), servidor local na porta 8964 e Playwright disponível por `CRED_PLAYWRIGHT`. `CRED_TEST_URL` permite validar o Render. Verifica navegação, filtros, retorno, consolidação, percentual de implantação, linha do tempo, CSV e seis larguras. Analytics permanece recusado durante esta validação; ela não comprova recebimento de eventos no GA4. Capturas ficam em `validacao_visual/`.
 
 O checkout tem alterações preexistentes em sync.php/sync.py e documentos de dados, além de arquivos locais não versionados. Adicionar ao commit somente index.html, documentação visual/deploy/contexto e o teste desta revisão. Nunca usar git add . nesta entrega. A conferência final deve comparar o HTML servido com o local e repetir o teste no Render.
 
@@ -49,8 +49,8 @@ Após o push, aguardar ~2 minutos e verificar:
 2. Verificar se os dados carregam (filtros populados, autocomplete funcionando).
 3. Abrir o console do browser — não deve haver erros JS.
 4. Testar a busca por município.
-5. Abrir o Dashboard — verificar KPIs, mapa e gráficos.
-6. Verificar se a aba Legislação mostra as portarias.
+5. Conferir o KPI de ativos, o consolidado e o percentual de implantação.
+6. Conferir Encerrados, Portarias e a linha do tempo no detalhe municipal.
 
 ---
 
