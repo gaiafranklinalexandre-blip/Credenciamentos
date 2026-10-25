@@ -2,7 +2,7 @@
 
 ## Panorama e estados independentes — 24/10/2026
 
-O painel abre com todos os municípios, resumo numérico e aba Credenciamentos ativos. Abas: Ativos, Encerrados, Homologações e Portarias. A coluna U controla os credenciamentos; a coluna V controla as homologações, inclusive de credenciamentos encerrados. O popup é uma linha do tempo com quantitativos por competência CNES e a parcela correspondente. Data da coluna N restaurada na API após corrigir o bind PHP e reconciliar os 16.553 registros. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Validação atual: `tests/painel.cjs`. Descrições posteriores de cinco abas e dashboard são históricas.
+O painel abre com todos os municípios consolidados por portaria e tabela de estratégias, com apenas o KPI de credenciamentos ativos. Portaria e estratégia recebem destaque visual. “Ver municípios” permite chegar ao detalhe preservando aba, portaria e estratégia. A linha do tempo termina com Concluído após a competência em que o total foi homologado, omitindo as posteriores. Verde indica conclusão, azul espera e âmbar/laranja atenção com ação municipal. As colunas U/V permanecem independentes. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste atual: `tests/consolidado.cjs`. A revisão é somente de frontend e documentação; backend e bases não foram alterados. Descrições posteriores de cinco abas e dashboard são históricas.
 
 
 ## Identidade compartilhada dos painéis — 24/10/2026
