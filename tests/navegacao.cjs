@@ -12,6 +12,10 @@ await p.evaluate(()=>{if(percentualImplantacao(10,1)!==10||percentualImplantacao
 await p.screenshot({path:'validacao_visual/navegacao-desktop.png',fullPage:true});
 await p.screenshot({path:'validacao_visual/navegacao-preview.png',clip:{x:0,y:180,width:1440,height:800}});
 await p.locator('.portaria-consolidada').screenshot({path:'validacao_visual/implantacao-portaria-preview.png'});
+// Destaques ativos mantêm texto visível; movimento reduzido desativa os efeitos.
+assert.ok(await p.locator('.ciclo-parcela-nome').count()>0);assert.ok(await p.locator('.ciclo-prazo-limite').count()>0);
+await p.emulateMedia({reducedMotion:'reduce'});assert.equal(await p.locator('.ciclo-agora i').first().evaluate(e=>getComputedStyle(e).animationName),'none');assert.equal(await p.locator('.ciclo-agora').first().evaluate(e=>getComputedStyle(e).animationName),'none');await p.emulateMedia({reducedMotion:'no-preference'});assert.equal(await p.locator('.ciclo-agora i').first().evaluate(e=>getComputedStyle(e).animationName),'ciclo-sinal-ativo');
+await p.evaluate(()=>{const base={tipo:'3 competências',data_portaria:'2026-08-24',portaria:'12123',credenciado:2,homologacao_1:1,selecao_credenciamento:'Finalizado',selecao_homologacao:'Finalizado'};const encerrado=cicloVisual([base],new Date(2026,9,25));if(encerrado.includes('ciclo-agora-parcela')||encerrado.includes('ciclo-agora-cnes'))throw Error('Encerrado recebeu pulso de ação');const concluido=cicloVisual([{...base,homologacao_1:2,selecao_credenciamento:'Ativo',selecao_homologacao:'Homologando'}],new Date(2026,9,25));if(concluido.includes('ciclo-agora-parcela')||concluido.includes('ciclo-agora-cnes'))throw Error('Concluído recebeu pulso de ação');});
 // Ciclo visual: datas de referência, conclusão antecipada, coluna J e estados independentes.
 await p.evaluate(()=>{
  const base={tipo:'3 competências',portaria:'11772',data_portaria:'2026-07-01',credenciado:10,homologacao_1:2,homologacao_2:0,homologacao_3:0,selecao_credenciamento:'Finalizado',selecao_homologacao:'Homologando'};
