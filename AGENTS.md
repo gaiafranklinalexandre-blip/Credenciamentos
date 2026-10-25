@@ -58,7 +58,7 @@ index.html (Render) ← fetch API em tempo real
 
 1. **Autocomplete de município** — busca por nome, destaca letras, mostra UF, fecha ao clicar fora.
 2. **Hierarquia de filtros** — selects cascateiam dinamicamente; município digitado desabilita selects; select preenchido limpa campo município.
-3. **Consulta integrada** — credenciamento e homologação no mesmo cartão; portarias permanecem acessíveis. Ver `docs/acompanhamento-integrado.md`.
+3. **Abas do painel** — Credenciamentos ativos (padrão), Credenciamentos encerrados, Homologações e Portarias; panorama nacional inicial e consulta municipal opcional. Ver `docs/acompanhamento-integrado.md`.
 4. **Card de homologação** — mostra 3 competências CNES + 3 parcelas financeiras com status temporal e tooltips.
 5. **Regra do dia 15** — zero antes do dia 15 do mês da parcela = aguardando; zero após dia 15 = processado sem homologação.
 6. **Regra 3 competências** — portaria mês M → CNES M, M+1, M+2 → parcelas M+2, M+3, M+4.
@@ -176,6 +176,6 @@ O Power BI será descontinuado quando o site estiver totalmente validado pela SA
 A API pr?pria de notas HTML foi testada com upload, leitura p?blica id?ntica e remo??o de teste. Para futuras publica??es, seguir [docs/hostinger-notas-tecnicas.md](docs/hostinger-notas-tecnicas.md). Usar HTTPS e chave exclusiva de notas; preservar `sync.php`, MySQL e documentos existentes. Acessos autorizados ficam somente em `docs/ACESSOS-HOSTINGER.local.md`, exclu?do do Git neste checkout. N?o confundir a valida??o da API com a instala??o de um automatizador local, que n?o foi feita.
 
 
-## Consulta integrada e fonte exclusiva de dados — 24/10/2026
+## Panorama, seleção e fonte exclusiva de dados — 24/10/2026
 
-Objetivo: explicar situação e próxima ação municipal sem exigir cruzamento de abas. Aplicar a qualquer alteração da consulta. Seguir [docs/acompanhamento-integrado.md](docs/acompanhamento-integrado.md), que substitui descrições anteriores de dashboard e cinco abas. Usar sempre as bases da API, inclusive datas de portaria; não adicionar valores fixos para compensar dados ausentes. Correto: indicar data indisponível e preservar os quantitativos. Evitar: inventar prazo ou inferir ausência no CNES a partir do saldo. Arquivos: `index.html`, `tests/integrado.cjs` e documentação. Competências e corte do dia 15 permanecem; o último dia da competência é incluído e o corte não comprova atualização técnica da fonte.
+Objetivo: dar panorama geral e explicar situação e próxima ação municipal. Aplicar a qualquer alteração da consulta. Seguir [docs/acompanhamento-integrado.md](docs/acompanhamento-integrado.md). O painel abre em Credenciamentos ativos com todos os municípios. Coluna U (Seleção Credenciamento) determina Ativos/Encerrados; coluna V (Seleção homologação) determina o ciclo de homologação independentemente. Credenciamento encerrado pode ter homologação em andamento. Não orientar cadastro no CNES em credenciamento encerrado. Coluna N contém a data; não confundir falha de transmissão com ausência no Excel. Usar sempre as bases da API, sem valores fixos. A linha do tempo deve mostrar quantitativo por competência CNES e parcela correspondente. Correto: agosto CNES → outubro parcela. Evitar: concluir que o prazo de homologação encerrou porque a janela municipal acabou. Arquivos: `index.html`, `tests/painel.cjs`, `sync.php` local/Hostinger e documentação. Preservar planilhas e mudanças preexistentes; não publicar PHP no GitHub. Competências e corte do dia 15 permanecem; último dia da competência incluído.

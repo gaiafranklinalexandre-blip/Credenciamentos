@@ -985,7 +985,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(ellipse 
 @media(max-width:540px){.cred-content{padding:24px 16px 30px}.capa-title{font-size:26px}.consulta-abas{padding:14px;gap:8px}.consulta-abas .nav-aba-item{flex-basis:100%;font-size:14px}.consulta-orientacao{padding:20px}.resultado-header{padding:18px}.content{padding:16px}}
 </style>
 <style>.consulta-abas{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}.consulta-abas [aria-current=page]{background:var(--blue);color:white}.integrado-intro{margin-bottom:24px;color:var(--text-mid)}.integrado-secao{margin:28px 0 16px;color:var(--navy);font-size:21px}.integrado-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:16px;box-shadow:var(--shadow)}.integrado-topo{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.integrado-card h3{font-size:20px;color:var(--navy);margin:0}.integrado-meta{color:var(--text-mid);font-size:14px;margin:5px 0 16px}.integrado-status{display:inline-block;border-radius:8px;padding:7px 12px;background:var(--blue-bg);color:var(--blue);font-weight:650;font-size:14px;align-self:start}.integrado-card.atencao{border-left:5px solid #b36b00}.atencao .integrado-status{background:var(--yellow-light);color:#754500}.concluido .integrado-status{background:var(--green-light);color:#12651c}.integrado-numeros{display:flex;gap:25px;flex-wrap:wrap;margin:16px 0}.integrado-numeros strong{display:block;font-size:25px;color:var(--navy)}.integrado-numeros span{font-size:14px;color:var(--text-mid)}.integrado-acao{padding:16px;background:var(--blue-bg);border-radius:10px;margin:16px 0}.integrado-acao p{margin:5px 0 0}.integrado-progresso{width:100%;height:7px;accent-color:var(--green)}.integrado-dialog{width:min(760px,calc(100% - 32px));max-height:85dvh;border:0;border-radius:18px;padding:28px;color:var(--text);overflow-y:auto;margin:auto;box-shadow:0 20px 80px #071d4144}.integrado-dialog::backdrop{background:#071d4188}.integrado-dialog header{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:16px}.integrado-dialog h2{font-size:23px;color:var(--navy)}.integrado-dialog h3{margin:20px 0 10px}.integrado-etapas{list-style:none;padding:0;margin:20px 0}.integrado-etapas li{padding:16px;margin:10px 0;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:9px}.integrado-etapas li.agora{border-left-color:#b36b00;background:var(--yellow-light)}.integrado-etapas p{margin:7px 0}.integrado-nota{font-size:14px;color:var(--text-mid);margin:14px 0}.integrado-card details{margin-top:14px}.integrado-card summary{cursor:pointer;color:var(--blue);padding:8px 0;min-height:44px}.integrado-dialog .btn-abrir{flex-shrink:0}#resultado .resultado-header{display:flex}.integrado-vazio{padding:28px;background:white;border-radius:12px}@media(max-width:540px){.integrado-card{padding:18px}.integrado-numeros{gap:18px}.integrado-dialog{padding:20px}.integrado-topo{display:block}.integrado-status{margin:10px 0}.integrado-dialog h2{font-size:20px}}
-</style></head>
+</style><style>.panorama-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:24px 0}.panorama-kpi{background:white;border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow)}.panorama-kpi strong{display:block;color:var(--blue);font-size:30px}.panorama-kpi span{font-size:14px;color:var(--text-mid)}.estados-processo{display:flex;gap:10px 24px;flex-wrap:wrap;font-size:14px;color:var(--text-mid);margin:12px 0}.linha-tempo{padding-left:22px;position:relative}.linha-tempo:before{content:'';position:absolute;left:6px;top:25px;bottom:40px;width:3px;background:#bed3ef}.linha-tempo li{position:relative;border-left:1px solid var(--line);margin:0 0 24px;padding:18px}.timeline-ponto{position:absolute;left:-25px;top:24px;width:15px;height:15px;border:3px solid white;border-radius:50%;background:var(--blue);box-shadow:0 0 0 2px #bed3ef}.agora .timeline-ponto{background:#b36b00}.timeline-resultado{background:var(--blue-bg);padding:12px;border-radius:8px;margin-top:12px}#fHomolWrap{padding:18px 0}#fHomol{min-height:44px;margin-left:10px;padding:8px;border:1px solid var(--line);border-radius:8px}@media(max-width:768px){.panorama-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.panorama-kpi{padding:15px}}@media(max-width:390px){.panorama-kpi strong{font-size:25px}.panorama-kpi span{font-size:12px}}
+</style><style>#capa{padding:0!important;min-height:0!important;align-items:stretch;gap:0}.capa-title{font-size:26px}.capa-line,.capa-logos{display:none}.capa-busca{margin-top:20px;margin-bottom:10px}.capa-att{margin-top:6px}#resultado{margin-top:16px}.resultado-header{padding:14px 20px}.panorama-grid{margin:16px 0}.consulta-abas{margin-top:10px}.content{padding-top:12px}</style></head>
 <body>
 
 <a class="cred-skip" href="#credContent">Ir para o conteúdo</a>
@@ -998,9 +999,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(ellipse 
 <!-- ═══ CAPA ═══ -->
 <div id="capa">
   <div class="capa-pre">Credenciamentos e homologações</div>
-  <h1 class="capa-title">Consulte seu município</h1>
+  <h1 class="capa-title">Panorama dos credenciamentos</h1>
   <div class="capa-line"></div>
-  <p class="cred-intro">Pesquise um município para acompanhar seus credenciamentos e homologações.</p>
+  <p class="cred-intro">Acompanhe os credenciamentos de todos os municípios ou filtre uma consulta específica.</p>
 
   <!-- Busca principal -->
   <div class="capa-busca">
@@ -1012,7 +1013,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(ellipse 
         onkeydown="onBuscaKey(event)">
       <button class="capa-busca-btn" onclick="executarConsulta()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Ver credenciamentos
+        Consultar município
       </button>
   <button type="button" class="cred-clear" onclick="limparConsulta();document.getElementById('buscaInput').focus()">Limpar seleções</button>
     </div>
@@ -1049,15 +1050,15 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(ellipse 
             <span class="badge-refinar" id="badgeRefinar" style="display:none">0</span>
           </button>
           <div class="refinar-dropdown" id="refinarDropdown">
-            <div class="refinar-dropdown-titulo">Filtrar dentro desta visualização</div>
+            <div class="refinar-dropdown-titulo">Refinar o panorama</div><div class="refinar-grupo"><label for="fsRegiao">Região</label><select id="fsRegiao" onchange="aplicarFiltrosSec()"><option value="">Todas</option></select></div><div class="refinar-grupo"><label for="fsUF">UF</label><select id="fsUF" onchange="aplicarFiltrosSec()"><option value="">Todas</option></select></div>
             <div class="refinar-grupo">
-              <label>Portaria</label>
+              <label for="fsPortaria">Portaria</label>
               <select id="fsPortaria" onchange="aplicarFiltrosSec()">
                 <option value="">Todas</option>
               </select>
             </div>
             <div class="refinar-grupo">
-              <label>Estratégia</label>
+              <label for="fsEstrategia">Estratégia</label>
               <select id="fsEstrategia" onchange="aplicarFiltrosSec()">
                 <option value="">Todas</option>
               </select>
@@ -1071,7 +1072,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:radial-gradient(ellipse 
       </div>
     </div>
 
-    <nav class="consulta-abas" aria-label="Consulta municipal"><button type="button" id="navi-ativos" class="btn-abrir" onclick="mudarAbaUnica('ativos')" aria-current="page">Acompanhamento integrado</button><button type="button" id="navi-portarias" class="btn-abrir" onclick="mudarAbaUnica('portarias')">Portarias e legislação</button></nav>
+    <section id="panorama" class="panorama-grid" aria-label="Panorama da consulta"></section>
+    <nav class="consulta-abas" aria-label="Áreas do painel"><button type="button" id="navi-ativos" class="btn-abrir" onclick="mudarAbaUnica('ativos')">Credenciamentos ativos</button><button type="button" id="navi-encerrados" class="btn-abrir" onclick="mudarAbaUnica('encerrados')">Credenciamentos encerrados</button><button type="button" id="navi-homologacoes" class="btn-abrir" onclick="mudarAbaUnica('homologacoes')">Homologações</button><button type="button" id="navi-portarias" class="btn-abrir" onclick="mudarAbaUnica('portarias')">Portarias</button></nav>
+    <div id="fHomolWrap" hidden><label for="fHomol">Situação da homologação</label><select id="fHomol" onchange="aplicarFiltrosSec()"><option value="">Todas</option><option value="ativas">Em andamento</option><option value="encerradas">Encerradas</option></select></div>
     <div class="content">
       <div id="c-ativos" role="region" aria-label="Acompanhamento integrado"></div>
       <div id="c-portarias" role="region" aria-label="Portarias e legislação"         style="display:none"></div>
@@ -1216,10 +1219,7 @@ function executarConsulta() {
   const mun = document.getElementById('buscaInput').value.trim();
   const erroEl = document.getElementById('consultaErro');
 
-  if (!mun) {
-    erroEl.style.display = 'block';
-    return;
-  }
+  if (!mun) {reiniciarResultadoUnico();return;}
   erroEl.style.display = 'none';
 
   if (!dados.length) {
@@ -1322,6 +1322,7 @@ async function carregarDados() {
     filtradosSec = dados;
     // Se o usuário já digitou algo enquanto carregava, atualiza o autocomplete
     if (document.getElementById('buscaInput').value.trim().length >= 2) onBuscaInput();
+    if(!municipioSel)reiniciarResultadoUnico();
   } catch(e) {
     console.error(e);
     const erroEl = document.getElementById('consultaErro');
@@ -1413,7 +1414,7 @@ document.addEventListener('click', e => {
 // ═══════════════════════════════════════
 // ABAS
 // ═══════════════════════════════════════
-const ABAS_CONTEUDO = ['ativos','portarias'];
+const ABAS_CONTEUDO = ['ativos','encerrados','homologacoes','portarias'];
 
 const ABA_LABELS = {
   'ativos':           'Credenciamentos Ativos',
@@ -1449,23 +1450,11 @@ function trocarAba(aba) {
   aplicarFiltrosSec();
 }
 
-function atualizarAba() {
-  ABAS_CONTEUDO.forEach(a => {
-    const el = document.getElementById(`c-${a}`);
-    if (el) el.style.display = 'none';
-  });
-  for(const a of ['ativos','portarias']){const b=document.getElementById('navi-'+a);if(b){if(a===abaAtiva)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}}
-  const elAtivo = document.getElementById(`c-${abaAtiva}`);
-  if (elAtivo) elAtivo.style.display = 'block';
-
-  // Atualiza label e itens do dropdown de navegação
-  const labelEl = document.getElementById('navAbaLabel');
-  if (labelEl) labelEl.textContent = ABA_LABELS[abaAtiva] || abaAtiva;
-
-  ABAS_CONTEUDO.forEach(a => {
-    const item = document.getElementById(`navi-${a}`);
-    if (item) { item.classList.toggle('ativo', a === abaAtiva); item.tabIndex=0; }
-  });
+function atualizarAba(){
+ document.getElementById('c-ativos').style.display=abaAtiva==='portarias'?'none':'block';
+ document.getElementById('c-portarias').style.display=abaAtiva==='portarias'?'block':'none';
+ document.getElementById('fHomolWrap').hidden=abaAtiva!=='homologacoes';
+ for(const a of ABAS_CONTEUDO){const b=document.getElementById('navi-'+a);if(a===abaAtiva)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}
 }
 
 // ═══════════════════════════════════════
@@ -1473,94 +1462,18 @@ function atualizarAba() {
 // ═══════════════════════════════════════
 
 // Retorna o conjunto base de cada aba (antes dos filtros secundários)
-function baseDeAba(aba) {
-  switch (aba) {
-    case 'ativos':
-      return filtrados;
-    case 'encerrados':
-      return filtrados.filter(d => !isAtivoOutros(d) && Number(d.credenciado) > 0);
-    case 'homol-ativas':
-      return filtrados.filter(d => isTipo3Comp(d.tipo) && isAtivoOutros(d) && Number(d.credenciado) > 0);
-    case 'homol-encerradas':
-      return filtrados.filter(d => isTipo3Comp(d.tipo) && !isAtivoOutros(d) && Number(d.credenciado) > 0);
-    case 'portarias':
-      return filtrados.filter(d => Number(d.credenciado) > 0);
-    default:
-      return filtrados;
-  }
+function baseDeAba(){return filtrados;}
+
+function popularFiltrosSec(){
+ for(const [id,key] of [['fsPortaria','portaria'],['fsEstrategia','estrategia'],['fsUF','uf'],['fsRegiao','regiao']]){const el=document.getElementById(id),sel=el.value;const vals=[...new Set(filtrados.map(d=>d[key]).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR',{numeric:true}));el.innerHTML='<option value="">Todas</option>'+vals.map(v=>`<option value="${escapar(v)}">${escapar(v)}</option>`).join('');if(vals.includes(sel))el.value=sel;}
+ document.getElementById('refinarWrap').style.display='inline-flex';
 }
-
-function popularFiltrosSec() {
-  const base = baseDeAba(abaAtiva);
-  const portarias = [...new Set(base.map(d => d.portaria).filter(Boolean))]
-    .map(Number).sort((a, b) => b - a);
-  const estrategias = [...new Set(base.map(d => d.estrategia).filter(Boolean))].sort();
-
-  const fsP = document.getElementById('fsPortaria');
-  const fsE = document.getElementById('fsEstrategia');
-
-  // Preserva seleção atual se ainda for válida
-  const selP = fsP.value;
-  const selE = fsE.value;
-
-  fsP.innerHTML = '<option value="">Todas</option>' +
-    portarias.map(p => `<option value="${p}"${String(p)===selP?'selected':''}>Portaria Nº ${p}</option>`).join('');
-  fsE.innerHTML = '<option value="">Todas</option>' +
-    estrategias.map(e => `<option value="${e}"${e===selE?'selected':''}>  ${e}</option>`).join('');
-
-  // Mostra o botão Refinar só se houver mais de uma opção para filtrar
-  const temOpcoes = portarias.length > 1 || estrategias.length > 1;
-  document.getElementById('refinarWrap').style.display = temOpcoes ? 'inline-flex' : 'none';
+function aplicarFiltrosSec(){
+ const pares=[['fsPortaria','portaria'],['fsEstrategia','estrategia'],['fsUF','uf'],['fsRegiao','regiao']];
+ filtradosSec=filtrados.filter(d=>pares.every(([id,k])=>!v(id)||String(d[k])===v(id)));
+ const n=pares.filter(([id])=>v(id)).length;document.getElementById('badgeRefinar').textContent=n;document.getElementById('badgeRefinar').style.display=n?'inline':'none';document.getElementById('fsLimpar').style.display=n?'inline-block':'none';document.getElementById('fsContador').textContent=`${filtradosSec.length} registros`;Object.keys(paginaAtual).forEach(k=>delete paginaAtual[k]);renderizar();
 }
-
-function aplicarFiltrosSec() {
-  const p = document.getElementById('fsPortaria').value;
-  const e = document.getElementById('fsEstrategia').value;
-  const temFiltro = p || e;
-
-  if (!temFiltro) {
-    // Sem filtro: render usa filtrados completo e aplica suas próprias regras
-    filtradosSec = filtrados;
-  } else {
-    // Com filtro: restringe pelo que existe na aba ativa
-    const base = baseDeAba(abaAtiva);
-    filtradosSec = base.filter(d =>
-      (!p || String(Number(d.portaria)) === String(Number(p))) &&
-      (!e || d.estrategia === e)
-    );
-    // Mensagens sem credenciado (aba Ativos) sempre aparecem independente do filtro
-    if (abaAtiva === 'ativos') {
-      const msgs = filtrados.filter(d => d.mensagem_painel && !Number(d.credenciado));
-      filtradosSec = [...filtradosSec, ...msgs];
-    }
-  }
-
-  document.getElementById('fsLimpar').style.display = temFiltro ? 'inline-block' : 'none';
-
-  const nFiltros = [p, e].filter(Boolean).length;
-  const badge = document.getElementById('badgeRefinar');
-  badge.textContent = nFiltros;
-  badge.style.display = nFiltros ? 'inline' : 'none';
-  document.getElementById('btnRefinar').classList.toggle('ativo', !!temFiltro);
-
-  const contador = document.getElementById('fsContador');
-  if (temFiltro) {
-    const base = baseDeAba(abaAtiva);
-    const exibidos = filtradosSec.filter(d => Number(d.credenciado) > 0).length;
-    contador.textContent = `${exibidos} de ${base.length} registro(s)`;
-  } else {
-    contador.textContent = '';
-  }
-
-  Object.keys(paginaAtual).forEach(k => delete paginaAtual[k]);
-  renderizar();
-}
-
-function limparFiltrosSec() {
-  document.getElementById('fsPortaria').value = '';
-  document.getElementById('fsEstrategia').value = '';
-  aplicarFiltrosSec();
-}
+function limparFiltrosSec(){for(const id of ['fsPortaria','fsEstrategia','fsUF','fsRegiao','fHomol'])document.getElementById(id).value='';aplicarFiltrosSec();}
 
 function toggleRefinar(e) {
   e.stopPropagation();
@@ -1781,7 +1694,7 @@ function fmt(d) {
 // DOWNLOAD CSV
 // ═══════════════════════════════════════
 function downloadCSV(tipo) {
-  const base = tipo==='integrado' ? filtradosSec.filter(d => Number(d.credenciado)>0) : tipo==='encerrados'
+  const base = tipo==='integrado' ? linhasDaAba() : tipo==='encerrados'
     ? filtradosSec.filter(d => (isTipo3Comp(d.tipo)&&!isAtivo3Comp(d.data_portaria))||(d.selecao_credenciamento||'').toLowerCase()==='finalizado')
     : tipo==='homologacoes'
     ? filtradosSec.filter(d => Number(d.credenciado)>0)
@@ -1815,42 +1728,43 @@ function hojeBrasilia(){const partes=new Intl.DateTimeFormat('en-CA',{timeZone:'
 function escapar(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function dataCivil(d){return d?d.toLocaleDateString('pt-BR'): 'Não informada';}
 let gruposIntegrados=[],focoExplicacao;
+const explicacao=document.createElement('dialog');explicacao.className='integrado-dialog';explicacao.setAttribute('aria-labelledby','explicacao-titulo');document.body.append(explicacao);
+function normalizarStatus(v){return String(v||'').trim().toLocaleLowerCase('pt-BR');}
+function credAtivo(d){return normalizarStatus(d.selecao_credenciamento)==='ativo';}
+function homolAtiva(d){return normalizarStatus(d.selecao_homologacao)==='homologando';}
+function linhasDaAba(arr=filtradosSec){return arr.filter(d=>Number(d.credenciado)>0&&(abaAtiva==='ativos'?credAtivo(d):abaAtiva==='encerrados'?!credAtivo(d):abaAtiva==='homologacoes'?isTipo3Comp(d.tipo)&&(v('fHomol')===''||(v('fHomol')==='ativas'?homolAtiva(d):!homolAtiva(d))):true));}
+function mudarAbaUnica(aba){trocarAba(aba);document.getElementById('fHomolWrap').hidden=aba!=='homologacoes';}
+function reiniciarResultadoUnico(){municipioSel='';filtrados=dados;filtradosSec=dados;abaAtiva='ativos';document.getElementById('resultado').style.display='block';document.getElementById('painel').style.display='block';document.getElementById('resultadoTitulo').textContent='Todos os municípios';document.getElementById('resultadoSub').textContent='Acompanhamento dos prazos e resultados de homologação.';['fsPortaria','fsEstrategia','fsUF','fsRegiao','fHomol'].forEach(id=>document.getElementById(id).value='');document.getElementById('fHomolWrap').hidden=true;if(dados.length){popularFiltrosSec();aplicarFiltrosSec();}else document.getElementById('c-ativos').innerHTML='<p class="integrado-vazio">Carregando a base de dados…</p>';atualizarAba();}
 function situacaoIntegrada(grupo,hoje=hojeBrasilia()){
  const r=grupo[0],cred=grupo.reduce((s,d)=>s+Number(d.credenciado||0),0),h=[1,2,3].map(i=>grupo.reduce((s,d)=>s+Number(d['homologacao_'+i]||0),0)),total=h.reduce((s,n)=>s+n,0),saldo=Math.max(0,cred-total),comps=isTipo3Comp(r.tipo)?calcComps(r.data_portaria,r.portaria):null;
- const base={r,cred,h,total,saldo,comps};
- if(!isTipo3Comp(r.tipo))return {...base,ordem:1,classe:'aguardando',titulo:'Regra específica de credenciamento',acao:'Consulte as condições desta portaria.',texto:'Este registro não segue o ciclo de três competências. Consulte as observações e a portaria para verificar os próximos passos.'};
- if(total>cred)return {...base,ordem:0,classe:'atencao',titulo:'Resultado precisa de conferência',acao:'Confira os quantitativos informados.',texto:'A soma das homologações supera a quantidade credenciada. Os valores originais foram preservados para conferência.'};
- if(saldo===0)return {...base,ordem:2,classe:'concluido',titulo:'Todas as equipes homologadas',acao:'Homologação concluída.',texto:'Todas as equipes credenciadas deste registro já foram homologadas. Não há saldo de homologação a acompanhar neste processo.'};
- if(!comps)return {...base,ordem:0,classe:'atencao',titulo:'Prazo não disponível na base',acao:'Confira a data da portaria antes de avaliar o prazo.',texto:'Não há uma data válida e única nas bases consultadas para calcular as competências. Os quantitativos abaixo vêm da base; o saldo não comprova ausência de cadastro no CNES.'};
+ const ca=credAtivo(r),ha=homolAtiva(r),base={r,cred,h,total,saldo,comps,credAtivo:ca,homolAtiva:ha};
+ if(!isTipo3Comp(r.tipo))return {...base,ordem:ca?0:2,classe:ca?'aguardando':'encerrado',titulo:ca?'Credenciamento ativo · regra específica':'Credenciamento encerrado',acao:ca?'Consulte as condições desta portaria.':'Não há ação de credenciamento a realizar.',texto:'Este registro não segue o ciclo de três competências. Consulte as condições e observações da base.'};
+ if(total>cred)return {...base,ordem:0,classe:'atencao',titulo:'Quantitativos precisam de conferência',acao:'Confira os resultados informados na base.',texto:'A soma das homologações supera o quantitativo credenciado; os valores originais foram preservados.'};
+ if(saldo===0)return {...base,ordem:2,classe:'concluido',titulo:'Todas as equipes homologadas',acao:'Não há saldo pendente de homologação.',texto:`${cred} de ${cred} equipes já foram homologadas. Credenciamento ${ca?'ativo':'encerrado'} e homologação ${ha?'em andamento':'encerrada'}, conforme os campos de seleção da base.`};
+ if(!ca)return {...base,ordem:ha?1:2,classe:ha?'aguardando':'encerrado',titulo:ha?'Cadastro encerrado · homologação em andamento':'Credenciamento e homologação encerrados',acao:ha?'Acompanhe os resultados de homologação.':'Consulte o resultado final.',texto:`Não há mais ação de credenciamento a realizar pelo município. ${ha?`A homologação continua em andamento${comps?', com última parcela prevista em '+comps[2].homolLabel:''}.`:'O processo de homologação também consta como encerrado na base.'} Saldo informado: ${saldo} equipe(s).`};
+ if(!comps)return {...base,ordem:0,classe:'atencao',titulo:'Credenciamento ativo · data indisponível na API',acao:'Confira a data da portaria na fonte de dados.',texto:'A seleção de credenciamento está ativa. A data da portaria não está disponível nesta consulta; não é possível calcular a competência atual.'};
  const aberta=hoje>=comps[0].inicio&&hoje<=comps[2].fim,ultima=aberta&&hoje>=comps[2].inicio;
- if(aberta)return {...base,ordem:0,classe:'atencao',titulo:ultima?'Última competência para cadastro':'Prazo de cadastro aberto',acao:'Confira o cadastro no CNES das equipes ainda não homologadas.',texto:`${ultima?'Esta é a última competência prevista. ':''}O prazo termina em ${dataCivil(comps[2].fim)} (${Math.round((comps[2].fim-hoje)/86400000)} dia(s) restante(s)). Há ${saldo} equipe(s) ainda não homologada(s); elas podem já estar cadastradas e aguardar processamento.`};
- if(hoje<comps[0].inicio)return {...base,ordem:1,classe:'aguardando',titulo:'Competências ainda não iniciadas',acao:'Prepare o cadastro no CNES.',texto:`A primeira competência começa em ${dataCivil(comps[0].inicio)}.`};
- const corteFinal=new Date(comps[2].aHomol,comps[2].homol-1,15),situacao=(r.selecao_homologacao||'').toLowerCase(),encerrada=/encerr|finaliz|conclu/.test(situacao);
- if(hoje<corteFinal)return {...base,ordem:1,classe:'aguardando',titulo:'Aguardando próximas parcelas',acao:'Acompanhe os próximos resultados de homologação.',texto:`O prazo de cadastro terminou em ${dataCivil(comps[2].fim)}. Ainda há parcelas previstas, até ${comps[2].homolLabel}. O saldo de ${saldo} equipe(s) ainda não é um resultado final.`};
- return {...base,ordem:encerrada?2:0,classe:encerrada?'encerrado':'atencao',titulo:encerrada?'Encerrado com saldo não homologado':'Saldo após a última parcela prevista',acao:encerrada?'Consulte o resultado final e as observações.':'Confira o resultado informado e as observações.',texto:`${saldo} de ${cred} equipe(s) permanecem sem homologação na base. ${encerrada?'O processo consta como encerrado.':'As três parcelas já atingiram o corte previsto; a API não informa quando os resultados foram atualizados.'} A base não identifica a causa individual da não homologação.`};
+ if(aberta)return {...base,ordem:0,classe:'atencao',titulo:ultima?'Última competência para cadastro':'Prazo de cadastro aberto',acao:'Confira o cadastro no CNES das equipes ainda não homologadas.',texto:`${ultima?'Esta é a última competência prevista. ':''}Prazo até ${dataCivil(comps[2].fim)} (${Math.round((comps[2].fim-hoje)/86400000)} dia(s) restante(s)). Saldo de ${saldo} equipe(s). Elas podem já estar cadastradas e aguardar homologação.`};
+ return {...base,ordem:1,classe:'aguardando',titulo:'Credenciamento ativo na base',acao:'Confira a situação registrada na base.',texto:`A seleção da base mantém este credenciamento ativo. O calendário calculado ${hoje<comps[0].inicio?'ainda não iniciou':'já passou do prazo de cadastro'}. O painel preserva a classificação da base e não altera o estado pelo calendário.`};
 }
-function mudarAbaUnica(aba){if(aba==='ativos'&&!municipioSel){reiniciarResultadoUnico();return;}if(aba==='portarias'&&!municipioSel){abrirPainel('portarias');document.getElementById('resultadoTitulo').textContent='Portarias publicadas';}else{trocarAba(aba);}for(const a of ['ativos','portarias']){const b=document.getElementById('navi-'+a);if(a===aba)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}}
-function reiniciarResultadoUnico(){filtrados=[];filtradosSec=[];gruposIntegrados=[];abaAtiva='ativos';document.getElementById('resultado').style.display='block';document.getElementById('painel').style.display='block';document.getElementById('resultadoTitulo').textContent='Acompanhamento municipal';document.getElementById('resultadoSub').textContent='Escolha um município para ver a situação integrada ou consulte as portarias.';document.getElementById('fsPortaria').value='';document.getElementById('fsEstrategia').value='';document.getElementById('refinarWrap').style.display='none';atualizarAba();document.getElementById('c-ativos').innerHTML='<p class="integrado-vazio">Selecione um município na busca acima para acompanhar seus credenciamentos.</p>';}
 function renderIntegrado(){
  const el=document.getElementById('c-ativos'),map=new Map();
- for(const d of filtradosSec.filter(d=>Number(d.credenciado)>0)){const key=JSON.stringify([d.municipio,d.uf,d.portaria,d.data_portaria,d.estrategia,d.tipo]);if(!map.has(key))map.set(key,[]);map.get(key).push(d);}
- gruposIntegrados=[...map.values()].map(g=>situacaoIntegrada(g)).sort((a,b)=>a.ordem-b.ordem||String(a.r.estrategia).localeCompare(String(b.r.estrategia),'pt-BR'));
- if(!gruposIntegrados.length){el.innerHTML='<p class="integrado-vazio">Nenhum credenciamento encontrado para esta consulta.</p>';return;}
- const limite=(paginaAtual.integrado||1)*POR_PAGINA;let html='<p class="integrado-intro">Veja o que precisa de atenção, o que aguarda resultados e o que já foi concluído. Credenciamento e homologação aparecem juntos em cada registro.</p>',anterior=-1;
- gruposIntegrados.slice(0,limite).forEach((s,i)=>{
-  if(s.ordem!==anterior){html+=`<h2 class="integrado-secao">${['Precisa de atenção','Acompanhamento','Resultados concluídos'][s.ordem]}</h2>`;anterior=s.ordem;}
-  const numer=s.comps||isTipo3Comp(s.r.tipo);html+=`<article class="integrado-card ${s.classe}"><div class="integrado-topo"><div><h3>${escapar(s.r.estrategia||s.r.nome_completo)}</h3><p class="integrado-meta">${escapar(s.r.municipio)} / ${escapar(s.r.uf)} · Portaria ${escapar(s.r.portaria)} · ${escapar(fmt(resolveData(s.r.data_portaria,s.r.portaria)))}</p></div><span class="integrado-status">${escapar(s.titulo)}</span></div><div class="integrado-numeros"><div><strong>${s.cred}</strong><span>credenciadas</span></div>${numer?`<div><strong>${s.total}</strong><span>homologadas</span></div><div><strong>${s.saldo}</strong><span>ainda não homologadas</span></div>`:''}</div>${numer&&s.total<=s.cred?`<progress class="integrado-progresso" value="${s.total}" max="${s.cred}" aria-label="${s.total} de ${s.cred} equipes homologadas"></progress>`:''}<div class="integrado-acao"><strong>${escapar(s.acao)}</strong><p>${escapar(s.texto)}</p></div><button type="button" class="btn-abrir" onclick="explicarSituacao(${i},this)">Entender situação</button>${s.r.observacao||s.r.mensagem_homologacao||s.r.mensagem_painel?`<details><summary>Observações da base</summary>${[...new Set([s.r.observacao,s.r.mensagem_homologacao,s.r.mensagem_painel].filter(Boolean))].map(v=>`<p>${escapar(v)}</p>`).join('')}</details>`:''}</article>`;
- });
- const msgs=filtradosSec.filter(d=>!Number(d.credenciado)&&d.mensagem_painel);if(msgs.length)html+='<section><h2 class="integrado-secao">Comunicados</h2>'+msgs.map(d=>`<p>${escapar(d.mensagem_painel)}</p>`).join('')+'</section>';
- if(gruposIntegrados.length>limite)html+='<button type="button" class="btn-abrir" onclick="carregarMais(\'integrado\')">Carregar mais registros</button>';
- el.innerHTML=html+'<div style="text-align:right;margin-top:20px"><button type="button" class="btn-download" onclick="downloadCSV(\'integrado\')">Baixar CSV da consulta</button></div>';
+ for(const d of linhasDaAba()){const k=JSON.stringify([d.ibge,d.municipio,d.uf,d.portaria,d.data_portaria,d.estrategia,d.tipo,d.selecao_credenciamento,d.selecao_homologacao]);if(!map.has(k))map.set(k,[]);map.get(k).push(d);}
+ gruposIntegrados=[...map.values()].map(g=>situacaoIntegrada(g)).sort((a,b)=>a.ordem-b.ordem||String(a.r.municipio).localeCompare(String(b.r.municipio),'pt-BR')||String(a.r.estrategia).localeCompare(String(b.r.estrategia),'pt-BR'));
+ const todos=filtradosSec.filter(d=>Number(d.credenciado)>0),ativos=todos.filter(credAtivo),enc=todos.filter(d=>!credAtivo(d)),hs=todos.filter(d=>isTipo3Comp(d.tipo)),sum=a=>a.reduce((s,d)=>s+Number(d.credenciado||0),0);
+ document.getElementById('panorama').innerHTML=[['Equipes credenciadas ativas',sum(ativos)],['Equipes com prazo encerrado',sum(enc)],['Municípios nesta consulta',new Set(todos.map(d=>d.ibge||d.municipio+'|'+d.uf)).size],['Registros com homologação em andamento',hs.filter(homolAtiva).length]].map(([t,n])=>`<div class="panorama-kpi"><strong>${n.toLocaleString('pt-BR')}</strong><span>${t}</span></div>`).join('');
+ const limite=(paginaAtual.integrado||1)*POR_PAGINA;let html=`<p class="integrado-intro">${gruposIntegrados.length} registros de estratégia e portaria · ${municipioSel?escapar(municipioSel):'todos os municípios'}. ${abaAtiva==='ativos'?'Credenciamentos com ação municipal ainda ativa.':abaAtiva==='encerrados'?'O município não tem mais ação de credenciamento a realizar. A homologação pode continuar.':'Resultados das três competências CNES, com andamento próprio da homologação.'}</p>`;
+ gruposIntegrados.slice(0,limite).forEach((s,i)=>{const tres=isTipo3Comp(s.r.tipo);html+=`<article class="integrado-card ${s.classe}"><div class="integrado-topo"><div><h3>${escapar(s.r.municipio)} / ${escapar(s.r.uf)} · ${escapar(s.r.estrategia||s.r.nome_completo)}</h3><p class="integrado-meta">Portaria ${escapar(s.r.portaria)} · ${escapar(fmt(resolveData(s.r.data_portaria,s.r.portaria)))}</p></div><span class="integrado-status">${escapar(s.titulo)}</span></div><div class="estados-processo"><span>Credenciamento: <strong>${s.credAtivo?'Ativo':'Encerrado'}</strong></span>${tres?`<span>Homologação: <strong>${escapar(s.r.selecao_homologacao||'Não informada')}</strong></span>`:''}</div><div class="integrado-numeros"><div><strong>${s.cred}</strong><span>credenciadas</span></div>${tres?`<div><strong>${s.total}</strong><span>homologadas</span></div><div><strong>${s.saldo}</strong><span>ainda não homologadas</span></div>`:''}</div>${tres&&s.total<=s.cred?`<progress class="integrado-progresso" value="${s.total}" max="${s.cred}" aria-label="${s.total} de ${s.cred} equipes homologadas"></progress>`:''}<div class="integrado-acao"><strong>${escapar(s.acao)}</strong><p>${escapar(s.texto)}</p></div><button type="button" class="btn-abrir" onclick="explicarSituacao(${i},this)">Entender situação</button>${[s.r.observacao,s.r.mensagem_homologacao].filter(Boolean).length?`<details><summary>Observações da base</summary>${[s.r.observacao,s.r.mensagem_homologacao].filter(Boolean).map(t=>`<p>${escapar(t)}</p>`).join('')}</details>`:''}</article>`;});
+ if(!gruposIntegrados.length)html+='<p class="integrado-vazio">Nenhum registro para os filtros desta aba.</p>';
+ if(gruposIntegrados.length>limite)html+=`<button type="button" class="btn-abrir" onclick="carregarMais('integrado')">Carregar mais · ${gruposIntegrados.length-limite} restantes</button>`;
+ el.innerHTML=html+`<div style="text-align:right;margin-top:20px"><button type="button" class="btn-download" onclick="downloadCSV('integrado')">Baixar CSV desta aba</button></div>`;
 }
-const explicacao=document.createElement('dialog');explicacao.className='integrado-dialog';explicacao.setAttribute('aria-labelledby','explicacao-titulo');document.body.append(explicacao);
 function explicarSituacao(i,botao){
  const s=gruposIntegrados[i];if(!s)return;focoExplicacao=botao;const hoje=hojeBrasilia();
- explicacao.innerHTML=`<header><div><h2 id="explicacao-titulo">Entenda sua situação</h2><p>${escapar(s.r.estrategia)} · Portaria ${escapar(s.r.portaria)}</p></div><button class="btn-abrir" type="button" onclick="fecharExplicacao()" aria-label="Fechar explicação">Fechar</button></header><h3>${escapar(s.titulo)}</h3><p>${escapar(s.texto)}</p><h3>O que aconteceu</h3><p>${s.cred} equipe(s) credenciada(s)${isTipo3Comp(s.r.tipo)?`; ${s.total} homologada(s) e ${s.saldo} ainda não homologada(s)`:''}.</p>${s.comps?`<ol class="integrado-etapas"><li><strong>Portaria publicada · ${escapar(fmt(resolveData(s.r.data_portaria,s.r.portaria)))}</strong><p>Autorizou o credenciamento de ${s.cred} equipe(s).</p></li>${s.comps.map((c,j)=>{const atual=hoje>=c.inicio&&hoje<=c.fim,corte=new Date(c.aHomol,c.homol-1,15);return `<li class="${atual?'agora':''}"><strong>${atual?'Agora · ':''}${j+1}ª competência CNES · ${c.label}</strong><p>Cadastro: ${dataCivil(c.inicio)} a ${dataCivil(c.fim)} · ${hoje>c.fim?'competência encerrada':atual?'competência aberta':'ainda não iniciada'}.</p><p>Parcela correspondente: <strong>${c.homolLabel}</strong></p><p>${s.h[j]>0?`${s.h[j]} equipe(s) homologada(s) nesta parcela.`:hoje<corte?'Aguardando processamento. Zero ainda não indica problema.':'Zero homologações informado. O corte previsto já passou; confira o resultado e o cadastro da competência correspondente.'}</p></li>`;}).join('')}</ol>`:''}<div class="integrado-acao"><strong>O que fazer agora</strong><p>${escapar(s.acao)}</p></div><p class="integrado-nota">As parcelas são resultados de competências diferentes. O saldo não comprova ausência de cadastro no CNES. O corte de referência é dia 15; a API não fornece a data de atualização dos resultados.</p><button class="btn-abrir" type="button" onclick="fecharExplicacao()">Voltar ao acompanhamento</button>`;
- explicacao.showModal();
+ const etapas=s.comps?s.comps.map((c,j)=>{const atual=hoje>=c.inicio&&hoje<=c.fim,corte=new Date(c.aHomol,c.homol-1,15);return `<li class="${atual?'agora':''}"><span class="timeline-ponto" aria-hidden="true"></span><strong>${atual?'Agora · ':''}CNES ${c.label}</strong><p>Competência de cadastro: ${dataCivil(c.inicio)} a ${dataCivil(c.fim)}.</p><div class="timeline-resultado"><strong>${s.h[j]===0&&s.homolAtiva&&hoje<corte?'Aguardando homologação da competência CNES '+c.label:s.h[j]+' equipe(s) homologada(s) da competência CNES '+c.label}</strong><p>Resultado na parcela financeira de ${c.homolLabel}.</p>${s.h[j]===0?`<p>${s.homolAtiva&&hoje<corte?'Aguardando processamento desta parcela.':'Nenhuma homologação informada para esta competência.'}</p>`:''}</div></li>`;}).join(''):`<li><span class="timeline-ponto" aria-hidden="true"></span><strong>Data da portaria indisponível na API</strong><p>Não é possível nomear as competências sem a data da portaria.</p>${s.h.map((n,j)=>`<p>${j+1}ª competência CNES: ${n} homologada(s).</p>`).join('')}</li>`;
+ explicacao.innerHTML=`<header><div><h2 id="explicacao-titulo">Entenda sua situação</h2><p>${escapar(s.r.municipio)} / ${escapar(s.r.uf)} · ${escapar(s.r.estrategia)} · Portaria ${escapar(s.r.portaria)}</p></div><button class="btn-abrir" type="button" onclick="fecharExplicacao()" aria-label="Fechar explicação">Fechar</button></header><div class="integrado-acao"><strong>${escapar(s.titulo)}</strong><p>${escapar(s.texto)}</p></div><div class="estados-processo"><span>Credenciamento: <strong>${s.credAtivo?'Ativo':'Encerrado'}</strong></span><span>Homologação: <strong>${escapar(s.r.selecao_homologacao||'Não informada')}</strong></span></div><ol class="integrado-etapas linha-tempo"><li><span class="timeline-ponto" aria-hidden="true"></span><strong>Credenciamento · ${escapar(fmt(resolveData(s.r.data_portaria,s.r.portaria)))}</strong><p>${s.cred} equipe(s) credenciada(s) pela portaria.</p></li>${isTipo3Comp(s.r.tipo)?etapas:'<li>Este credenciamento possui regra específica. Consulte a portaria.</li>'}<li><span class="timeline-ponto" aria-hidden="true"></span><strong>Situação atual</strong><p>${s.total} homologada(s) · saldo ${s.saldo}. ${escapar(s.acao)}</p></li></ol><p class="integrado-nota">O prazo municipal de cadastro e o processamento de homologação são etapas distintas. A homologação da competência CNES ocorre na parcela financeira dois meses depois.</p><button class="btn-abrir" type="button" onclick="fecharExplicacao()">Voltar ao painel</button>`;explicacao.showModal();
 }
+
 function fecharExplicacao(){explicacao.close();}
 explicacao.addEventListener('close',()=>focoExplicacao?.focus());
 reiniciarResultadoUnico();

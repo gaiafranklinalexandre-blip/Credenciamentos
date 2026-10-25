@@ -1,9 +1,8 @@
 # Design
 
-## Acompanhamento integrado — 24/10/2026
+## Panorama e estados independentes — 24/10/2026
 
-A consulta passa a reunir credenciamento e homologação, com prioridades, situação, saldo e orientação no próprio cartão. Dashboard e abas separadas foram removidos por solicitação do usuário. Portarias seguem acessíveis. Datas e quantitativos vêm exclusivamente das bases da API, sem fallback fixo. Regras, limites e validação atuais: [acompanhamento-integrado.md](acompanhamento-integrado.md). O teste vigente desta experiência é `tests/integrado.cjs`; instruções abaixo sobre dashboard e cinco abas descrevem a experiência anterior e não se aplicam à nova consulta.
-
+O painel abre com todos os municípios, resumo numérico e aba Credenciamentos ativos. Abas: Ativos, Encerrados, Homologações e Portarias. A coluna U controla os credenciamentos; a coluna V controla as homologações, inclusive de credenciamentos encerrados. O popup é uma linha do tempo com quantitativos por competência CNES e a parcela correspondente. Data da coluna N restaurada na API após corrigir o bind PHP e reconciliar os 16.553 registros. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Validação atual: `tests/painel.cjs`. Descrições posteriores de cinco abas e dashboard são históricas.
 
 
 ## Identidade compartilhada dos painéis — 24/10/2026
