@@ -2,7 +2,7 @@
 
 ## Objetivo e quando aplicar
 
-Desde 24/10/2026, o painel abre com o panorama de todos os municípios **consolidado por portaria**, na aba **Credenciamentos ativos**. As outras abas são **Credenciamentos encerrados**, **Homologações** e **Portarias**. Cada portaria apresenta uma tabela por estratégia; os detalhes individuais e a linha do tempo aparecem após escolher um município. Aplicar estas orientações a toda mudança na consulta e nas mensagens de situação.
+Desde 24/10/2026, o painel abre com o panorama de todos os municípios **consolidado por portaria**, em **Credenciamentos ativos**. O menu lateral oferece também **Credenciamentos encerrados**, **Homologações** e **Portarias**. Cada portaria apresenta uma tabela por estratégia; os detalhes individuais e a linha do tempo aparecem após escolher um município. Aplicar estas orientações a toda mudança na consulta e nas mensagens de situação.
 
 ## Instruções práticas
 
@@ -14,13 +14,18 @@ Desde 24/10/2026, o painel abre com o panorama de todos os municípios **consoli
 - Somar as três homologações de cada registro. No consolidado, somar os saldos individuais não negativos; excedente de homologação de um registro não pode compensar pendência de outro. Sinalizar quantitativos excedentes para conferência, sem alterar a fonte. Tipos específicos não recebem homologação ou saldo inferido.
 - No detalhe municipal, manter o agrupamento por município, UF, portaria, data, estratégia e tipo, preservando seleções U/V distintas. O CSV continua contendo os registros originais da aba e dos filtros, sem substituir as linhas pelas agregações visuais.
 - Manter **somente um KPI: Credenciamentos ativos**, soma da quantidade credenciada em registros com coluna U Ativo, respeitando os filtros de município, região, UF, portaria e estratégia. A aba selecionada e o filtro de situação da homologação não mudam a definição desse KPI.
-- Dar destaque visual ao número da portaria e ao nome da estratégia, tanto no consolidado quanto nos detalhes. “Ver municípios” abre lista pesquisável e paginada da portaria/estratégia; ao escolher um município, preservar a aba e aplicar os filtros correspondentes. A busca municipal principal continua disponível.
+- Dar destaque visual ao número da portaria e ao nome da estratégia, tanto no consolidado quanto nos detalhes. “Ver municípios” abre lista pesquisável e paginada da portaria/estratégia; ao escolher um município, preservar a área e aplicar os filtros correspondentes.
+- Não exibir a antiga barra de pesquisa inicial. Centralizar Região, UF, Município, Portaria e Estratégia no botão **Filtros**, que abre um diálogo lateral. Mostrar situação da homologação nesse mesmo diálogo apenas na área Homologações. Região e UF restringem as opções municipais. O município tem autocomplete com teclado e destaque do trecho encontrado.
+- Alterações no diálogo são rascunhos: só entram em vigor ao clicar em **Aplicar filtros**. Fechar ou pressionar Escape descarta o rascunho. Nome municipal ambíguo ou inexistente exige seleção válida, sem aplicar uma consulta incorreta. “Limpar filtros” no diálogo limpa o rascunho; os chips e “Limpar todos” no painel removem filtros aplicados.
+- Mostrar o contexto atual no título, no caminho **Consolidado → Município / UF** e nos chips de filtros. No município, manter **← Voltar ao consolidado** no cabeçalho fixo. O retorno restaura filtros e paginação da origem, mantendo a área atual; não deve redefinir tudo para Ativos.
+- A troca de área pelo menu lateral preserva os filtros e o município selecionado. Os botões Voltar/Avançar do navegador restauram o estado da consulta; recarregar preserva o estado da entrada atual no histórico. Esse histórico contém apenas parâmetros de navegação, nunca cópias dos dados da API.
+- No computador o menu permanece lateral. No celular, usar gaveta com botão de menu, fundo de fechamento, Escape, foco contido e indicação da área atual. O menu fechado deve ficar fora da ordem de tabulação. Preservar foco na saída dos diálogos.
 - Exibir primeiro os casos que precisam de atenção, depois acompanhamento e resultados concluídos dentro de cada aba. Quantidade totalmente homologada não muda a seleção da coluna U ou V. Mostrar separadamente ambos os estados em cada cartão.
 - Registros de tipo específico não recebem calendário de três competências nem saldo de homologação inferido.
 - Manter competências M, M+1, M+2 e parcelas M+2, M+3, M+4. Usar datas civis de Brasília, incluindo o último dia da janela. A partir do dia 15, o corte de referência já foi atingido; isso não comprova atualização da base.
 - Saldo pendente não comprova falta de cadastro. Orientar a conferência do CNES, sem atribuir causa individual não demonstrada.
 - O campo `updated_at` informa atualização técnica do registro, não necessariamente a competência efetivamente processada. Não apresentar data de portaria como atualização dos resultados.
-- O botão “Entender situação” abre uma linha do tempo visual com publicação, competências CNES e parcelas. Em cada competência, mostrar explicitamente o quantitativo homologado de origem e a parcela financeira correspondente (exemplo: 1 equipe da competência CNES agosto/2026 homologada na parcela outubro/2026). Se o total homologado for igual ao credenciado, mostrar apenas até a competência na qual o acumulado atingiu o total e encerrar com **✓ Concluído**. Não mostrar competências posteriores desnecessárias. Excedentes ou saldo pendente não permitem abreviar a linha do tempo. Isso não altera as seleções originais U/V. Manter Escape, foco contido e devolução do foco ao botão de origem.
+- O botão **Explicar** abre uma linha do tempo visual com publicação, competências CNES e parcelas. Em cada competência, mostrar explicitamente o quantitativo homologado de origem e a parcela financeira correspondente (exemplo: 1 equipe da competência CNES agosto/2026 homologada na parcela outubro/2026). Se o total homologado for igual ao credenciado, mostrar apenas até a competência na qual o acumulado atingiu o total e encerrar com **✓ Concluído**. Não mostrar competências posteriores desnecessárias. Excedentes ou saldo pendente não permitem abreviar a linha do tempo. Isso não altera as seleções originais U/V. Manter Escape, foco contido e devolução do foco ao botão de origem.
 - Usar verde e sinal de conclusão para homologação total; azul e indicação de espera para processamento; âmbar/laranja, ícone de atenção e prazo quando houver ação municipal pendente; cinza para encerramento sem ação municipal. Cor nunca é o único indicador. Não usar vermelho apenas porque uma competência passou.
 - Preservar autocomplete, filtros por portaria/estratégia, portarias, paginação, CSV e consentimento. CSS e JS permanecem incorporados em `index.html`.
 
@@ -38,15 +43,16 @@ Desde 24/10/2026, o painel abre com o panorama de todos os municípios **consoli
 
 - Tudo vermelho porque uma competência terminou.
 - Listar milhares de cartões municipais na visão geral ou exibir outros KPIs além de credenciamentos ativos.
+- Deixar o gestor sem retorno visível ao consolidado, limpar portaria/estratégia ao trocar de área ou aplicar filtros antes da confirmação no diálogo.
 - “Equipe não cadastrada” deduzido somente do saldo.
 - Datas de portaria fixas ou dados de exemplo em produção.
 - Chamar zero de resultado definitivo apenas porque o calendário passou do corte.
 
 ## Arquivos impactados e validação
 
-`index.html`, `tests/consolidado.cjs` (com entradas de compatibilidade em `tests/painel.cjs` e `tests/integrado.cjs`), `AGENTS.md` e documentos de contexto, design e deploy. A revisão de consolidação não altera planilhas, dados ou backend. A correção anterior do PHP está registrada abaixo.
+`index.html`, `tests/navegacao.cjs` (com entradas de compatibilidade em `tests/consolidado.cjs`, `tests/painel.cjs` e `tests/integrado.cjs`), `AGENTS.md` e documentos de contexto, design e deploy. A revisão de navegação não altera planilhas, dados, regras de negócio ou backend. A correção anterior do PHP está registrada abaixo.
 
-Executar `node tests/consolidado.cjs` com Playwright disponível (`CRED_PLAYWRIGHT` pode indicar o módulo). `CRED_TEST_URL` seleciona a URL; padrão local na porta 8963. Verifica a consolidação contra a API real, municípios distintos, soma de quantidades e saldos, independência U/V, único KPI, passagem ao município, conclusão abreviada na 1ª/2ª/3ª competência, filtros, paginação, CSV, modal, teclado e cinco larguras, sem coleta de analytics de QA. Capturas locais em `validacao_visual/`.
+Executar `node tests/navegacao.cjs` com Playwright disponível (`CRED_PLAYWRIGHT` pode indicar o módulo). `CRED_TEST_URL` seleciona a URL; padrão local na porta 8964. Verifica API real, consolidação, independência U/V, único KPI, filtros com município, validação, cancelar/aplicar, menu lateral/móvel, retorno explícito e do navegador, preservação da consulta ao recarregar, restauração da paginação, Explicar, conclusão abreviada, CSV, teclado e cinco larguras. Analytics permanece recusado durante QA. Capturas locais em `validacao_visual/`.
 
 ## Correção da transmissão de datas — 24/10/2026
 
