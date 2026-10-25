@@ -167,3 +167,5 @@ Preservar o favicon anterior (PNG de 13.108 bytes). O logo SUS aprovado pertence
 ## Etapas de homologação — 25/10/2026
 
 Indicador de três etapas na situação consolidada e no detalhe municipal, com ordinal, CNES, parcela e quantidade. Verde identifica resultado informado; azul identifica corte de calendário atingido; borda tracejada indica parcela prevista. Textos acompanham as cores. Específicos mostra Somente credenciamento, sem indicador ou métricas de homologação. Regras completas em acompanhamento-integrado.md.
+
+O acompanhamento usa dois blocos: Município / cadastro CNES (âmbar) e Ministério da Saúde / homologação (azul), ligados por competência e parcela. No consolidado ocupa linha própria abaixo dos quantitativos; no celular os blocos ficam empilhados. Destacar CNES agora e Parcela do mês separadamente. Exibir limite mensal e limite final de cadastro, sem confundir com a última parcela financeira.

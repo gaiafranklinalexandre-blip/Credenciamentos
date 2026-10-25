@@ -15,6 +15,11 @@ await p.locator('.portaria-consolidada').screenshot({path:'validacao_visual/impl
 // Ciclo visual: datas de referência, conclusão antecipada, coluna J e estados independentes.
 await p.evaluate(()=>{
  const base={tipo:'3 competências',portaria:'11772',data_portaria:'2026-07-01',credenciado:10,homologacao_1:2,homologacao_2:0,homologacao_3:0,selecao_credenciamento:'Finalizado',selecao_homologacao:'Homologando'};
+ const agosto={...base,data_portaria:'2026-08-24',selecao_credenciamento:'Ativo'};
+ const paralelo=cicloVisual([agosto],new Date(2026,9,25));if(!paralelo.includes('3ª competência CNES · última para cadastro')||!paralelo.includes('Limite previsto para cadastro: 31/10/2026')||!paralelo.includes('1ª homologação · próxima: 2ª')||!paralelo.includes('CNES agora')||!paralelo.includes('Parcela do mês')||!paralelo.includes('Parcela Dez/26'))throw Error('Períodos municipal e ministerial não estão claros');
+ const ultimoDia=cicloVisual([agosto],new Date(2026,9,31));if(!ultimoDia.includes('CNES agora'))throw Error('Último dia de cadastro excluído');
+ const depoisDoPrazo=cicloVisual([agosto],new Date(2026,10,1));if(depoisDoPrazo.includes('CNES agora')||!depoisDoPrazo.includes('Prazo do calendário encerrado · seleção ativa na base'))throw Error('Calendário alterou seleção U');
+ const encerrado=cicloVisual([{...agosto,selecao_credenciamento:'Finalizado'}],new Date(2026,9,25));if(!encerrado.includes('Cadastro encerrado na base')||encerrado.includes('CNES agora')||encerrado.includes('Confira o cadastro no CNES'))throw Error('Encerrado recebeu orientação de cadastro');
  const antes=cicloVisual([base],new Date(2026,9,14)),depois=cicloVisual([base],new Date(2026,9,15));
  if(!antes.includes('1ª homologação · próxima: 2ª')||!antes.includes('2 de 3 parcelas')||!depois.includes('2ª homologação · próxima: 3ª (última)')||!depois.includes('1 de 3 parcelas'))throw Error('Corte de referência incorreto');
  const ultima=cicloVisual([base],new Date(2026,10,15));if(!ultima.includes('Nenhuma parcela futura')||!ultima.includes('base ainda indica homologação em andamento'))throw Error('Calendário confundido com processamento');
