@@ -63,3 +63,9 @@ A afirmação anterior de data ausente no Excel estava incorreta: a coluna N con
 O PHP remoto foi lido, preservado em backup local não versionado e atualizado com somente essa substituição, sem publicar as demais alterações preexistentes do PHP local. O arquivo remoto foi relido para conferir a igualdade com o patch esperado. Todos os campos de negócio foram reconciliados entre uma cópia de leitura do Excel aberto e a API antes da sincronização. Depois, o fluxo existente de `sync.py` recarregou os mesmos 16.553 registros; o retorno foi comparado campo a campo, incluindo todas as datas. Nenhuma estrutura, valor ou fórmula do Excel foi escrita.
 
 Exemplo Betim: CNES agosto → parcela outubro; setembro → novembro; outubro → dezembro. A coluna U controla o prazo de ação municipal, independentemente do ciclo ministerial de homologação da coluna V. A base conferida tem 2 registros Ativos e 16.551 Finalizados; o painel preserva essa classificação, sem ampliar o universo de Ativos por conta própria.
+
+## Compatibilidade de portaria e estratégia — 25/10/2026
+
+Objetivo: evitar consultas vazias por combinações inexistentes. Ao selecionar município, região, UF ou portaria no diálogo, limitar as estratégias às presentes na API para esse contexto. Se a estratégia anterior deixar de existir, limpar somente o rascunho desse campo e informar a mudança. Aplicar continua sendo obrigatório; cancelar preserva os filtros aplicados. Validar a combinação também ao aplicar, inclusive para consultas antigas. Não alterar bases, rótulos de estratégias ou seleções U/V.
+
+Exemplo correto: Rio De Janeiro/RJ, Portaria 10.345 oferece PAS e Residentes conforme a API conferida nesta data. Evitar: oferecer eSB 40h nessa combinação ou inferir situação municipal a partir de zero resultados. Consultas antigas sem resultados mostram alternativas reais da aba quando disponíveis. Arquivos: `index.html`, `tests/navegacao.cjs`; regressão verifica PAS com 76 credenciadas.
