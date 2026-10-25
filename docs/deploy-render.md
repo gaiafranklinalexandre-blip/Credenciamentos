@@ -1,5 +1,9 @@
 # Deploy no Render
 
+## Cards e parcelas — 25/10/2026
+
+Revisão vigente: cada estratégia tem card com quantitativos rotulados, orientação municipal e resultados por parcela em tabela de três colunas. Não há cabeçalho de colunas flutuante. A parcela do mês é estática; somente ação municipal com prazo aberto pode pulsar. A espera futura é Aguardando resultado de [mês/ano], sem processamento confirmado inferido. Específicos continua somente credenciamento. Explicar narra os resultados do caso. Executar tests/navegacao.cjs localmente e no Render, conferir HTML servido e capturas desktop/mobile. A revisão altera somente frontend, testes e documentação; manter planilhas e backend preexistentes.
+
 ## Panorama e estados independentes — 24/10/2026
 
 A navegação usa menu lateral (gaveta no celular), com Credenciamentos ativos como área padrão, além de Encerrados e Portarias; as homologações estão integradas, sem área própria. A busca inicial foi removida. O botão Filtros abre diálogo lateral com Região, UF, Município, Portaria, Estratégia. Aplicar confirma o rascunho; fechar descarta. Os filtros aplicados aparecem em chips removíveis. O detalhe municipal mostra o caminho Consolidado → Município / UF e o retorno explícito no cabeçalho fixo. Voltar restaura contexto/paginação; a troca de área preserva filtros. O histórico do navegador e o recarregamento preservam a consulta. O botão da linha do tempo se chama Explicar. Após Saldo, a tabela e o detalhe municipal exibem % de implantação (homologadas ÷ credenciadas × 100); no consolidado, usa-se a razão entre somas. Permanecem o consolidado por portaria/estratégia, apenas o KPI de ativos, conclusão abreviada e regras U/V. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste: `tests/navegacao.cjs`. Esta revisão não altera backend ou bases. Descrições posteriores de cinco abas e dashboard são históricas.
