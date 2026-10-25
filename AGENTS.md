@@ -187,3 +187,7 @@ Objetivo: o gestor entender ação, prazo CNES e espera por resultado. A coluna 
 ## Linguagem pública e identidade compartilhada — 25/10/2026
 
 Objetivo: textos que expliquem situação, prazo e resultado ao gestor. Em qualquer texto visível, evitar base, API, seleção U/V e justificativas de implementação; manter regras internas na documentação. Usar linguagem direta, sem alterar fonte, CSV ou regras de negócio. Referência visual: https://notas-tecnicas-aps.onrender.com/ (cores, sombras, superfícies e organização), conforme docs/design.md. Exemplo correto: Aguardando resultado de novembro; evitar a base indica e a API não informa. Arquivos: index.html, tests/navegacao.cjs e documentação. Ver docs/acompanhamento-integrado.md, seção Linguagem para o gestor.
+
+## Histórico e WhatsApp — 25/10/2026
+
+Objetivo: contar a sequência do credenciamento e permitir compartilhamento pelo usuário. Histórico inclui portaria/data por extenso, quantidade/estratégia, competências CNES e parcelas, resultados e saldo acumulado por etapa. Ativos/Encerrados mudam o tempo verbal, sem afirmar cadastro efetivo ou processamento não confirmado. Mensagem WhatsApp e tela usam o mesmo modelo; botão somente abre texto preenchido para escolha de destinatário e confirmação. Seguir docs/acompanhamento-integrado.md, seção Histórico narrativo e WhatsApp. Arquivos: index.html, tests/navegacao.cjs e docs/design.md. Exemplo correto: 1 de 2 homologadas na primeira parcela, restando 1; evitar usar o saldo final em todas as etapas ou enviar mensagem automaticamente.
