@@ -1,5 +1,9 @@
 # Deploy no Render
 
+## Filtros e consultas salvas — 26/10/2026
+
+Revisão inspirada no funcionamento do SIAPS: grupos de filtros, abas Configurar filtros/Consultas salvas, salvamento local de parâmetros aplicados, recuperação como rascunho e ajuda de interpretação. Não muda API, bancos, planilhas, CSV, U/V ou identidade visual das Notas Técnicas APS. Validar tests/navegacao.cjs localmente e no Render; comparar HTML servido. A suíte cobre também persistência, cancelar/aplicar, armazenamento indisponível, opções antigas e abas por teclado. Consultas de QA ficam somente no contexto isolado do navegador de testes.
+
 ## Cards e parcelas — 25/10/2026
 
 Revisão vigente: cada estratégia tem card com quantitativos rotulados, orientação municipal e resultados por parcela em tabela de três colunas. Não há cabeçalho de colunas flutuante. A parcela do mês é estática; somente ação municipal com prazo aberto pode pulsar. A espera futura é Aguardando resultado de [mês/ano], sem processamento confirmado inferido. Específicos continua somente credenciamento. Explicar narra os resultados do caso. Executar tests/navegacao.cjs localmente e no Render, conferir HTML servido e capturas desktop/mobile. A revisão altera somente frontend, testes e documentação; manter planilhas e backend preexistentes.

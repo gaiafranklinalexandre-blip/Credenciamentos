@@ -1,5 +1,9 @@
 # Contexto do Projeto
 
+## Consultas frequentes e organização dos filtros — 26/10/2026
+
+O SIAPS odontológico foi explorado como referência de funcionamento (abas, medidas, agrupamento/comparação, competência, refinamento, filtros salvos e consulta com resultado). O painel conserva a identidade das Notas Técnicas APS e as áreas Ativos/Encerrados/Portarias. Os filtros agora têm abas Configurar filtros/Consultas salvas, grupos territoriais e de credenciamento, salvamento local de consultas aplicadas e recuperação como rascunho. Só Aplicar filtros altera área e resultados. A ajuda expansível explica os indicadores. Nenhuma linha de dados é armazenada nas consultas, e API, planilhas, U/V, competências, parcelas, CSV, Histórico e WhatsApp permanecem com as regras vigentes. Referências: docs/acompanhamento-integrado.md e docs/design.md.
+
 ## Consulta em cards e resultados por parcela — 25/10/2026
 
 A consulta usa cards por estratégia com rótulos permanentes junto dos quantitativos. A orientação municipal precede os resultados por parcela (Parcela / Cadastro CNES verificado / Resultado). O mês atual é estático e somente o prazo municipal com ação pode pulsar. Zero futuro com homologação em andamento mostra Aguardando resultado de [mês/ano]; não inferir processamento confirmado. Específicos continua somente credenciamento. Explicar conta a sequência do caso. A revisão remove títulos flutuantes compartilhados e os três painéis repetitivos, preservando fonte API, U/V, competências, parcelas, dia 15, navegação, CSV e consentimento. Referências atuais: docs/acompanhamento-integrado.md, docs/design.md e tests/navegacao.cjs.
