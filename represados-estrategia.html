@@ -103,6 +103,12 @@
   .kpi-valor{font-size:28px;font-weight:800;color:var(--text);}
   .kpi-sub{font-size:12px;color:var(--text-mid);margin-top:4px;}
 
+  /* ── GRADE DE SIGLAS ────────────────────────────── */
+  .grade-siglas{display:flex;flex-wrap:wrap;gap:12px;}
+  .sigla-caixa{border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;text-align:center;min-width:92px;background:#fff;}
+  .sigla-nome{font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+  .sigla-valor{font-size:19px;font-weight:800;color:var(--blue);}
+
   /* ── TABELA ─────────────────────────────────────── */
   .tabela-wrap{overflow-x:auto;}
   table.tabela{width:100%;border-collapse:collapse;}
@@ -117,7 +123,7 @@
   .chart-wrap{position:relative;}
   #chartEstrategia{height:560px;}
   #chartStatus{height:280px;}
-  #mapa{height:380px;border-radius:10px;}
+  #mapa{height:380px;border-radius:10px;background:#eef2fb;}
 
   .grid-2{display:grid;grid-template-columns:1.3fr .9fr;gap:18px;}
   @media(max-width:950px){.grid-2{grid-template-columns:1fr;}}
@@ -253,6 +259,16 @@
 
       <!-- ABA: VISÃO GERAL -->
       <div class="aba-painel ativo" id="aba-geral">
+        <div class="card">
+          <div class="card-head">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
+            <div><div class="tt">Represados por sigla</div><div class="sub">Quantidade solicitada por estratégia, em resumo</div></div>
+          </div>
+          <div class="card-body">
+            <div class="grade-siglas" id="gradeSiglas"></div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-head">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V9"/><path d="M13 17V5"/><path d="M18 17v-3"/></svg>
@@ -580,6 +596,49 @@ function renderKPIs() {
 
 const CORES = ['#1351B4','#168821','#FFCD07','#E52207','#6c3fc5','#FF6B6B','#4ECDC4','#45B7D1','#FF8C42','#00D4AA','#FF1744','#00BCD4','#FF9800','#673AB7'];
 
+const SIGLAS = {
+  'Agente Comunitário de Saúde': 'ACS',
+  'Incentivo para Residência na Atenção Primária à Saúde': 'Resid.',
+  'Saúde Bucal - 40 Horas': 'eSB 40h',
+  'Saúde da Família': 'eSF',
+  'eMulti Estratégica': 'eMulti Estrat.',
+  'Saúde Bucal com carga horária diferenciada': 'eSB CHD',
+  'Atenção Primária (eAP)': 'eAP',
+  'Novo PAC Conectividade': 'PAC',
+  'eMulti Complementar': 'eMulti Compl.',
+  'Academia de Saúde': 'Academia',
+  'eMulti Ampliada': 'eMulti Ampl.',
+  'Inclusão de Incentivo Quilombola - eSF': 'Quilombola',
+  'Ampliação de eMulti - Padi': 'Padi',
+  'eSF > eSFR': 'eSF→eSFR',
+  'Unidade Odontológica Móvel': 'UOM',
+  'eAP > eSF': 'eAP→eSF',
+  'Saúde da Família Ribeirinha': 'eSFR',
+  'Consultório na Rua': 'eCR',
+  'eSB CHD > eSB 40h': 'eSB CHD→40h',
+  'Pnaisari': 'Pnaisari',
+  'eMulti Ampliada Intermunicipal': 'eMulti Interm.',
+  'Atenção Primária Prisional': 'eAPP',
+  'Alteração de tipologia eAPP': 'eAPP (alt.)',
+  'eAPP Complementar Psicossocial': 'eAPP Compl.'
+};
+
+function siglaDe(estrategia) {
+  if (SIGLAS[estrategia]) return SIGLAS[estrategia];
+  return estrategia.length > 14 ? estrategia.slice(0, 13) + '…' : estrategia;
+}
+
+function renderGradeSiglas() {
+  const dados = agruparPorEstrategia().sort((a, b) => b.quantidade - a.quantidade);
+  const el = document.getElementById('gradeSiglas');
+  el.innerHTML = dados.length ? dados.map(d => `
+    <div class="sigla-caixa" title="${d.estrategia}">
+      <div class="sigla-nome">${siglaDe(d.estrategia)}</div>
+      <div class="sigla-valor">${d.quantidade.toLocaleString('pt-BR')}</div>
+    </div>
+  `).join('') : '<div class="vazio">Nenhum dado para os filtros aplicados</div>';
+}
+
 function renderChartEstrategia() {
   const dados = agruparPorEstrategia().sort((a, b) => b.quantidade - a.quantidade);
   const ctx = document.getElementById('chartEstrategia');
@@ -618,11 +677,7 @@ function renderMapa() {
   filtrados.forEach(d => { const uf = d.uf || 'Desconhecido'; porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0); });
 
   if (_mapaInst) _mapaInst.remove();
-  _mapaInst = L.map('mapa', { center: [-14.5, -51.9], zoom: 4, zoomControl: true, attributionControl: true, scrollWheelZoom: false });
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 10,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(_mapaInst);
+  _mapaInst = L.map('mapa', { center: [-14.5, -51.9], zoom: 4, zoomControl: true, attributionControl: false, scrollWheelZoom: false });
 
   function corUF(uf) {
     const v = porUF[uf] || 0;
@@ -637,13 +692,14 @@ function renderMapa() {
   }
 
   fetch(GEOJSON_URL).then(r => r.json()).then(geo => {
-    L.geoJSON(geo, {
-      style: feat => ({ fillColor: corUF(feat.properties.sigla), weight: 1.5, color: '#fff', fillOpacity: 0.85 }),
+    const camada = L.geoJSON(geo, {
+      style: feat => ({ fillColor: corUF(feat.properties.sigla), weight: 1.5, color: '#fff', fillOpacity: 0.9 }),
       onEachFeature: (feat, layer) => {
         const uf = feat.properties.sigla;
         layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} represados`);
       }
     }).addTo(_mapaInst);
+    _mapaInst.fitBounds(camada.getBounds(), { padding: [10, 10] });
   }).catch(err => console.error('Erro ao carregar GeoJSON:', err));
 }
 
@@ -696,6 +752,7 @@ function renderTabelaMunicipio() {
 
 function renderTudo() {
   renderKPIs();
+  renderGradeSiglas();
   renderChartEstrategia();
   renderChartStatus();
   renderMapa();
