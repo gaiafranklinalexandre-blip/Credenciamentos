@@ -502,6 +502,12 @@ async function carregarDados() {
 function trocarAba(aba) {
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('ativo', b.dataset.aba === aba));
   document.querySelectorAll('.aba-painel').forEach(p => p.classList.toggle('ativo', p.id === 'aba-' + aba));
+
+  if (aba === 'combinacoes') {
+    setTimeout(() => renderMapaCombinacoes(combinacoesFiltradas()), 50);
+  } else if (aba === 'geral') {
+    setTimeout(() => renderMapa(), 50);
+  }
 }
 
 function popularFiltros() {
@@ -943,7 +949,9 @@ function renderMapa() {
         layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} represados`);
       }
     }).addTo(_mapaInst);
-    _mapaInst.fitBounds(camada.getBounds(), { padding: [10, 10] });
+    _mapaInst.invalidateSize();
+    const bounds = camada.getBounds();
+    if (bounds.isValid()) _mapaInst.fitBounds(bounds, { padding: [10, 10] });
   }).catch(err => console.error('Erro ao carregar GeoJSON:', err));
 }
 
@@ -1110,7 +1118,9 @@ function renderMapaCombinacoes(combos) {
         layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} municípios concomitantes`);
       }
     }).addTo(_mapaCombinacoesInst);
-    _mapaCombinacoesInst.fitBounds(camada.getBounds(), { padding: [10, 10] });
+    _mapaCombinacoesInst.invalidateSize();
+    const bounds = camada.getBounds();
+    if (bounds.isValid()) _mapaCombinacoesInst.fitBounds(bounds, { padding: [10, 10] });
   }).catch(err => console.error('Erro ao carregar GeoJSON (combinações):', err));
 }
 
