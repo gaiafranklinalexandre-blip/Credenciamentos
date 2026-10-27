@@ -142,10 +142,6 @@
   .chip-estrategia.ativo{background:var(--blue);border-color:var(--blue);color:#fff;}
   .combo-badges{display:flex;flex-wrap:wrap;gap:4px;}
   .combo-badge{background:var(--blue-bg);color:var(--blue);font-size:11px;font-weight:700;padding:3px 9px;border-radius:30px;white-space:nowrap;}
-  .combo-linha-municipios{background:#f8fafc;}
-  .combo-municipios-lista{font-size:12.5px;color:var(--text);padding:12px 16px;max-height:220px;overflow-y:auto;}
-  .combo-municipios-lista span{display:inline-block;background:#fff;border:1px solid var(--border);border-radius:6px;padding:3px 9px;margin:2px;}
-  .combo-expandir{cursor:pointer;color:var(--blue);font-weight:700;}
   .paginacao{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:14px;font-size:13px;color:var(--text-mid);}
   .paginacao button{height:36px;padding:0 14px;border-radius:30px;border:1.5px solid var(--border);background:#fff;color:var(--blue);font-weight:700;font-size:13px;cursor:pointer;}
   .paginacao button:disabled{opacity:.4;cursor:default;}
@@ -164,7 +160,7 @@
   .chart-wrap{position:relative;}
   #chartEstrategia{height:560px;}
   #chartStatus{height:280px;}
-  #mapa{height:380px;border-radius:10px;background:#eef2fb;}
+  #mapa,#mapaCombinacoes{height:380px;border-radius:10px;background:#eef2fb;}
 
   .grid-2{display:grid;grid-template-columns:1.3fr .9fr;gap:18px;}
   @media(max-width:950px){.grid-2{grid-template-columns:1fr;}}
@@ -191,7 +187,7 @@
     .marca{padding:16px 16px;}
     .conteudo{padding:16px 14px 28px;}
     #chartEstrategia{height:420px;}
-    #mapa{height:240px;}
+    #mapa,#mapaCombinacoes{height:240px;}
   }
 </style>
 </head>
@@ -400,6 +396,9 @@
               <label class="f-label">A combinação deve incluir</label>
               <div class="chips-filtro" id="chipsEstrategiaCombinacao"></div>
             </div>
+
+            <div class="kpi-grid" id="kpiCombinacoes"></div>
+
             <input class="busca-tabela" id="buscaCombinacao" placeholder="Buscar estratégia na combinação..." oninput="paginaCombinacao=1;renderCombinacoes();">
             <div class="tabela-wrap">
               <table class="tabela" id="tabelaCombinacoes">
@@ -407,12 +406,22 @@
                   <th data-k="combinacao">Combinação de estratégias</th>
                   <th data-k="qtdEstrategias" class="num">Qtde. de estratégias</th>
                   <th data-k="municipios" class="num">Municípios</th>
+                  <th data-k="solicitacoes" class="num">Solicitações</th>
+                  <th data-k="quantidade" class="num">Quantidade solicitada</th>
                 </tr></thead>
                 <tbody></tbody>
               </table>
             </div>
             <div class="paginacao" id="paginacaoCombinacoes"></div>
           </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16M15 5v16"/></svg>
+            <div><div class="tt">Distribuição geográfica das combinações</div><div class="sub">Estados com mais municípios em solicitação concomitante, considerando os filtros e chips acima</div></div>
+          </div>
+          <div class="card-body"><div id="mapaCombinacoes"></div></div>
         </div>
       </div>
 
@@ -439,9 +448,9 @@ let ordemEstrategia = { k: 'quantidade', dir: -1 };
 let ordemMunicipio  = { k: 'quantidade', dir: -1 };
 let ordemCombinacao = { k: 'municipios', dir: -1 };
 let combinacaoFiltroSet = new Set();
-let combinacoesExpandidas = new Set();
 let paginaCombinacao = 1;
 const TAMANHO_PAGINA_COMBINACAO = 25;
+let _mapaCombinacoesInst = null;
 
 window.addEventListener('DOMContentLoaded', () => {
   carregarDados();
@@ -1001,9 +1010,11 @@ function agruparCombinacoesPorMunicipio() {
   const porMunicipio = {};
   filtrados.forEach(d => {
     const key = (d.municipio || 'Desconhecido') + '|' + (d.uf || '');
-    if (!porMunicipio[key]) porMunicipio[key] = { municipio: d.municipio || 'Desconhecido', uf: d.uf || '', estrategias: new Set() };
+    if (!porMunicipio[key]) porMunicipio[key] = { municipio: d.municipio || 'Desconhecido', uf: d.uf || '', estrategias: new Set(), solicitacoes: 0, quantidade: 0 };
     const est = estrategiaCanonica(d.estrategia);
     if (est) porMunicipio[key].estrategias.add(est);
+    porMunicipio[key].solicitacoes += 1;
+    porMunicipio[key].quantidade += Number(d.quantidade) || 0;
   });
 
   const porCombo = {};
@@ -1011,11 +1022,96 @@ function agruparCombinacoesPorMunicipio() {
     if (m.estrategias.size < 2) return;
     const lista = [...m.estrategias].sort((a, b) => ordemDe(a) - ordemDe(b));
     const chave = lista.join(' + ');
-    if (!porCombo[chave]) porCombo[chave] = { chave, combinacao: lista, qtdEstrategias: lista.length, municipios: [] };
-    porCombo[chave].municipios.push({ municipio: m.municipio, uf: m.uf });
+    if (!porCombo[chave]) porCombo[chave] = { chave, combinacao: lista, qtdEstrategias: lista.length, municipios: 0, solicitacoes: 0, quantidade: 0, porUF: {} };
+    porCombo[chave].municipios += 1;
+    porCombo[chave].solicitacoes += m.solicitacoes;
+    porCombo[chave].quantidade += m.quantidade;
+    porCombo[chave].porUF[m.uf] = (porCombo[chave].porUF[m.uf] || 0) + 1;
   });
 
   return Object.values(porCombo);
+}
+
+function combinacoesFiltradas() {
+  const buscaEl = document.getElementById('buscaCombinacao');
+  const busca = buscaEl ? buscaEl.value.toLowerCase().trim() : '';
+
+  let combos = agruparCombinacoesPorMunicipio();
+
+  if (combinacaoFiltroSet.size) {
+    combos = combos.filter(c => [...combinacaoFiltroSet].every(e => c.combinacao.includes(e)));
+  }
+  if (busca) {
+    combos = combos.filter(c => c.combinacao.some(e => e.toLowerCase().includes(busca) || siglaDe(e).toLowerCase().includes(busca)));
+  }
+  return combos;
+}
+
+function renderKPIsCombinacoes(combos) {
+  const el = document.getElementById('kpiCombinacoes');
+  if (!el) return;
+
+  const totalMunicipios = combos.reduce((s, c) => s + c.municipios, 0);
+  const totalSolicitacoes = combos.reduce((s, c) => s + c.solicitacoes, 0);
+  const totalQuantidade = combos.reduce((s, c) => s + c.quantidade, 0);
+
+  el.innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Combinações encontradas</div>
+      <div class="kpi-valor">${combos.length.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">com os filtros aplicados</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Municípios concomitantes</div>
+      <div class="kpi-valor">${totalMunicipios.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">pediram 2+ estratégias ao mesmo tempo</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Solicitações envolvidas</div>
+      <div class="kpi-valor">${totalSolicitacoes.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">registros represados nessas combinações</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Quantidade solicitada</div>
+      <div class="kpi-valor">${totalQuantidade.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">equipes/serviços nessas combinações</div>
+    </div>
+  `;
+}
+
+function renderMapaCombinacoes(combos) {
+  const porUF = {};
+  combos.forEach(c => {
+    Object.entries(c.porUF).forEach(([uf, qtd]) => {
+      porUF[uf] = (porUF[uf] || 0) + qtd;
+    });
+  });
+
+  if (_mapaCombinacoesInst) _mapaCombinacoesInst.remove();
+  _mapaCombinacoesInst = L.map('mapaCombinacoes', { center: [-14.5, -51.9], zoom: 4, zoomControl: true, attributionControl: false, scrollWheelZoom: false });
+
+  function corUF(uf) {
+    const v = porUF[uf] || 0;
+    const maxVal = Math.max(...Object.values(porUF), 1);
+    const p = v / maxVal;
+    if (p === 0) return '#f0f4ff';
+    if (p < 0.2) return '#dbeafe';
+    if (p < 0.4) return '#93c5fd';
+    if (p < 0.6) return '#3b82f6';
+    if (p < 0.8) return '#1351B4';
+    return '#1e3a8a';
+  }
+
+  fetch(GEOJSON_URL).then(r => r.json()).then(geo => {
+    const camada = L.geoJSON(geo, {
+      style: feat => ({ fillColor: corUF(feat.properties.sigla), weight: 1.5, color: '#fff', fillOpacity: 0.9 }),
+      onEachFeature: (feat, layer) => {
+        const uf = feat.properties.sigla;
+        layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} municípios concomitantes`);
+      }
+    }).addTo(_mapaCombinacoesInst);
+    _mapaCombinacoesInst.fitBounds(camada.getBounds(), { padding: [10, 10] });
+  }).catch(err => console.error('Erro ao carregar GeoJSON (combinações):', err));
 }
 
 function popularChipsCombinacao() {
@@ -1043,38 +1139,21 @@ function irParaPaginaCombinacao(pagina) {
   renderCombinacoes();
 }
 
-function toggleExpandirCombinacao(chave) {
-  if (combinacoesExpandidas.has(chave)) combinacoesExpandidas.delete(chave);
-  else combinacoesExpandidas.add(chave);
-  renderCombinacoes();
-}
-
 function renderCombinacoes() {
   const tbody = document.querySelector('#tabelaCombinacoes tbody');
   if (!tbody) return;
 
-  const buscaEl = document.getElementById('buscaCombinacao');
-  const busca = buscaEl ? buscaEl.value.toLowerCase().trim() : '';
+  const combos = combinacoesFiltradas();
 
-  let combos = agruparCombinacoesPorMunicipio();
+  renderKPIsCombinacoes(combos);
+  renderMapaCombinacoes(combos);
 
-  if (combinacaoFiltroSet.size) {
-    combos = combos.filter(c => [...combinacaoFiltroSet].every(e => c.combinacao.includes(e)));
-  }
-  if (busca) {
-    combos = combos.filter(c => c.combinacao.some(e => e.toLowerCase().includes(busca) || siglaDe(e).toLowerCase().includes(busca)));
-  }
-
-  combos.sort((a, b) => {
-    if (ordemCombinacao.k === 'municipios') return (a.municipios.length - b.municipios.length) * ordemCombinacao.dir;
-    if (ordemCombinacao.k === 'qtdEstrategias') return (a.qtdEstrategias - b.qtdEstrategias) * ordemCombinacao.dir;
-    return (a.chave > b.chave ? 1 : -1) * ordemCombinacao.dir;
-  });
+  combos.sort((a, b) => (a[ordemCombinacao.k] > b[ordemCombinacao.k] ? 1 : -1) * ordemCombinacao.dir);
 
   const paginacaoEl = document.getElementById('paginacaoCombinacoes');
 
   if (!combos.length) {
-    tbody.innerHTML = `<tr><td colspan="3" class="vazio">Nenhuma solicitação concomitante encontrada para os filtros aplicados</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="vazio">Nenhuma solicitação concomitante encontrada para os filtros aplicados</td></tr>`;
     if (paginacaoEl) paginacaoEl.innerHTML = '';
     return;
   }
@@ -1094,27 +1173,15 @@ function renderCombinacoes() {
     `;
   }
 
-  tbody.innerHTML = paginaAtual.map(c => {
-    const expandido = combinacoesExpandidas.has(c.chave);
-    const municipiosOrdenados = c.municipios.slice().sort((a, b) => a.municipio.localeCompare(b.municipio));
-    const linhaDetalhe = expandido ? `
-      <tr class="combo-linha-municipios">
-        <td colspan="3">
-          <div class="combo-municipios-lista">
-            ${municipiosOrdenados.map(m => `<span>${m.municipio} — ${m.uf}</span>`).join('')}
-          </div>
-        </td>
-      </tr>
-    ` : '';
-    return `
-      <tr onclick="toggleExpandirCombinacao('${c.chave.replace(/'/g, "\\'")}')" style="cursor:pointer;">
-        <td><div class="combo-badges">${c.combinacao.map(e => `<span class="combo-badge">${siglaDe(e)}</span>`).join('')}</div></td>
-        <td class="num">${c.qtdEstrategias}</td>
-        <td class="num"><span class="combo-expandir">${c.municipios.length.toLocaleString('pt-BR')} ${expandido ? '▲' : '▼'}</span></td>
-      </tr>
-      ${linhaDetalhe}
-    `;
-  }).join('');
+  tbody.innerHTML = paginaAtual.map(c => `
+    <tr>
+      <td><div class="combo-badges">${c.combinacao.map(e => `<span class="combo-badge">${siglaDe(e)}</span>`).join('')}</div></td>
+      <td class="num">${c.qtdEstrategias}</td>
+      <td class="num">${c.municipios.toLocaleString('pt-BR')}</td>
+      <td class="num">${c.solicitacoes.toLocaleString('pt-BR')}</td>
+      <td class="num">${c.quantidade.toLocaleString('pt-BR')}</td>
+    </tr>
+  `).join('');
 }
 
 ordenarClique('tabelaEstrategia', ordemEstrategia, renderTabelaEstrategia);
