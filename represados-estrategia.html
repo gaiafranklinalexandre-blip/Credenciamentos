@@ -43,7 +43,7 @@
     background:radial-gradient(ellipse at 90% 12%,#e7efff99,transparent 50%),#f7f9fd;
   }
 
-  svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .cabecalho svg,.menu-lateral svg,.card-head svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
   #acessoNegado{min-height:100vh;display:none;align-items:center;justify-content:center;font-size:17px;color:var(--text-mid);text-align:center;padding:24px;}
 
@@ -104,6 +104,9 @@
   .kpi-sub{font-size:12px;color:var(--text-mid);margin-top:4px;}
 
   /* ── GRADE DE SIGLAS ────────────────────────────── */
+  .grupo-siglas{margin-bottom:18px;}
+  .grupo-siglas:last-child{margin-bottom:0;}
+  .grupo-siglas-titulo{font-size:11.5px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
   .grade-siglas{display:flex;flex-wrap:wrap;gap:12px;}
   .sigla-caixa{border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;text-align:center;min-width:92px;background:#fff;}
   .sigla-nome{font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
@@ -262,10 +265,10 @@
         <div class="card">
           <div class="card-head">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M3 9h18"/><path d="M3 15h18"/></svg>
-            <div><div class="tt">Represados por sigla</div><div class="sub">Quantidade solicitada por estratégia, em resumo</div></div>
+            <div><div class="tt">Represados</div><div class="sub">Quantidade solicitada por estratégia, agrupada por tipo</div></div>
           </div>
           <div class="card-body">
-            <div class="grade-siglas" id="gradeSiglas"></div>
+            <div id="gradeSiglas"></div>
           </div>
         </div>
 
@@ -562,9 +565,6 @@ function renderKPIs() {
   });
   const tempoMedio = diasCount ? Math.round(totalDias / diasCount) : 0;
 
-  const porEst = agruparPorEstrategia();
-  const topEst = porEst.sort((a, b) => b.quantidade - a.quantidade)[0];
-
   document.getElementById('kpiGrid').innerHTML = `
     <div class="kpi">
       <div class="kpi-label">Total de solicitações</div>
@@ -582,14 +582,9 @@ function renderKPIs() {
       <div class="kpi-sub">dias desde a solicitação</div>
     </div>
     <div class="kpi roxo">
-      <div class="kpi-label">Municípios envolvidos</div>
+      <div class="kpi-label">Municípios</div>
       <div class="kpi-valor">${municipiosUnicos.toLocaleString('pt-BR')}</div>
       <div class="kpi-sub">com solicitação pendente</div>
-    </div>
-    <div class="kpi amarelo">
-      <div class="kpi-label">Estratégia mais solicitada</div>
-      <div class="kpi-valor" style="font-size:16px;line-height:1.3;">${topEst ? topEst.estrategia : '—'}</div>
-      <div class="kpi-sub">${topEst ? topEst.quantidade.toLocaleString('pt-BR') + ' solicitações' : ''}</div>
     </div>
   `;
 }
@@ -628,15 +623,77 @@ function siglaDe(estrategia) {
   return estrategia.length > 14 ? estrategia.slice(0, 13) + '…' : estrategia;
 }
 
+const GRUPOS_ORDEM = ['Equipes', 'Serviços', 'Programas e incentivos', 'Incentivos adicionais', 'Profissionais', 'Conversões'];
+
+const GRUPO_POR_ESTRATEGIA = {
+  'Saúde da Família': 'Equipes',
+  'Saúde da Família Ribeirinha': 'Equipes',
+  'Atenção Primária (eAP)': 'Equipes',
+  'Atenção Primária Prisional': 'Equipes',
+  'eAPP Complementar Psicossocial': 'Equipes',
+  'eMulti Estratégica': 'Equipes',
+  'eMulti Complementar': 'Equipes',
+  'eMulti Ampliada': 'Equipes',
+  'eMulti Ampliada Intermunicipal': 'Equipes',
+  'Saúde Bucal - 40 Horas': 'Equipes',
+  'Saúde Bucal com carga horária diferenciada': 'Equipes',
+  'Consultório na Rua': 'Equipes',
+
+  'Unidade Odontológica Móvel': 'Serviços',
+  'Academia de Saúde': 'Serviços',
+
+  'Pnaisari': 'Programas e incentivos',
+  'Novo PAC Conectividade': 'Programas e incentivos',
+
+  'Ampliação de eMulti - Padi': 'Incentivos adicionais',
+  'Inclusão de Incentivo Quilombola - eSF': 'Incentivos adicionais',
+
+  'Agente Comunitário de Saúde': 'Profissionais',
+  'Incentivo para Residência na Atenção Primária à Saúde': 'Profissionais',
+
+  'eSF > eSFR': 'Conversões',
+  'eAP > eSF': 'Conversões',
+  'eSB CHD > eSB 40h': 'Conversões',
+  'Alteração de tipologia eAPP': 'Conversões'
+};
+
+function grupoDe(estrategia) {
+  return GRUPO_POR_ESTRATEGIA[estrategia] || 'Outros';
+}
+
 function renderGradeSiglas() {
-  const dados = agruparPorEstrategia().sort((a, b) => b.quantidade - a.quantidade);
+  const dados = agruparPorEstrategia();
   const el = document.getElementById('gradeSiglas');
-  el.innerHTML = dados.length ? dados.map(d => `
-    <div class="sigla-caixa" title="${d.estrategia}">
-      <div class="sigla-nome">${siglaDe(d.estrategia)}</div>
-      <div class="sigla-valor">${d.quantidade.toLocaleString('pt-BR')}</div>
-    </div>
-  `).join('') : '<div class="vazio">Nenhum dado para os filtros aplicados</div>';
+
+  if (!dados.length) {
+    el.innerHTML = '<div class="vazio">Nenhum dado para os filtros aplicados</div>';
+    return;
+  }
+
+  const porGrupo = {};
+  dados.forEach(d => {
+    const g = grupoDe(d.estrategia);
+    (porGrupo[g] = porGrupo[g] || []).push(d);
+  });
+
+  const ordemFinal = [...GRUPOS_ORDEM, ...Object.keys(porGrupo).filter(g => !GRUPOS_ORDEM.includes(g))];
+
+  el.innerHTML = ordemFinal.filter(g => porGrupo[g]).map(g => {
+    const itens = porGrupo[g].sort((a, b) => b.quantidade - a.quantidade);
+    return `
+      <div class="grupo-siglas">
+        <div class="grupo-siglas-titulo">${g}</div>
+        <div class="grade-siglas">
+          ${itens.map(d => `
+            <div class="sigla-caixa" title="${d.estrategia}">
+              <div class="sigla-nome">${siglaDe(d.estrategia)}</div>
+              <div class="sigla-valor">${d.quantidade.toLocaleString('pt-BR')}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function renderChartEstrategia() {
