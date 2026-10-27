@@ -661,6 +661,43 @@ function grupoDe(estrategia) {
   return GRUPO_POR_ESTRATEGIA[estrategia] || 'Outros';
 }
 
+const ORDEM_ESTRATEGIA = [
+  'Saúde da Família',
+  'Atenção Primária (eAP)',
+  'Saúde Bucal - 40 Horas',
+  'Saúde Bucal com carga horária diferenciada',
+  'eMulti Estratégica',
+  'eMulti Complementar',
+  'eMulti Ampliada',
+  'eMulti Ampliada Intermunicipal',
+  'Saúde da Família Ribeirinha',
+  'Atenção Primária Prisional',
+  'eAPP Complementar Psicossocial',
+  'Consultório na Rua',
+
+  'Unidade Odontológica Móvel',
+  'Academia de Saúde',
+
+  'Novo PAC Conectividade',
+  'Pnaisari',
+
+  'Inclusão de Incentivo Quilombola - eSF',
+  'Ampliação de eMulti - Padi',
+
+  'Agente Comunitário de Saúde',
+  'Incentivo para Residência na Atenção Primária à Saúde',
+
+  'eSF > eSFR',
+  'eAP > eSF',
+  'eSB CHD > eSB 40h',
+  'Alteração de tipologia eAPP'
+];
+
+function ordemDe(estrategia) {
+  const i = ORDEM_ESTRATEGIA.indexOf(estrategia);
+  return i === -1 ? ORDEM_ESTRATEGIA.length : i;
+}
+
 function renderGradeSiglas() {
   const dados = agruparPorEstrategia();
   const el = document.getElementById('gradeSiglas');
@@ -679,7 +716,7 @@ function renderGradeSiglas() {
   const ordemFinal = [...GRUPOS_ORDEM, ...Object.keys(porGrupo).filter(g => !GRUPOS_ORDEM.includes(g))];
 
   el.innerHTML = ordemFinal.filter(g => porGrupo[g]).map(g => {
-    const itens = porGrupo[g].sort((a, b) => b.quantidade - a.quantidade);
+    const itens = porGrupo[g].sort((a, b) => ordemDe(a.estrategia) - ordemDe(b.estrategia));
     return `
       <div class="grupo-siglas">
         <div class="grupo-siglas-titulo">${g}</div>
