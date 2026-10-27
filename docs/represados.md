@@ -298,3 +298,22 @@ python sync.py
 **Banco de dados**: MySQL no Hostinger (sync.php)
 
 Nenhuma configuração especial necessária — arquivo HTML estático é servido direto.
+
+---
+
+## Painel por Estratégia — represados-estrategia.html (27/10/2026)
+
+Arquivo independente, visual inspirado no gov.br/SIAPS público (siaps.saude.gov.br/publico): barra gov.br, banner azul em degradê, abas (Visão Geral / Por Estratégia / Por Município) e cards com ícone circular, mantendo a paleta institucional do projeto (`--blue: #1351B4` etc.) em vez de copiar as cores do SIAPS. Não substitui `represados.html`, que continua no ar com seu próprio layout.
+
+**Objetivo**: dar uma visão do que está sendo solicitado pelos municípios, agrupado por estratégia — não apenas por estado/tempo de fila como no painel original.
+
+**Dados e acesso**: consome o mesmo endpoint `?action=represados` do `sync.php`, sem lógica de autenticação própria no frontend — a restrição de acesso (retorno 403) é tratada no backend, igual ao `represados.html`.
+
+**Estrutura**:
+- Filtros comuns às três abas: UF, Município (autocomplete), Estratégia, Status, Tipo de solicitação, Ano.
+- KPIs: total de solicitações, quantidade acumulada, municípios envolvidos, estratégia mais solicitada.
+- Visão Geral: gráfico de barras por estratégia, donut por status, mapa Leaflet por UF.
+- Por Estratégia: tabela ordenável (solicitações, quantidade, municípios, tempo médio).
+- Por Município: tabela ordenável (quantidade, estratégias distintas, tempo médio).
+
+Se a estrutura de colunas do endpoint `represados` mudar, atualizar os dois arquivos (`represados.html` e `represados-estrategia.html`) juntos.

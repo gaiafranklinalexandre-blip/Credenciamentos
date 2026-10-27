@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Represados por Estratégia — APS</title>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-D8TE54RKD3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-D8TE54RKD3', { 'page_title': 'Represados por Estratégia', 'page_location': window.location.href });
+</script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" />
+
+<style>
+  :root{
+    --gov-blue:#1351b4;
+    --gov-blue-dark:#071d41;
+    --gov-border:#dbe5f4;
+    --gov-blue-bg:#eef2fb;
+    --gov-selected-a:#dce9ff;
+    --gov-selected-b:#eff5ff;
+    --green:#168821; --green-light:#e3f5e1;
+    --red:#e52207; --red-light:#ffe8e5;
+    --yellow:#ffcd07; --yellow-light:#fff5c2;
+    --purple:#6c3fc5;
+    --text:#1c1c1c; --text-mid:#555;
+    --white:#fff;
+    --shadow-sm:0 3px 7px #071d4105;
+    --shadow-lg:0 12px 28px #1351b414;
+    --radius-card:12px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{font-family:'Segoe UI',Arial,sans-serif;background:#f4f6fb;color:var(--text);font-size:15px;}
+
+  #acessoNegado{min-height:100vh;display:none;align-items:center;justify-content:center;font-size:18px;color:var(--text-mid);text-align:center;padding:24px;}
+
+  /* ── TOPO GOV.BR ───────────────────────────────── */
+  .govbr-bar{background:#fff;border-bottom:1px solid var(--gov-border);padding:10px 28px;display:flex;align-items:center;gap:14px;}
+  .govbr-logo{font-weight:800;font-size:19px;letter-spacing:.2px;}
+  .govbr-logo .g{color:#1351b4;} .govbr-logo .o{color:#ffcd07;} .govbr-logo .v{color:#168821;} .govbr-logo .br{color:#1351b4;}
+  .govbr-sep{width:1px;height:22px;background:var(--gov-border);}
+  .govbr-orgao{color:#4a4a4a;font-size:14.5px;font-weight:600;}
+
+  .app-bar{background:#fff;border-bottom:1px solid var(--gov-border);padding:12px 28px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm);}
+  .app-bar .hamb{color:var(--gov-blue);font-size:19px;}
+  .app-bar .app-title{font-size:16px;font-weight:700;color:#1c1c1c;}
+  .app-bar .app-title small{display:block;font-size:11.5px;font-weight:500;color:var(--text-mid);}
+
+  /* ── BANNER ─────────────────────────────────────── */
+  .hero{margin:22px 28px 0;background:linear-gradient(120deg,#1351b4,#2670e8 60%,#1351b4);border-radius:var(--radius-card);padding:30px 32px;color:#fff;box-shadow:var(--shadow-lg);position:relative;overflow:hidden;}
+  .hero::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(255,255,255,.18),transparent 55%);}
+  .hero-ico{font-size:30px;margin-bottom:6px;}
+  .hero h1{font-size:22px;font-weight:800;position:relative;}
+  .hero p{font-size:13.5px;opacity:.92;margin-top:4px;max-width:620px;position:relative;}
+
+  /* ── TABS ───────────────────────────────────────── */
+  .tabs{margin:18px 28px 0;background:#eef2fb;border-radius:10px;display:flex;gap:4px;padding:4px;flex-wrap:wrap;}
+  .tab-btn{flex:1;min-width:140px;text-align:center;padding:10px 14px;border:none;background:transparent;border-radius:8px;font-size:13.5px;font-weight:700;color:var(--gov-blue);cursor:pointer;transition:background .15s,color .15s;}
+  .tab-btn.ativo{background:var(--gov-blue);color:#fff;box-shadow:var(--shadow-sm);}
+  .tab-btn:not(.ativo):hover{background:linear-gradient(90deg,var(--gov-selected-a),var(--gov-selected-b));}
+
+  /* ── CARD GENÉRICO ─────────────────────────────── */
+  .card{background:#fff;border:1px solid var(--gov-border);border-radius:var(--radius-card);margin:18px 28px 0;box-shadow:var(--shadow-sm);}
+  .card-head{display:flex;align-items:center;gap:14px;padding:18px 22px;}
+  .card-head .ico{width:40px;height:40px;border-radius:50%;background:var(--gov-blue-bg);color:var(--gov-blue);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .card-head .tt{font-size:15px;font-weight:700;color:var(--gov-blue);}
+  .card-head .sub{font-size:12.5px;color:var(--text-mid);margin-top:2px;}
+  .card-body{padding:0 22px 22px;}
+
+  /* ── FILTROS ────────────────────────────────────── */
+  .filtros-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;}
+  .f-grupo{display:flex;flex-direction:column;gap:6px;position:relative;}
+  .f-label{font-size:11px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.4px;}
+  .f-select,.f-input{height:44px;padding:0 12px;border:1px solid var(--gov-border);border-radius:8px;font-family:inherit;font-size:13.5px;background:#fff;}
+  .f-select:focus,.f-input:focus{outline:none;border-color:var(--gov-blue);}
+  .lista-sugestoes{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--gov-border);border-radius:0 0 8px 8px;max-height:230px;overflow-y:auto;display:none;z-index:60;box-shadow:var(--shadow-lg);}
+  .lista-sugestoes div{padding:9px 12px;font-size:13px;cursor:pointer;}
+  .lista-sugestoes div:hover{background:var(--gov-selected-b);}
+  .filtros-acoes{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
+  .btn-outline,.btn-primario{height:44px;padding:0 20px;border-radius:30px;font-size:13.5px;font-weight:700;cursor:pointer;}
+  .btn-outline{background:#fff;border:2px solid var(--gov-blue);color:var(--gov-blue);}
+  .btn-primario{background:var(--gov-blue);border:none;color:#fff;}
+  .btn-primario:hover{background:#2670e8;}
+
+  /* ── KPIs ───────────────────────────────────────── */
+  .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin:18px 28px 0;}
+  .kpi{background:#fff;border:1px solid var(--gov-border);border-top:4px solid var(--gov-blue);border-radius:var(--radius-card);padding:20px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;}
+  .kpi.verde{border-top-color:var(--green);} .kpi.amarelo{border-top-color:var(--yellow);} .kpi.roxo{border-top-color:var(--purple);}
+  .kpi-label{font-size:11px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+  .kpi-valor{font-size:30px;font-weight:800;}
+  .kpi-sub{font-size:12px;color:var(--text-mid);margin-top:4px;}
+  .kpi-ico{position:absolute;top:10px;right:14px;font-size:34px;opacity:.1;}
+
+  /* ── TABELA ─────────────────────────────────────── */
+  .tabela-wrap{overflow-x:auto;}
+  table.tabela{width:100%;border-collapse:collapse;}
+  table.tabela thead th{background:var(--gov-blue-bg);color:var(--gov-blue);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;padding:11px 14px;white-space:nowrap;cursor:pointer;user-select:none;}
+  table.tabela thead th:hover{background:#e0e9fb;}
+  table.tabela tbody td{padding:11px 14px;border-bottom:1px solid #eef1f6;font-size:13px;white-space:nowrap;}
+  table.tabela tbody tr:hover{background:#f7faff;}
+  table.tabela td.num{text-align:right;font-weight:600;}
+  .barra-mini{display:inline-block;height:8px;background:var(--gov-blue);border-radius:4px;vertical-align:middle;margin-right:8px;}
+  .pill{display:inline-block;padding:2px 9px;border-radius:30px;font-size:11px;font-weight:700;}
+  .pill-solicitada{background:var(--yellow-light);color:#8a6d00;}
+  .pill-credenciada{background:var(--green-light);color:var(--green);}
+  .pill-publicada{background:var(--gov-blue-bg);color:var(--gov-blue);}
+  .busca-tabela{height:40px;padding:0 14px;border:1px solid var(--gov-border);border-radius:30px;font-size:13px;width:260px;max-width:100%;margin-bottom:14px;}
+
+  .chart-wrap{position:relative;}
+  #chartEstrategia{height:560px;}
+  #chartStatus{height:280px;}
+  #mapa{height:380px;border-radius:10px;}
+
+  .grid-2{display:grid;grid-template-columns:1.3fr .9fr;gap:18px;}
+  @media(max-width:950px){.grid-2{grid-template-columns:1fr;}}
+
+  .loading{text-align:center;padding:40px;color:var(--text-mid);}
+  .spinner{display:inline-block;width:28px;height:28px;border:4px solid var(--gov-blue-bg);border-top-color:var(--gov-blue);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .vazio{padding:30px;text-align:center;color:var(--text-mid);font-size:13.5px;}
+
+  footer.rodape{margin-top:32px;background:var(--gov-blue-dark);color:#cfd9ea;text-align:center;font-size:12px;padding:16px;}
+
+  .aba-painel{display:none;}
+  .aba-painel.ativo{display:block;}
+
+  @media(max-width:700px){
+    .govbr-bar,.app-bar{padding:10px 14px;}
+    .hero,.tabs,.card,.kpi-grid{margin-left:12px;margin-right:12px;}
+    .hero{padding:22px 18px;}
+    .tab-btn{min-width:100px;font-size:12px;padding:9px 8px;}
+    #chartEstrategia{height:420px;}
+    #mapa{height:240px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="acessoNegado">Indisponível</div>
+
+<div id="painel" style="display:none;">
+
+  <div class="govbr-bar">
+    <div class="govbr-logo"><span class="g">gov</span><span class="o">.</span><span class="v">br</span></div>
+    <div class="govbr-sep"></div>
+    <div class="govbr-orgao">Ministério da Saúde</div>
+  </div>
+
+  <div class="app-bar">
+    <span class="hamb">☰</span>
+    <div class="app-title">Represados — Painel por Estratégia<small>Atenção Primária à Saúde</small></div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-ico">📋</div>
+    <h1>Solicitações Represadas da APS</h1>
+    <p>Acompanhe o que está sendo solicitado pelos municípios, organizado por estratégia, estado e tempo de espera.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn ativo" data-aba="geral" onclick="trocarAba('geral')">Visão Geral</button>
+    <button class="tab-btn" data-aba="estrategia" onclick="trocarAba('estrategia')">Por Estratégia</button>
+    <button class="tab-btn" data-aba="municipio" onclick="trocarAba('municipio')">Por Município</button>
+  </div>
+
+  <!-- FILTROS -->
+  <div class="card">
+    <div class="card-head">
+      <div class="ico">▼</div>
+      <div><div class="tt">Refine a pesquisa</div><div class="sub">Os filtros valem para as três visões do painel</div></div>
+    </div>
+    <div class="card-body">
+      <div class="filtros-grid">
+        <div class="f-grupo">
+          <label class="f-label">Estado</label>
+          <select id="fUF" class="f-select" onchange="onUFChange()"><option value="">Todos</option></select>
+        </div>
+        <div class="f-grupo">
+          <label class="f-label">Município</label>
+          <input id="fMunicipio" class="f-input" placeholder="Digite ou clique..." onfocus="mostrarSugestoes()" oninput="buscarSugestoes()">
+          <div id="listaSugestoes" class="lista-sugestoes"></div>
+        </div>
+        <div class="f-grupo">
+          <label class="f-label">Estratégia</label>
+          <select id="fEstrategia" class="f-select" onchange="onFiltroChange()"><option value="">Todas</option></select>
+        </div>
+        <div class="f-grupo">
+          <label class="f-label">Status</label>
+          <select id="fStatus" class="f-select" onchange="onFiltroChange()">
+            <option value="">Todos</option>
+            <option value="SOLICITADA">Solicitada</option>
+            <option value="CREDENCIADA">Credenciada</option>
+            <option value="PUBLICADO EM PORTARIA">Publicado em portaria</option>
+          </select>
+        </div>
+        <div class="f-grupo">
+          <label class="f-label">Tipo de solicitação</label>
+          <select id="fTipo" class="f-select" onchange="popularEstrategias();onFiltroChange();">
+            <option value="">Todos</option>
+            <option value="CRED">Credenciamento</option>
+            <option value="AMPL">Ampliação</option>
+            <option value="TIPO">Alteração de tipo</option>
+            <option value="ADESAO">Adesão</option>
+            <option value="OUTRO">Outro</option>
+          </select>
+        </div>
+        <div class="f-grupo">
+          <label class="f-label">Ano</label>
+          <select id="fAno" class="f-select" onchange="onFiltroChange()"><option value="">Todos</option></select>
+        </div>
+      </div>
+      <div class="filtros-acoes">
+        <button class="btn-outline" onclick="limparFiltros()">Limpar filtros</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- ABA: VISÃO GERAL -->
+  <div class="aba-painel ativo" id="aba-geral">
+    <div class="card">
+      <div class="card-head">
+        <div class="ico">📊</div>
+        <div><div class="tt">Represados por estratégia</div><div class="sub">Quantidade solicitada, do maior para o menor</div></div>
+      </div>
+      <div class="card-body">
+        <div class="grid-2">
+          <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
+          <div>
+            <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div class="ico">🗺️</div>
+        <div><div class="tt">Distribuição geográfica</div><div class="sub">Quantidade represada por estado</div></div>
+      </div>
+      <div class="card-body"><div id="mapa"></div></div>
+    </div>
+  </div>
+
+  <!-- ABA: POR ESTRATÉGIA -->
+  <div class="aba-painel" id="aba-estrategia">
+    <div class="card">
+      <div class="card-head">
+        <div class="ico">📑</div>
+        <div><div class="tt">Resumo por estratégia</div><div class="sub">Clique numa coluna para ordenar</div></div>
+      </div>
+      <div class="card-body">
+        <input class="busca-tabela" id="buscaEstrategia" placeholder="Buscar estratégia..." oninput="renderTabelaEstrategia()">
+        <div class="tabela-wrap">
+          <table class="tabela" id="tabelaEstrategia">
+            <thead><tr>
+              <th data-k="estrategia">Estratégia</th>
+              <th data-k="solicitacoes" class="num">Solicitações</th>
+              <th data-k="quantidade" class="num">Quantidade</th>
+              <th data-k="municipios" class="num">Municípios</th>
+              <th data-k="tempoMedio" class="num">Tempo médio (dias)</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABA: POR MUNICÍPIO -->
+  <div class="aba-painel" id="aba-municipio">
+    <div class="card">
+      <div class="card-head">
+        <div class="ico">🏙️</div>
+        <div><div class="tt">Resumo por município</div><div class="sub">Clique numa coluna para ordenar</div></div>
+      </div>
+      <div class="card-body">
+        <input class="busca-tabela" id="buscaMunicipio" placeholder="Buscar município..." oninput="renderTabelaMunicipio()">
+        <div class="tabela-wrap">
+          <table class="tabela" id="tabelaMunicipio">
+            <thead><tr>
+              <th data-k="municipio">Município</th>
+              <th data-k="uf">UF</th>
+              <th data-k="quantidade" class="num">Quantidade</th>
+              <th data-k="estrategias" class="num">Estratégias distintas</th>
+              <th data-k="tempoMedio" class="num">Tempo médio (dias)</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="rodape">Ministério da Saúde · SAPS · Credenciamento APS · 2026</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
+
+<script>
+const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=represados';
+const GEOJSON_URL = 'docs/brazil-states.geojson';
+
+let represados = [];
+let filtrados = [];
+let municipiosDisponiveis = [];
+let _mapaInst = null;
+let _chartEstrategia = null, _chartStatus = null;
+let ordemEstrategia = { k: 'quantidade', dir: -1 };
+let ordemMunicipio  = { k: 'quantidade', dir: -1 };
+
+window.addEventListener('DOMContentLoaded', carregarDados);
+
+async function carregarDados() {
+  const kpiEl = document.getElementById('kpiGrid');
+  kpiEl.innerHTML = '<div class="loading" style="grid-column:1/-1;"><div class="spinner"></div> Carregando dados...</div>';
+  try {
+    const resp = await fetch(API_URL);
+    if (resp.status === 403) {
+      document.getElementById('painel').style.display = 'none';
+      document.getElementById('acessoNegado').style.display = 'flex';
+      return;
+    }
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    document.getElementById('acessoNegado').style.display = 'none';
+    document.getElementById('painel').style.display = 'block';
+
+    const data = await resp.json();
+    represados = Array.isArray(data) ? data : [];
+    if (!represados.length) throw new Error('Nenhum represado retornado da API');
+
+    popularFiltros();
+    onFiltroChange();
+  } catch (err) {
+    console.error('Erro ao carregar dados:', err);
+    kpiEl.innerHTML = `<div class="loading" style="grid-column:1/-1;color:var(--red);">Erro ao carregar dados:<br>${err.message}</div>`;
+  }
+}
+
+function trocarAba(aba) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('ativo', b.dataset.aba === aba));
+  document.querySelectorAll('.aba-painel').forEach(p => p.classList.toggle('ativo', p.id === 'aba-' + aba));
+}
+
+function popularFiltros() {
+  const ufs = [...new Set(represados.map(d => d.uf).filter(u => u && u !== 'Desconhecido'))].sort();
+  const selUF = document.getElementById('fUF');
+  selUF.innerHTML = '<option value="">Todos</option>' + ufs.map(u => `<option value="${u}">${u}</option>`).join('');
+
+  const anos = [...new Set(represados.map(d => {
+    if (!d.data_solicitacao) return null;
+    const a = new Date(d.data_solicitacao).getFullYear();
+    return a > 2000 ? a : null;
+  }).filter(Boolean))].sort((a, b) => b - a);
+  const selAno = document.getElementById('fAno');
+  selAno.innerHTML = '<option value="">Todos</option>' + anos.map(a => `<option value="${a}">${a}</option>`).join('');
+
+  popularEstrategias();
+  popularMunicipios();
+}
+
+function popularEstrategias() {
+  const tipo = document.getElementById('fTipo').value;
+  let dados = represados;
+  if (tipo) dados = dados.filter(d => d.request_type === tipo);
+  const ests = [...new Set(dados.map(d => d.estrategia).filter(Boolean))].sort();
+  const sel = document.getElementById('fEstrategia');
+  const atual = sel.value;
+  sel.innerHTML = '<option value="">Todas</option>' + ests.map(e => `<option value="${e}">${e}</option>`).join('');
+  if (ests.includes(atual)) sel.value = atual;
+}
+
+function popularMunicipios() {
+  const uf = document.getElementById('fUF').value;
+  let muns = represados;
+  if (uf) muns = muns.filter(d => d.uf === uf);
+  municipiosDisponiveis = [...new Set(muns.map(d => d.municipio).filter(Boolean))].sort();
+}
+
+function onUFChange() {
+  popularMunicipios();
+  document.getElementById('fMunicipio').value = '';
+  onFiltroChange();
+}
+
+function mostrarSugestoes() {
+  const el = document.getElementById('listaSugestoes');
+  el.innerHTML = municipiosDisponiveis.length
+    ? municipiosDisponiveis.map(m => `<div onclick="selecionarMunicipio('${m.replace(/'/g, "\\'")}')">${m}</div>`).join('')
+    : '<div style="color:#999;cursor:default;">Nenhum município disponível</div>';
+  el.style.display = 'block';
+}
+
+function buscarSugestoes() {
+  const termo = document.getElementById('fMunicipio').value.toLowerCase().trim();
+  if (!termo) return mostrarSugestoes();
+  const el = document.getElementById('listaSugestoes');
+  const achados = municipiosDisponiveis.filter(m => m.toLowerCase().includes(termo));
+  el.innerHTML = achados.length
+    ? achados.map(m => `<div onclick="selecionarMunicipio('${m.replace(/'/g, "\\'")}')">${m}</div>`).join('')
+    : '<div style="color:#999;cursor:default;">Nenhum município encontrado</div>';
+  el.style.display = 'block';
+}
+
+function selecionarMunicipio(m) {
+  document.getElementById('fMunicipio').value = m;
+  document.getElementById('listaSugestoes').style.display = 'none';
+  onFiltroChange();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.f-grupo')) {
+    const el = document.getElementById('listaSugestoes');
+    if (el) el.style.display = 'none';
+  }
+});
+
+function onFiltroChange() {
+  aplicarFiltros();
+  renderTudo();
+}
+
+function aplicarFiltros() {
+  const uf = document.getElementById('fUF').value;
+  const municipio = document.getElementById('fMunicipio').value;
+  const estrategia = document.getElementById('fEstrategia').value;
+  const status = document.getElementById('fStatus').value;
+  const tipo = document.getElementById('fTipo').value;
+  const ano = document.getElementById('fAno').value;
+
+  filtrados = represados.filter(d => {
+    if (uf && d.uf !== uf) return false;
+    if (municipio && d.municipio !== municipio) return false;
+    if (estrategia && d.estrategia !== estrategia) return false;
+    if (status && d.status !== status) return false;
+    if (tipo && d.request_type !== tipo) return false;
+    if (ano) {
+      const a = new Date(d.data_solicitacao || '2026-01-01').getFullYear();
+      if (a !== parseInt(ano)) return false;
+    }
+    return true;
+  });
+}
+
+function limparFiltros() {
+  ['fUF','fMunicipio','fEstrategia','fStatus','fTipo','fAno'].forEach(id => document.getElementById(id).value = '');
+  popularMunicipios();
+  popularEstrategias();
+  onFiltroChange();
+}
+
+function diasDesde(dataStr) {
+  if (!dataStr) return null;
+  const d = new Date(dataStr);
+  return Math.floor((new Date() - d) / 86400000);
+}
+
+function agruparPorEstrategia() {
+  const m = {};
+  filtrados.forEach(d => {
+    const k = d.estrategia || 'Desconhecida';
+    if (!m[k]) m[k] = { estrategia: k, solicitacoes: 0, quantidade: 0, municipios: new Set(), totalDias: 0, diasCount: 0 };
+    m[k].solicitacoes += 1;
+    m[k].quantidade += Number(d.quantidade) || 0;
+    if (d.municipio) m[k].municipios.add(d.municipio);
+    const dias = diasDesde(d.data_solicitacao);
+    if (dias !== null) { m[k].totalDias += dias; m[k].diasCount += 1; }
+  });
+  return Object.values(m).map(v => ({
+    estrategia: v.estrategia,
+    solicitacoes: v.solicitacoes,
+    quantidade: v.quantidade,
+    municipios: v.municipios.size,
+    tempoMedio: v.diasCount ? Math.round(v.totalDias / v.diasCount) : 0
+  }));
+}
+
+function agruparPorMunicipio() {
+  const m = {};
+  filtrados.forEach(d => {
+    const k = (d.municipio || 'Desconhecido') + '|' + (d.uf || '');
+    if (!m[k]) m[k] = { municipio: d.municipio || 'Desconhecido', uf: d.uf || '', quantidade: 0, estrategias: new Set(), totalDias: 0, diasCount: 0 };
+    m[k].quantidade += Number(d.quantidade) || 0;
+    if (d.estrategia) m[k].estrategias.add(d.estrategia);
+    const dias = diasDesde(d.data_solicitacao);
+    if (dias !== null) { m[k].totalDias += dias; m[k].diasCount += 1; }
+  });
+  return Object.values(m).map(v => ({
+    municipio: v.municipio,
+    uf: v.uf,
+    quantidade: v.quantidade,
+    estrategias: v.estrategias.size,
+    tempoMedio: v.diasCount ? Math.round(v.totalDias / v.diasCount) : 0
+  }));
+}
+
+function renderKPIs() {
+  const total = filtrados.length;
+  const totalQtd = filtrados.reduce((s, d) => s + (Number(d.quantidade) || 0), 0);
+  const municipiosUnicos = new Set(filtrados.map(d => d.municipio).filter(Boolean)).size;
+
+  const porEst = agruparPorEstrategia();
+  const topEst = porEst.sort((a, b) => b.quantidade - a.quantidade)[0];
+
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Total de solicitações</div>
+      <div class="kpi-valor">${total.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">represados em fila</div>
+      <div class="kpi-ico">📋</div>
+    </div>
+    <div class="kpi verde">
+      <div class="kpi-label">Quantidade acumulada</div>
+      <div class="kpi-valor">${totalQtd.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">equipes/serviços solicitados</div>
+      <div class="kpi-ico">👥</div>
+    </div>
+    <div class="kpi roxo">
+      <div class="kpi-label">Municípios envolvidos</div>
+      <div class="kpi-valor">${municipiosUnicos.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">com solicitação pendente</div>
+      <div class="kpi-ico">🏙️</div>
+    </div>
+    <div class="kpi amarelo">
+      <div class="kpi-label">Estratégia mais solicitada</div>
+      <div class="kpi-valor" style="font-size:18px;line-height:1.3;">${topEst ? topEst.estrategia : '—'}</div>
+      <div class="kpi-sub">${topEst ? topEst.quantidade.toLocaleString('pt-BR') + ' solicitações' : ''}</div>
+      <div class="kpi-ico">⭐</div>
+    </div>
+  `;
+}
+
+const CORES = ['#1351B4','#168821','#FFCD07','#E52207','#6c3fc5','#FF6B6B','#4ECDC4','#45B7D1','#FF8C42','#00D4AA','#FF1744','#00BCD4','#FF9800','#673AB7'];
+
+function renderChartEstrategia() {
+  const dados = agruparPorEstrategia().sort((a, b) => b.quantidade - a.quantidade);
+  const ctx = document.getElementById('chartEstrategia');
+  if (_chartEstrategia) _chartEstrategia.destroy();
+  _chartEstrategia = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: dados.map(d => d.estrategia),
+      datasets: [{ data: dados.map(d => d.quantidade), backgroundColor: dados.map((_, i) => CORES[i % CORES.length]), borderColor: '#fff', borderWidth: 2 }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true } }
+    }
+  });
+}
+
+function renderChartStatus() {
+  const porStatus = {};
+  filtrados.forEach(d => { const s = d.status || 'Desconhecido'; porStatus[s] = (porStatus[s] || 0) + 1; });
+  const labels = Object.keys(porStatus);
+  const ctx = document.getElementById('chartStatus');
+  if (_chartStatus) _chartStatus.destroy();
+  _chartStatus = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: Object.values(porStatus), backgroundColor: ['#FFCD07','#168821','#1351B4','#E52207'] }] },
+    options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom' } } }
+  });
+}
+
+function renderMapa() {
+  const porUF = {};
+  filtrados.forEach(d => { const uf = d.uf || 'Desconhecido'; porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0); });
+
+  if (_mapaInst) _mapaInst.remove();
+  _mapaInst = L.map('mapa', { center: [-14.5, -51.9], zoom: 4, zoomControl: true, attributionControl: false, scrollWheelZoom: false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', { maxZoom: 10 }).addTo(_mapaInst);
+
+  function corUF(uf) {
+    const v = porUF[uf] || 0;
+    const maxVal = Math.max(...Object.values(porUF), 1);
+    const p = v / maxVal;
+    if (p === 0) return '#f0f4ff';
+    if (p < 0.2) return '#dbeafe';
+    if (p < 0.4) return '#93c5fd';
+    if (p < 0.6) return '#3b82f6';
+    if (p < 0.8) return '#1351B4';
+    return '#1e3a8a';
+  }
+
+  fetch(GEOJSON_URL).then(r => r.json()).then(geo => {
+    L.geoJSON(geo, {
+      style: feat => ({ fillColor: corUF(feat.properties.sigla), weight: 1.5, color: '#fff', fillOpacity: 0.85 }),
+      onEachFeature: (feat, layer) => {
+        const uf = feat.properties.sigla;
+        layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} represados`);
+      }
+    }).addTo(_mapaInst);
+  }).catch(err => console.error('Erro ao carregar GeoJSON:', err));
+}
+
+function ordenarClique(tabelaId, config, renderFn) {
+  document.querySelectorAll(`#${tabelaId} thead th`).forEach(th => {
+    th.onclick = () => {
+      const k = th.dataset.k;
+      if (config.k === k) config.dir *= -1; else { config.k = k; config.dir = -1; }
+      renderFn();
+    };
+  });
+}
+
+function renderTabelaEstrategia() {
+  const busca = document.getElementById('buscaEstrategia').value.toLowerCase().trim();
+  let dados = agruparPorEstrategia();
+  if (busca) dados = dados.filter(d => d.estrategia.toLowerCase().includes(busca));
+  dados.sort((a, b) => (a[ordemEstrategia.k] > b[ordemEstrategia.k] ? 1 : -1) * ordemEstrategia.dir);
+
+  const maxQtd = Math.max(...dados.map(d => d.quantidade), 1);
+  const tbody = document.querySelector('#tabelaEstrategia tbody');
+  tbody.innerHTML = dados.length ? dados.map(d => `
+    <tr>
+      <td>${d.estrategia}</td>
+      <td class="num">${d.solicitacoes.toLocaleString('pt-BR')}</td>
+      <td class="num"><span class="barra-mini" style="width:${Math.max(6, (d.quantidade / maxQtd) * 60)}px;"></span>${d.quantidade.toLocaleString('pt-BR')}</td>
+      <td class="num">${d.municipios.toLocaleString('pt-BR')}</td>
+      <td class="num">${d.tempoMedio}</td>
+    </tr>
+  `).join('') : `<tr><td colspan="5" class="vazio">Nenhuma estratégia encontrada</td></tr>`;
+}
+
+function renderTabelaMunicipio() {
+  const busca = document.getElementById('buscaMunicipio').value.toLowerCase().trim();
+  let dados = agruparPorMunicipio();
+  if (busca) dados = dados.filter(d => d.municipio.toLowerCase().includes(busca));
+  dados.sort((a, b) => (a[ordemMunicipio.k] > b[ordemMunicipio.k] ? 1 : -1) * ordemMunicipio.dir);
+
+  const tbody = document.querySelector('#tabelaMunicipio tbody');
+  tbody.innerHTML = dados.length ? dados.map(d => `
+    <tr>
+      <td>${d.municipio}</td>
+      <td>${d.uf}</td>
+      <td class="num">${d.quantidade.toLocaleString('pt-BR')}</td>
+      <td class="num">${d.estrategias.toLocaleString('pt-BR')}</td>
+      <td class="num">${d.tempoMedio}</td>
+    </tr>
+  `).join('') : `<tr><td colspan="5" class="vazio">Nenhum município encontrado</td></tr>`;
+}
+
+function renderTudo() {
+  renderKPIs();
+  renderChartEstrategia();
+  renderChartStatus();
+  renderMapa();
+  renderTabelaEstrategia();
+  renderTabelaMunicipio();
+}
+
+ordenarClique('tabelaEstrategia', ordemEstrategia, renderTabelaEstrategia);
+ordenarClique('tabelaMunicipio', ordemMunicipio, renderTabelaMunicipio);
+</script>
+
+</body>
+</html>
