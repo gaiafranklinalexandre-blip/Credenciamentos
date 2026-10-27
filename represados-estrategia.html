@@ -111,6 +111,12 @@
   .sigla-caixa{border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;text-align:center;min-width:92px;background:#fff;}
   .sigla-nome{font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
   .sigla-valor{font-size:19px;font-weight:800;color:var(--blue);}
+  .sigla-comparativo{font-size:10.5px;color:var(--text-mid);margin-top:5px;border-top:1px solid #eef1f6;padding-top:5px;line-height:1.4;}
+  .sigla-comparativo b{color:var(--green);}
+
+  /* ── COMPARATIVO NACIONAL ───────────────────────── */
+  .comparativo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
+  .comparativo-nota{font-size:11.5px;color:var(--text-mid);margin-top:10px;}
 
   /* ── TABELA ─────────────────────────────────────── */
   .tabela-wrap{overflow-x:auto;}
@@ -260,6 +266,18 @@
       <!-- KPIs -->
       <div class="kpi-grid" id="kpiGrid"></div>
 
+      <!-- COMPARATIVO COM O QUE JÁ É PAGO (APS 360) -->
+      <div class="card">
+        <div class="card-head">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V9"/><path d="M13 17V5"/><path d="M18 17v-3"/></svg>
+          <div><div class="tt">Comparativo com o que já é pago</div><div class="sub">Totais nacionais do APS 360 — não variam com os filtros acima</div></div>
+        </div>
+        <div class="card-body">
+          <div class="comparativo-grid" id="comparativoGrid"></div>
+          <div class="comparativo-nota" id="comparativoNota"></div>
+        </div>
+      </div>
+
       <!-- ABA: VISÃO GERAL -->
       <div class="aba-painel ativo" id="aba-geral">
         <div class="card">
@@ -354,10 +372,12 @@
 
 <script>
 const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=represados_estrategia';
+const PAGOS_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=pagos_estrategia';
 const GEOJSON_URL = 'docs/brazil-states.geojson';
 
 let represados = [];
 let filtrados = [];
+let PAGOS = {};
 let municipiosDisponiveis = [];
 let _mapaInst = null;
 let _chartEstrategia = null, _chartStatus = null;
@@ -389,6 +409,19 @@ async function carregarDados() {
     const data = await resp.json();
     represados = Array.isArray(data) ? data : [];
     if (!represados.length) throw new Error('Nenhum represado retornado da API');
+
+    try {
+      const respPagos = await fetch(PAGOS_URL);
+      if (respPagos.ok) {
+        const dataPagos = await respPagos.json();
+        PAGOS = {};
+        (Array.isArray(dataPagos) ? dataPagos : []).forEach(p => {
+          PAGOS[p.estrategia] = Number(p.quantidade_paga) || 0;
+        });
+      }
+    } catch (e) {
+      console.warn('Comparativo com pagos (APS 360) indisponível:', e);
+    }
 
     popularFiltros();
     onFiltroChange();
@@ -698,6 +731,65 @@ function ordemDe(estrategia) {
   return i === -1 ? ORDEM_ESTRATEGIA.length : i;
 }
 
+const CONVERSAO_DESTINO = {
+  'eSF > eSFR': 'Saúde da Família Ribeirinha',
+  'eAP > eSF': 'Saúde da Família',
+  'eSB CHD > eSB 40h': 'Saúde Bucal - 40 Horas',
+  'Alteração de tipologia eAPP': 'Atenção Primária Prisional'
+};
+
+function totalNacionalPorEstrategia(estrategia) {
+  return represados
+    .filter(d => d.estrategia === estrategia)
+    .reduce((s, d) => s + (Number(d.quantidade) || 0), 0);
+}
+
+function renderComparativoNacional() {
+  const grid = document.getElementById('comparativoGrid');
+  const nota = document.getElementById('comparativoNota');
+  if (!grid) return;
+
+  const estrategiasComPago = Object.keys(PAGOS);
+  if (!estrategiasComPago.length) {
+    grid.innerHTML = '<div class="vazio">Comparativo com o APS 360 ainda não foi sincronizado.</div>';
+    nota.textContent = '';
+    return;
+  }
+
+  let totalPago = 0, totalRepresadoCorrespondente = 0;
+  estrategiasComPago.forEach(est => {
+    totalPago += PAGOS[est] || 0;
+    totalRepresadoCorrespondente += totalNacionalPorEstrategia(est);
+  });
+  const totalSeAprovado = totalPago + totalRepresadoCorrespondente;
+  const pctAumento = totalPago > 0 ? Math.round((totalRepresadoCorrespondente / totalPago) * 1000) / 10 : 0;
+
+  grid.innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Já credenciado (pago)</div>
+      <div class="kpi-valor">${totalPago.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">equipes/serviços cofinanciados hoje</div>
+    </div>
+    <div class="kpi amarelo">
+      <div class="kpi-label">Represado correspondente</div>
+      <div class="kpi-valor">${totalRepresadoCorrespondente.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">nas estratégias com comparativo</div>
+    </div>
+    <div class="kpi verde">
+      <div class="kpi-label">Seria se aprovado</div>
+      <div class="kpi-valor">${totalSeAprovado.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">pago + represado</div>
+    </div>
+    <div class="kpi roxo">
+      <div class="kpi-label">Aumento potencial</div>
+      <div class="kpi-valor">+${pctAumento.toLocaleString('pt-BR')}%</div>
+      <div class="kpi-sub">sobre o que já é pago</div>
+    </div>
+  `;
+
+  nota.textContent = 'Conversões de tipologia (eSF→eSFR, eAP→eSF, eSB CHD→eSB 40h, alteração de eAPP) e "Novo PAC Conectividade" não têm um "pago" comparável isolado — a projeção delas aparece nas caixas de Conversões, abaixo.';
+}
+
 function renderGradeSiglas() {
   const dados = agruparPorEstrategia();
   const el = document.getElementById('gradeSiglas');
@@ -725,12 +817,30 @@ function renderGradeSiglas() {
             <div class="sigla-caixa" title="${d.estrategia}">
               <div class="sigla-nome">${siglaDe(d.estrategia)}</div>
               <div class="sigla-valor">${d.quantidade.toLocaleString('pt-BR')}</div>
+              ${comparativoDaCaixa(d.estrategia)}
             </div>
           `).join('')}
         </div>
       </div>
     `;
   }).join('');
+}
+
+function comparativoDaCaixa(estrategia) {
+  if (CONVERSAO_DESTINO[estrategia]) {
+    const destino = CONVERSAO_DESTINO[estrategia];
+    const pagoDestino = PAGOS[destino];
+    if (pagoDestino === undefined) return '';
+    const representadoNacional = totalNacionalPorEstrategia(estrategia);
+    const novoTotal = pagoDestino + representadoNacional;
+    return `<div class="sigla-comparativo">${siglaDe(destino)}: ${pagoDestino.toLocaleString('pt-BR')} → <b>${novoTotal.toLocaleString('pt-BR')}</b></div>`;
+  }
+
+  const pagoAtual = PAGOS[estrategia];
+  if (pagoAtual === undefined) return '';
+  const representadoNacional = totalNacionalPorEstrategia(estrategia);
+  const pct = pagoAtual > 0 ? Math.round((representadoNacional / pagoAtual) * 100) : (representadoNacional > 0 ? 100 : 0);
+  return `<div class="sigla-comparativo">Hoje: ${pagoAtual.toLocaleString('pt-BR')} pagas <b>(+${pct}%)</b></div>`;
 }
 
 function renderChartEstrategia() {
@@ -846,6 +956,7 @@ function renderTabelaMunicipio() {
 
 function renderTudo() {
   renderKPIs();
+  renderComparativoNacional();
   renderGradeSiglas();
   renderChartEstrategia();
   renderChartStatus();
