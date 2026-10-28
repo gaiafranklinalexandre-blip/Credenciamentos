@@ -1021,7 +1021,8 @@ function renderKPIs() {
     const dias = diasDesde(d.data_solicitacao);
     if (dias !== null) { totalDias += dias; diasCount += 1; }
   });
-  const tempoMedio = diasCount ? Math.round(totalDias / diasCount) : 0;
+  const tempoMedioDias = diasCount ? totalDias / diasCount : 0;
+  const tempoMedioAnos = (tempoMedioDias / 365.25).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
   document.getElementById('kpiGrid').innerHTML = `
     <div class="kpi">
@@ -1036,8 +1037,8 @@ function renderKPIs() {
     </div>
     <div class="kpi">
       <div class="kpi-label">Tempo médio represado</div>
-      <div class="kpi-valor">${tempoMedio}</div>
-      <div class="kpi-sub">dias desde a solicitação</div>
+      <div class="kpi-valor">${tempoMedioAnos}</div>
+      <div class="kpi-sub">anos desde a solicitação</div>
     </div>
     <div class="kpi">
       <div class="kpi-label">Municípios</div>
