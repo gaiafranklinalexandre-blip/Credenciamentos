@@ -370,12 +370,7 @@
               </div>
               <div class="f-grupo">
                 <label class="f-label">Status</label>
-                <select id="fStatus" class="f-select" onchange="onFiltroChange()">
-                  <option value="">Todos</option>
-                  <option value="SOLICITADA">Solicitada</option>
-                  <option value="CREDENCIADA">Credenciada</option>
-                  <option value="PUBLICADO EM PORTARIA">Publicado em portaria</option>
-                </select>
+                <select id="fStatus" class="f-select" onchange="onFiltroChange()"><option value="">Todos</option></select>
               </div>
               <div class="f-grupo">
                 <label class="f-label">Tipo de solicitação</label>
@@ -772,6 +767,10 @@ function popularFiltros() {
   const ufs = [...new Set(represados.map(d => d.uf).filter(u => u && u !== 'Desconhecido'))].sort();
   const selUF = document.getElementById('fUF');
   selUF.innerHTML = '<option value="">Todos</option>' + ufs.map(u => `<option value="${u}">${u}</option>`).join('');
+
+  const statusDisponiveis = [...new Set(represados.map(d => d.status).filter(Boolean))].sort();
+  const selStatus = document.getElementById('fStatus');
+  selStatus.innerHTML = '<option value="">Todos</option>' + statusDisponiveis.map(s => `<option value="${s}">${s}</option>`).join('');
 
   popularEstrategias();
   popularMunicipios();
