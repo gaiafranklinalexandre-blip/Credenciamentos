@@ -640,9 +640,9 @@ function combinarDuplicatas(lista) {
   const porNumero = {};
 
   lista.forEach(d => {
-    // TIPO: cada linha sob o mesmo numero de solicitacao e uma conversao de
-    // equipe diferente (OBS traz a origem/destino distintos) - nao e duplicata.
-    if (d.request_type === 'TIPO') {
+    // TIPO e AMPL: cada linha sob o mesmo numero de solicitacao e um registro
+    // diferente (OBS traz origem/destino ou INE distintos) - nao e duplicata.
+    if (d.request_type === 'TIPO' || d.request_type === 'AMPL') {
       linhas.push(d);
       return;
     }
