@@ -185,12 +185,8 @@
   .busca-tabela{height:40px;padding:0 14px 0 36px;border:1px solid var(--border);border-radius:30px;font-size:13px;width:260px;max-width:100%;margin-bottom:14px;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7c93' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;}
 
   .chart-wrap{position:relative;}
-  #chartEstrategia{height:560px;}
   #chartStatus{height:280px;}
   #mapa,#mapaCombinacoes{height:380px;border-radius:10px;background:#eef2fb;}
-
-  .grid-2{display:grid;grid-template-columns:1.3fr .9fr;gap:18px;}
-  @media(max-width:950px){.grid-2{grid-template-columns:1fr;}}
 
   .loading{text-align:center;padding:40px;color:var(--text-mid);}
   .spinner{display:inline-block;width:28px;height:28px;border:4px solid var(--blue-bg);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;}
@@ -257,7 +253,6 @@
     #menuToggle{display:none;}
     .marca{padding:16px 16px;}
     .conteudo{padding:16px 14px 28px;}
-    #chartEstrategia{height:420px;}
     #mapa,#mapaCombinacoes{height:240px;}
   }
 </style>
@@ -458,14 +453,11 @@
 
         <div class="card">
           <div class="card-head">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M8 17V9"/><path d="M13 17V5"/><path d="M18 17v-3"/></svg>
-            <div><div class="tt">Represados por estratégia</div><div class="sub">Quantidade solicitada, do maior para o menor</div></div>
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            <div><div class="tt">Represados por status</div><div class="sub">Distribuição das solicitações pendentes por situação</div></div>
           </div>
           <div class="card-body">
-            <div class="grid-2">
-              <div class="chart-wrap"><canvas id="chartEstrategia"></canvas></div>
-              <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
-            </div>
+            <div class="chart-wrap" style="max-width:420px;margin:0 auto;"><canvas id="chartStatus"></canvas></div>
           </div>
         </div>
 
@@ -677,7 +669,7 @@ function combinarDuplicatas(lista) {
 }
 let municipiosDisponiveis = [];
 let _mapaInst = null;
-let _chartEstrategia = null, _chartStatus = null;
+let _chartStatus = null;
 let ordemEstrategia = { k: 'quantidade', dir: -1 };
 let ordemMunicipio  = { k: 'quantidade', dir: -1 };
 let ordemCombinacao = { k: 'municipios', dir: -1 };
@@ -1323,26 +1315,6 @@ function caixaEstrategia(d) {
   return `<div class="sigla-caixa" title="${d.estrategia}"><div class="sigla-nome">${siglaDe(d.estrategia)}</div>${corpo}</div>`;
 }
 
-function renderChartEstrategia() {
-  const dados = agruparPorEstrategia().sort((a, b) => b.quantidade - a.quantidade);
-  const ctx = document.getElementById('chartEstrategia');
-  if (_chartEstrategia) _chartEstrategia.destroy();
-  _chartEstrategia = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: dados.map(d => d.estrategia),
-      datasets: [{ data: dados.map(d => d.quantidade), backgroundColor: dados.map((_, i) => CORES[i % CORES.length]), borderColor: '#fff', borderWidth: 2 }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true } }
-    }
-  });
-}
-
 function renderChartStatus() {
   const porStatus = {};
   filtrados.forEach(d => { const s = d.status || 'Desconhecido'; porStatus[s] = (porStatus[s] || 0) + 1; });
@@ -1474,7 +1446,6 @@ function renderDuplicidades() {
 function renderTudo() {
   renderKPIs();
   renderGradeSiglas();
-  renderChartEstrategia();
   renderChartStatus();
   renderMapa();
   renderTabelaEstrategia();
