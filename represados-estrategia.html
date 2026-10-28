@@ -185,6 +185,7 @@
   .busca-tabela{height:40px;padding:0 14px 0 36px;border:1px solid var(--border);border-radius:30px;font-size:13px;width:260px;max-width:100%;margin-bottom:14px;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7c93' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;}
 
   .chart-wrap{position:relative;}
+  #chartTemporalWrap{height:280px;}
   #mapa,#mapaCombinacoes{height:380px;border-radius:10px;background:#eef2fb;}
 
   .loading{text-align:center;padding:40px;color:var(--text-mid);}
@@ -452,6 +453,14 @@
 
         <div class="card">
           <div class="card-head">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M4 16l5-6 4 3 6-8"/></svg>
+            <div><div class="tt">Solicitações ao longo do tempo</div><div class="sub">Novas solicitações por mês, pela data do pedido</div></div>
+          </div>
+          <div class="card-body"><div class="chart-wrap" id="chartTemporalWrap"><canvas id="chartTemporal"></canvas></div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16M15 5v16"/></svg>
             <div><div class="tt">Distribuição geográfica</div><div class="sub">Quantidade represada por estado</div></div>
           </div>
@@ -665,6 +674,7 @@ function combinarDuplicatas(lista) {
 }
 let municipiosDisponiveis = [];
 let _mapaInst = null;
+let _chartTemporal = null;
 let ordemEstrategia = { k: 'quantidade', dir: -1 };
 let ordemMunicipio  = { k: 'quantidade', dir: -1 };
 let ordemCombinacao = { k: 'municipios', dir: -1 };
@@ -1357,6 +1367,55 @@ function desenharPontos(mapaInst, lista, rotuloTooltip) {
   }
 }
 
+const MESES_ABREV = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+function renderChartTemporal() {
+  const canvas = document.getElementById('chartTemporal');
+  if (!canvas) return;
+
+  const porMes = {};
+  filtrados.forEach(d => {
+    if (!d.data_solicitacao) return;
+    const chave = d.data_solicitacao.substring(0, 7); // YYYY-MM
+    porMes[chave] = (porMes[chave] || 0) + 1;
+  });
+
+  const chaves = Object.keys(porMes).sort();
+  const labels = chaves.map(c => {
+    const [ano, mes] = c.split('-');
+    return `${MESES_ABREV[parseInt(mes, 10) - 1]}/${ano.slice(2)}`;
+  });
+  const valores = chaves.map(c => porMes[c]);
+
+  if (_chartTemporal) _chartTemporal.destroy();
+  _chartTemporal = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Solicitações',
+        data: valores,
+        borderColor: '#1351B4',
+        backgroundColor: 'rgba(19,81,180,0.08)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.3,
+        pointRadius: chaves.length > 24 ? 0 : 3,
+        pointBackgroundColor: '#1351B4'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#f0f0f5' } },
+        x: { grid: { display: false }, ticks: { maxRotation: 60, minRotation: 0, autoSkip: true, maxTicksLimit: 18 } }
+      }
+    }
+  });
+}
+
 function renderMapa() {
   const porMunicipio = {};
   filtrados.forEach(d => {
@@ -1455,6 +1514,7 @@ function renderDuplicidades() {
 function renderTudo() {
   renderKPIs();
   renderGradeSiglas();
+  renderChartTemporal();
   renderMapa();
   renderTabelaEstrategia();
   renderTabelaMunicipio();
