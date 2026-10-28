@@ -80,6 +80,8 @@ index.html (Render) ← fetch API em tempo real
 - Ao editar `index.html`, sempre fazer commit e push para `main` — o Render faz o deploy automaticamente.
 - Chart.js e Leaflet são carregados **sob demanda** (só quando o dashboard é aberto). Não mover para o `<head>`.
 - O CSS do Leaflet está no `<head>` via `<link>` — necessário para o mapa renderizar corretamente.
+- Atualização de portaria nova na `base_credenciamentos_2026.xlsx`: usar o agente `atualizar-base-credenciamento` (`.claude/agents/atualizar-base-credenciamento.md`). Arquivos de origem vão em `PORTARIAS/`. Ver `docs/gestao-dados.md` para o fluxo completo — inclui risco crítico de perda de fórmulas ao salvar via openpyxl e a obrigação de reconciliar contra a base atual antes de escrever.
+- **Nunca versionar `*.db`** (ex.: `banco_parcelas.db`) — o repositório publica automaticamente num site público no Render; bancos locais com dados internos de pagamento não podem ir para o GitHub. Protegido via `.gitignore`. Ver `docs/pagamentos-cgfap.md`.
 
 ---
 
@@ -168,3 +170,13 @@ O Power BI será descontinuado quando o site estiver totalmente validado pela SA
 |---|---|
 | [`docs/powerbi/contexto-powerbi.md`](docs/powerbi/contexto-powerbi.md) | Status, objetivo, relação com o site, critério de descontinuação |
 | [`docs/powerbi/medidas-dax.md`](docs/powerbi/medidas-dax.md) | Todas as medidas DAX criadas, regras e erros já ocorridos |
+
+### Consulta de pagamentos CGFAP (ferramenta independente)
+| Documento | Conteúdo |
+|---|---|
+| [`docs/pagamentos-cgfap.md`](docs/pagamentos-cgfap.md) | `indexar_parcela.py` — indexador SQLite dos relatórios de validação de pagamento (pasta `Parcela_XX_2026`), resiliente a mudança de nome de coluna/arquivo entre meses; limitações de valor conhecidas; valores de referência por IED |
+
+
+## Notas t?cnicas ? upload no Hostinger (21/10/2026)
+
+A API pr?pria de notas HTML foi testada com upload, leitura p?blica id?ntica e remo??o de teste. Para futuras publica??es, seguir [docs/hostinger-notas-tecnicas.md](docs/hostinger-notas-tecnicas.md). Usar HTTPS e chave exclusiva de notas; preservar `sync.php`, MySQL e documentos existentes. Acessos autorizados ficam somente em `docs/ACESSOS-HOSTINGER.local.md`, exclu?do do Git neste checkout. N?o confundir a valida??o da API com a instala??o de um automatizador local, que n?o foi feita.

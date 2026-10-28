@@ -1,0 +1,21 @@
+# Bancos de dados locais — nunca versionar (dados internos de pagamento/CNES,
+# este repo faz deploy automatico para site publico no Render).
+*.db
+*.db-journal
+
+# Bases de dados em Excel/CSV — nao versionar (ver CLAUDE.md).
+*.xlsx
+*.xls
+*.csv
+!docs/*.csv
+
+# Arquivos de bloqueio/lixo do Office e do Windows.
+~$*
+desktop.ini
+
+# Power BI.
+*.pbix
+
+# Cache Python.
+__pycache__/
+*.pyc
