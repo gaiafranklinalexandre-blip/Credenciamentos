@@ -185,7 +185,6 @@
   .busca-tabela{height:40px;padding:0 14px 0 36px;border:1px solid var(--border);border-radius:30px;font-size:13px;width:260px;max-width:100%;margin-bottom:14px;background:#f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7c93' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;}
 
   .chart-wrap{position:relative;}
-  #chartStatus{height:280px;}
   #mapa,#mapaCombinacoes{height:380px;border-radius:10px;background:#eef2fb;}
 
   .loading{text-align:center;padding:40px;color:var(--text-mid);}
@@ -453,16 +452,6 @@
 
         <div class="card">
           <div class="card-head">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-            <div><div class="tt">Represados por status</div><div class="sub">Distribuição das solicitações pendentes por situação</div></div>
-          </div>
-          <div class="card-body">
-            <div class="chart-wrap" style="max-width:420px;margin:0 auto;"><canvas id="chartStatus"></canvas></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16M15 5v16"/></svg>
             <div><div class="tt">Distribuição geográfica</div><div class="sub">Quantidade represada por estado</div></div>
           </div>
@@ -617,7 +606,8 @@
 const API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=represados_estrategia';
 const PAGOS_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=pagos_estrategia';
 const MUNICIPIOS_FILTRO_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php?action=municipios_filtro';
-const GEOJSON_URL = 'docs/brazil-states.geojson';
+const COORDENADAS_URL = 'docs/municipios-coordenadas.json';
+let MUNICIPIOS_COORDS = {};
 
 let represados = [];
 let filtrados = [];
@@ -636,15 +626,21 @@ const ESTRATEGIAS_EXCLUIDAS = new Set([
 // somando a quantidade em vez de descartar informacao. Isso evita contar a mesma
 // solicitacao mais de uma vez nos KPIs/graficos/combinacoes.
 function combinarDuplicatas(lista) {
+  const linhas = [];
+  const duplicatas = [];
   const porNumero = {};
+
   lista.forEach(d => {
+    // TIPO: cada linha sob o mesmo numero de solicitacao e uma conversao de
+    // equipe diferente (OBS traz a origem/destino distintos) - nao e duplicata.
+    if (d.request_type === 'TIPO') {
+      linhas.push(d);
+      return;
+    }
     const chave = d.nro_solicitacao || `__sem_numero_${d.id}`;
     if (!porNumero[chave]) porNumero[chave] = [];
     porNumero[chave].push(d);
   });
-
-  const linhas = [];
-  const duplicatas = [];
 
   Object.entries(porNumero).forEach(([numero, grupo]) => {
     if (grupo.length === 1) {
@@ -669,7 +665,6 @@ function combinarDuplicatas(lista) {
 }
 let municipiosDisponiveis = [];
 let _mapaInst = null;
-let _chartStatus = null;
 let ordemEstrategia = { k: 'quantidade', dir: -1 };
 let ordemMunicipio  = { k: 'quantidade', dir: -1 };
 let ordemCombinacao = { k: 'municipios', dir: -1 };
@@ -734,6 +729,13 @@ async function carregarDados() {
       }
     } catch (e) {
       console.warn('Filtros estratégicos (base_filtro) indisponíveis:', e);
+    }
+
+    try {
+      const respCoords = await fetch(COORDENADAS_URL);
+      if (respCoords.ok) MUNICIPIOS_COORDS = await respCoords.json();
+    } catch (e) {
+      console.warn('Coordenadas de municípios indisponíveis (mapa ficará sem pontos):', e);
     }
 
     popularFiltros();
@@ -1315,50 +1317,57 @@ function caixaEstrategia(d) {
   return `<div class="sigla-caixa" title="${d.estrategia}"><div class="sigla-nome">${siglaDe(d.estrategia)}</div>${corpo}</div>`;
 }
 
-function renderChartStatus() {
-  const porStatus = {};
-  filtrados.forEach(d => { const s = d.status || 'Desconhecido'; porStatus[s] = (porStatus[s] || 0) + 1; });
-  const labels = Object.keys(porStatus);
-  const ctx = document.getElementById('chartStatus');
-  if (_chartStatus) _chartStatus.destroy();
-  _chartStatus = new Chart(ctx, {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data: Object.values(porStatus), backgroundColor: ['#FFCD07','#168821','#1351B4','#E52207'] }] },
-    options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom' } } }
+// Raio/cor do marcador por intensidade relativa (escala quadratica para nao
+// deixar os maiores dominando visualmente o mapa).
+function escalaMarcador(valor, maxValor) {
+  const p = maxValor > 0 ? valor / maxValor : 0;
+  const raio = 4 + Math.sqrt(p) * 18;
+  let cor;
+  if (p < 0.05) cor = '#93c5fd';
+  else if (p < 0.2) cor = '#3b82f6';
+  else if (p < 0.5) cor = '#1351B4';
+  else cor = '#1e3a8a';
+  return { raio, cor };
+}
+
+function montarPontosPorMunicipio(lista) {
+  // lista: [{ ibge, municipio, uf, quantidade }]
+  const comCoordenadas = lista.filter(m => m.ibge && MUNICIPIOS_COORDS[String(m.ibge)]);
+  const maxValor = Math.max(...comCoordenadas.map(m => m.quantidade), 1);
+  return { pontos: comCoordenadas, maxValor };
+}
+
+function desenharPontos(mapaInst, lista, rotuloTooltip) {
+  const { pontos, maxValor } = montarPontosPorMunicipio(lista);
+  const marcadores = pontos.map(m => {
+    const [lat, lon] = MUNICIPIOS_COORDS[String(m.ibge)];
+    const { raio, cor } = escalaMarcador(m.quantidade, maxValor);
+    const marcador = L.circleMarker([lat, lon], {
+      radius: raio, color: '#fff', weight: 1, fillColor: cor, fillOpacity: 0.78
+    });
+    marcador.bindTooltip(`<strong>${m.municipio} — ${m.uf}</strong><br>${m.quantidade.toLocaleString('pt-BR')} ${rotuloTooltip}`);
+    return marcador;
   });
+
+  const grupo = L.featureGroup(marcadores).addTo(mapaInst);
+  mapaInst.invalidateSize();
+  if (marcadores.length) {
+    const bounds = grupo.getBounds();
+    if (bounds.isValid()) mapaInst.fitBounds(bounds, { padding: [14, 14] });
+  }
 }
 
 function renderMapa() {
-  const porUF = {};
-  filtrados.forEach(d => { const uf = d.uf || 'Desconhecido'; porUF[uf] = (porUF[uf] || 0) + (Number(d.quantidade) || 0); });
+  const porMunicipio = {};
+  filtrados.forEach(d => {
+    const key = d.ibge || d.municipio;
+    if (!porMunicipio[key]) porMunicipio[key] = { ibge: d.ibge, municipio: d.municipio, uf: d.uf, quantidade: 0 };
+    porMunicipio[key].quantidade += Number(d.quantidade) || 0;
+  });
 
   if (_mapaInst) _mapaInst.remove();
   _mapaInst = L.map('mapa', { center: [-14.5, -51.9], zoom: 4, zoomControl: true, attributionControl: false, scrollWheelZoom: false });
-
-  function corUF(uf) {
-    const v = porUF[uf] || 0;
-    const maxVal = Math.max(...Object.values(porUF), 1);
-    const p = v / maxVal;
-    if (p === 0) return '#f0f4ff';
-    if (p < 0.2) return '#dbeafe';
-    if (p < 0.4) return '#93c5fd';
-    if (p < 0.6) return '#3b82f6';
-    if (p < 0.8) return '#1351B4';
-    return '#1e3a8a';
-  }
-
-  fetch(GEOJSON_URL).then(r => r.json()).then(geo => {
-    const camada = L.geoJSON(geo, {
-      style: feat => ({ fillColor: corUF(feat.properties.sigla), weight: 1.5, color: '#fff', fillOpacity: 0.9 }),
-      onEachFeature: (feat, layer) => {
-        const uf = feat.properties.sigla;
-        layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} represados`);
-      }
-    }).addTo(_mapaInst);
-    _mapaInst.invalidateSize();
-    const bounds = camada.getBounds();
-    if (bounds.isValid()) _mapaInst.fitBounds(bounds, { padding: [10, 10] });
-  }).catch(err => console.error('Erro ao carregar GeoJSON:', err));
+  desenharPontos(_mapaInst, Object.values(porMunicipio), 'represados');
 }
 
 function ordenarClique(tabelaId, config, renderFn) {
@@ -1446,7 +1455,6 @@ function renderDuplicidades() {
 function renderTudo() {
   renderKPIs();
   renderGradeSiglas();
-  renderChartStatus();
   renderMapa();
   renderTabelaEstrategia();
   renderTabelaMunicipio();
@@ -1458,7 +1466,7 @@ function agruparCombinacoesPorMunicipio() {
   const porMunicipio = {};
   filtrados.forEach(d => {
     const key = (d.municipio || 'Desconhecido') + '|' + (d.uf || '');
-    if (!porMunicipio[key]) porMunicipio[key] = { municipio: d.municipio || 'Desconhecido', uf: d.uf || '', estrategias: new Set(), solicitacoes: 0, quantidade: 0 };
+    if (!porMunicipio[key]) porMunicipio[key] = { ibge: d.ibge, municipio: d.municipio || 'Desconhecido', uf: d.uf || '', estrategias: new Set(), solicitacoes: 0, quantidade: 0 };
     const est = estrategiaCanonica(d.estrategia);
     if (est) porMunicipio[key].estrategias.add(est);
     porMunicipio[key].solicitacoes += 1;
@@ -1470,11 +1478,12 @@ function agruparCombinacoesPorMunicipio() {
     if (m.estrategias.size < 2) return;
     const lista = [...m.estrategias].sort((a, b) => ordemDe(a) - ordemDe(b));
     const chave = lista.join(' + ');
-    if (!porCombo[chave]) porCombo[chave] = { chave, combinacao: lista, qtdEstrategias: lista.length, municipios: 0, solicitacoes: 0, quantidade: 0, porUF: {} };
+    if (!porCombo[chave]) porCombo[chave] = { chave, combinacao: lista, qtdEstrategias: lista.length, municipios: 0, solicitacoes: 0, quantidade: 0, porUF: {}, municipiosDetalhe: [] };
     porCombo[chave].municipios += 1;
     porCombo[chave].solicitacoes += m.solicitacoes;
     porCombo[chave].quantidade += m.quantidade;
     porCombo[chave].porUF[m.uf] = (porCombo[chave].porUF[m.uf] || 0) + 1;
+    porCombo[chave].municipiosDetalhe.push({ ibge: m.ibge, municipio: m.municipio, uf: m.uf, quantidade: m.quantidade });
   });
 
   return Object.values(porCombo);
@@ -1528,40 +1537,14 @@ function renderKPIsCombinacoes(combos) {
 }
 
 function renderMapaCombinacoes(combos) {
-  const porUF = {};
+  const municipios = [];
   combos.forEach(c => {
-    Object.entries(c.porUF).forEach(([uf, qtd]) => {
-      porUF[uf] = (porUF[uf] || 0) + qtd;
-    });
+    (c.municipiosDetalhe || []).forEach(m => municipios.push(m));
   });
 
   if (_mapaCombinacoesInst) _mapaCombinacoesInst.remove();
   _mapaCombinacoesInst = L.map('mapaCombinacoes', { center: [-14.5, -51.9], zoom: 4, zoomControl: true, attributionControl: false, scrollWheelZoom: false });
-
-  function corUF(uf) {
-    const v = porUF[uf] || 0;
-    const maxVal = Math.max(...Object.values(porUF), 1);
-    const p = v / maxVal;
-    if (p === 0) return '#f0f4ff';
-    if (p < 0.2) return '#dbeafe';
-    if (p < 0.4) return '#93c5fd';
-    if (p < 0.6) return '#3b82f6';
-    if (p < 0.8) return '#1351B4';
-    return '#1e3a8a';
-  }
-
-  fetch(GEOJSON_URL).then(r => r.json()).then(geo => {
-    const camada = L.geoJSON(geo, {
-      style: feat => ({ fillColor: corUF(feat.properties.sigla), weight: 1.5, color: '#fff', fillOpacity: 0.9 }),
-      onEachFeature: (feat, layer) => {
-        const uf = feat.properties.sigla;
-        layer.bindTooltip(`<strong>${uf}</strong><br>${(porUF[uf] || 0).toLocaleString('pt-BR')} municípios concomitantes`);
-      }
-    }).addTo(_mapaCombinacoesInst);
-    _mapaCombinacoesInst.invalidateSize();
-    const bounds = camada.getBounds();
-    if (bounds.isValid()) _mapaCombinacoesInst.fitBounds(bounds, { padding: [10, 10] });
-  }).catch(err => console.error('Erro ao carregar GeoJSON (combinações):', err));
+  desenharPontos(_mapaCombinacoesInst, municipios, 'quantidade (combinação)');
 }
 
 function popularChipsCombinacao() {
