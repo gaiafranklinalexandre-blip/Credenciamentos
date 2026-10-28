@@ -301,6 +301,10 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2ZM9 3v16M15 5v16"/></svg>
           <span>Por município</span>
         </button>
+        <button class="nav-btn" data-aba="duplicidades" onclick="trocarAba('duplicidades')">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2"/><rect x="4" y="9" width="12" height="12" rx="2"/></svg>
+          <span>Duplicidades</span>
+        </button>
       </nav>
 
       <div class="menu-titulo" style="margin-top:28px;">Tático</div>
@@ -529,6 +533,33 @@
         </div>
       </div>
 
+      <!-- ABA: DUPLICIDADES -->
+      <div class="aba-painel" id="aba-duplicidades">
+        <div class="card">
+          <div class="card-head">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2"/><rect x="4" y="9" width="12" height="12" rx="2"/></svg>
+            <div><div class="tt">Solicitações com o mesmo número</div><div class="sub">Linhas que compartilhavam o mesmo nº de solicitação foram combinadas automaticamente (quantidade somada) em todo o painel — esta lista é só para auditoria</div></div>
+          </div>
+          <div class="card-body">
+            <div class="kpi-grid" id="kpiDuplicidades"></div>
+            <div class="tabela-wrap">
+              <table class="tabela" id="tabelaDuplicidades">
+                <thead><tr>
+                  <th>Nº da solicitação</th>
+                  <th>Município</th>
+                  <th>UF</th>
+                  <th>Estratégia</th>
+                  <th class="num">Linhas combinadas</th>
+                  <th class="num">Quantidade total</th>
+                  <th>Observações</th>
+                </tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ABA: COMBINAÇÕES -->
       <div class="aba-painel" id="aba-combinacoes">
         <div class="card">
@@ -605,6 +636,50 @@ let represados = [];
 let filtrados = [];
 let PAGOS = {};
 let MUNICIPIOS_FILTRO = {};
+let DUPLICATAS_DETECTADAS = [];
+
+// Estrategias que nao devem entrar na base deste painel (pedido do usuario em 27/10/2026)
+const ESTRATEGIAS_EXCLUIDAS = new Set([
+  'Novo PAC Conectividade',
+  'UAPI - Unidade Amiga da Primeira Infância',
+  'UAPI'
+]);
+
+// Combina linhas que compartilham o mesmo numero de solicitacao (mesma "Nº Solicitação"),
+// somando a quantidade em vez de descartar informacao. Isso evita contar a mesma
+// solicitacao mais de uma vez nos KPIs/graficos/combinacoes.
+function combinarDuplicatas(lista) {
+  const porNumero = {};
+  lista.forEach(d => {
+    const chave = d.nro_solicitacao || `__sem_numero_${d.id}`;
+    if (!porNumero[chave]) porNumero[chave] = [];
+    porNumero[chave].push(d);
+  });
+
+  const linhas = [];
+  const duplicatas = [];
+
+  Object.entries(porNumero).forEach(([numero, grupo]) => {
+    if (grupo.length === 1) {
+      linhas.push(grupo[0]);
+      return;
+    }
+    const base = grupo[0];
+    const quantidadeTotal = grupo.reduce((s, d) => s + (Number(d.quantidade) || 0), 0);
+    linhas.push({ ...base, quantidade: quantidadeTotal });
+    duplicatas.push({
+      numero,
+      municipio: base.municipio,
+      uf: base.uf,
+      estrategia: base.estrategia,
+      linhas: grupo.length,
+      quantidadeTotal,
+      obs: grupo.map(d => d.obs).filter(Boolean)
+    });
+  });
+
+  return { linhas, duplicatas };
+}
 let municipiosDisponiveis = [];
 let _mapaInst = null;
 let _chartEstrategia = null, _chartStatus = null;
@@ -639,8 +714,14 @@ async function carregarDados() {
     document.getElementById('painel').style.display = 'block';
 
     const data = await resp.json();
-    represados = Array.isArray(data) ? data : [];
-    if (!represados.length) throw new Error('Nenhum represado retornado da API');
+    const bruto = Array.isArray(data) ? data : [];
+    if (!bruto.length) throw new Error('Nenhum represado retornado da API');
+
+    const semExcluidas = bruto.filter(d => !ESTRATEGIAS_EXCLUIDAS.has(d.estrategia));
+    const { linhas, duplicatas } = combinarDuplicatas(semExcluidas);
+    represados = linhas;
+    DUPLICATAS_DETECTADAS = duplicatas;
+    renderDuplicidades();
 
     try {
       const respPagos = await fetch(PAGOS_URL);
@@ -1354,6 +1435,41 @@ function renderTabelaMunicipio() {
       <td class="num">${d.tempoMedio}</td>
     </tr>
   `).join('') : `<tr><td colspan="5" class="vazio">Nenhum município encontrado</td></tr>`;
+}
+
+function renderDuplicidades() {
+  const kpiEl = document.getElementById('kpiDuplicidades');
+  const tbody = document.querySelector('#tabelaDuplicidades tbody');
+  if (!kpiEl || !tbody) return;
+
+  const totalLinhasExcedentes = DUPLICATAS_DETECTADAS.reduce((s, d) => s + (d.linhas - 1), 0);
+
+  kpiEl.innerHTML = `
+    <div class="kpi">
+      <div class="kpi-label">Números de solicitação duplicados</div>
+      <div class="kpi-valor">${DUPLICATAS_DETECTADAS.length.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">apareciam em mais de uma linha</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Linhas combinadas automaticamente</div>
+      <div class="kpi-valor">${totalLinhasExcedentes.toLocaleString('pt-BR')}</div>
+      <div class="kpi-sub">não contam mais em dobro nos KPIs</div>
+    </div>
+  `;
+
+  tbody.innerHTML = DUPLICATAS_DETECTADAS.length ? DUPLICATAS_DETECTADAS
+    .sort((a, b) => b.linhas - a.linhas)
+    .map(d => `
+      <tr>
+        <td>${d.numero}</td>
+        <td>${d.municipio}</td>
+        <td>${d.uf}</td>
+        <td>${d.estrategia}</td>
+        <td class="num">${d.linhas}</td>
+        <td class="num">${d.quantidadeTotal.toLocaleString('pt-BR')}</td>
+        <td>${d.obs.join(' | ')}</td>
+      </tr>
+    `).join('') : `<tr><td colspan="7" class="vazio">Nenhuma solicitação duplicada encontrada nesta carga</td></tr>`;
 }
 
 function renderTudo() {
