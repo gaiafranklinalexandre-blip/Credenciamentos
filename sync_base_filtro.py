@@ -30,11 +30,11 @@ def main():
 
     registros = []
     for linha in linhas:
-        ibge_7 = (linha.get("IBGE_7 DIGITOS") or "").strip()
-        if not ibge_7:
+        ibge = (linha.get("IBGE") or "").strip()
+        if not ibge:
             continue
         registros.append({
-            "ibge": int(ibge_7),
+            "ibge": int(ibge),
             "uf": (linha.get("UF") or "").strip(),
             "municipio": (linha.get("MUNICÍPIO") or "").strip(),
             "regiao": (linha.get("REGIAO") or "").strip(),
