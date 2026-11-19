@@ -22,7 +22,7 @@ Painel web público de monitoramento dos **Novos Credenciamentos da Atenção Pr
 | Deploy | Render (auto-deploy no push para `main`) |
 | Gráficos | Chart.js 4.4.3 (carregado sob demanda via CDN) |
 | Mapa | Leaflet 1.9.4 (carregado sob demanda via CDN) |
-| Tipografia | Raleway (Google Fonts) |
+| Tipografia | Rawline incorporada; tema gov.br DS 3.7.0 com marca SUS (ver `docs/design.md`) |
 
 ---
 

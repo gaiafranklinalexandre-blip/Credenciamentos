@@ -2,6 +2,8 @@
 
 Frontend nativo: **https://credenciamentos.onrender.com/**.
 
+**Design vigente (19/11/2026):** gov.br DS 3.7.0 com Rawline e Font Awesome incorporados, marca SUS no cabeçalho, cores e componentes oficiais sem os degradês anteriores. Tudo permanece no `index.html`; scripts de negócio preservados. Regeneração/procedência em `docs/design.md`. Suíte `tests/painel.cjs` e teste comum dos sites aprovados. Publicação desta revisão autorizada pelo usuário em 19/11/2026.
+
 Painel de consulta municipal, credenciamentos, homologações, portarias e dashboard, servido pelo Render a partir de `main`. A API PHP/MySQL permanece na Hostinger e não é alterada pela publicação do frontend.
 
 O endereço `painel-credenciamentos.onrender.com` pertence ao wrapper legado de Power BI, de outro repositório. Não usar esse wrapper para validar deploys deste projeto.

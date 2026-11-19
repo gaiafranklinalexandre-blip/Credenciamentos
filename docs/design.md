@@ -1,5 +1,13 @@
 # Design
 
+## Interface vigente — gov.br DS e SUS, 19/11/2026
+
+Tema oficial `@govbr-ds/core` 3.7.0 incorporado ao `index.html`, com Rawline 400/500/600/700 e Font Awesome Free 5.11.2 locais. Cabeçalho branco com SUS (40 px/24 px de altura), botões preenchidos/contornados/textuais, campos de 48 px, cartões de raio 4 px, foco visível e sombras discretas. A marca gov.br não é exibida. O bloco final `style#govbr-ds` adapta os seletores existentes; os estilos legados anteriores ficam subordinados a ele. As descrições de degradês, Segoe UI e raios 12 px abaixo são históricas e não representam o tema vigente.
+
+Fonte comum no checkout APS 360: `02_PAGINAS_ONLINE/design_referencia/govbr/`. Execute `sincronizar.py` nessa pasta, a partir do APS 360, para incorporar futuras alterações do tema; o frontend distribuído continua em um único HTML e não depende desse caminho em produção. Não mudou API, cálculos, sincronização ou planilhas. Todos os scripts do HTML foram comparados ao estado anterior e preservados byte a byte.
+
+Suíte funcional `tests/painel.cjs` aprovada, incluindo filtros, consultas salvas, histórico/WhatsApp, U/V, dia 15, CSV e seis larguras. O teste temporal fixa o relógio do navegador em 25/10/2026, cenário já pressuposto pelas expectativas antigas; produção usa a data corrente. A suíte comum do APS 360 também validou o frontend com a data corrente em sete larguras. Capturas ficaram fora do repositório, na pasta temporária. **Publicação desta revisão autorizada pelo usuário em 19/11/2026.**
+
 ## Panorama e estados independentes — 24/10/2026
 
 A navegação usa menu lateral (gaveta no celular), com Credenciamentos ativos como área padrão, além de Encerrados e Portarias; as homologações estão integradas, sem área própria. A busca inicial foi removida. O botão Filtros abre diálogo lateral com Região, UF, Município, Portaria, Estratégia. Aplicar confirma o rascunho; fechar descarta. Os filtros aplicados aparecem em chips removíveis. O detalhe municipal mostra o caminho Consolidado → Município / UF e o retorno explícito no cabeçalho fixo. Voltar restaura contexto/paginação; a troca de área preserva filtros. O histórico do navegador e o recarregamento preservam a consulta. O botão da linha do tempo se chama Explicar. Após Saldo, a tabela e o detalhe municipal exibem % de implantação (homologadas ÷ credenciadas × 100); no consolidado, usa-se a razão entre somas. Permanecem o consolidado por portaria/estratégia, apenas o KPI de ativos, conclusão abreviada e regras U/V. Referência vigente: [acompanhamento-integrado.md](acompanhamento-integrado.md). Teste: `tests/navegacao.cjs`. Esta revisão não altera backend ou bases. Descrições posteriores de cinco abas e dashboard são históricas.
