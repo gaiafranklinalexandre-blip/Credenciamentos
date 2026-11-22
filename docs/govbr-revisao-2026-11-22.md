@@ -11,3 +11,5 @@ Verificações: dez larguras × quatro abas, contraste e dicas; simulador com mo
 Limites: não há certificação WCAG, revisão integral com leitor de tela ou zoom real. Represados completo depende da restrição por IP existente; não contornar autenticação. Não alterar APIs ou sincronizar dados nesta entrega.
 
 Publicação dos frontends públicos autorizada pelo usuário nesta tarefa. Valores CNES permanece local/interno: banco, caches, planilhas e dados financeiros não acompanham o push. Mantidas parcela 10/2026, aptidão S, projeção de 12 parcelas e acumulado separados. Novas parcelas dependem de solicitação.
+
+Complemento solicitado: favicon SUS idêntico ao arquivo usado em Notas Técnicas, em `favicon.png`; referências atualizadas em `index.html`, `represados.html`, `represados-estrategia.html` e no protótipo local. Preservar esse recurso nas próximas publicações. O Modo Tático não teve seu CSS, HTML ou JavaScript alterado.

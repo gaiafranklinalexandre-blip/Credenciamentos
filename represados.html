@@ -137,6 +137,7 @@ body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 </style>
+<link rel="icon" type="image/png" href="favicon.png?v=20261122">
 </head>
 <body>
 <div class="template-base">
@@ -1083,8 +1084,9 @@ body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-
     const state = {source:select,host,id:`${select.id}-govbr`,label,description:select.getAttribute('aria-describedby') || '',nativeLabel};
     states.set(select,state);
     try { render(state); } catch (error) { host.remove(); states.delete(select); console.warn('Campo nativo preservado: componente select indisponível.',error); return; }
-    if (nativeLabel) nativeLabel.hidden = true;
+    if (nativeLabel) { nativeLabel.hidden = true; nativeLabel.style.setProperty('display','none','important'); }
     select.hidden = true;
+    select.style.setProperty('display','none','important');
     const proto = select.ownerDocument.defaultView.HTMLSelectElement.prototype;
     for (const property of ['value','selectedIndex']) {
       const descriptor = Object.getOwnPropertyDescriptor(proto,property);
