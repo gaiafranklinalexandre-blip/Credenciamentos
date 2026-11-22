@@ -128,7 +128,7 @@ html body input:focus:not(:focus-visible),html body select:focus:not(:focus-visi
   </div>
 </header>
 
-<main id="main" class="d-flex flex-fill">
+<main id="main" class="d-flex flex-fill"><h1 class="cred-sr">Credenciamentos da Atenção Primária à Saúde</h1>
 <div class="container-lg d-flex"><div class="row"><div class="col pb-5"><div id="main-content" class="main-content" tabindex="-1">
   <nav id="caminho" class="cred-caminho" aria-label="Caminho" hidden></nav>
   <div id="carregando" class="br-message info" role="status"><div class="icon"><i class="fas fa-info-circle fa-lg" aria-hidden="true"></i></div><div class="content"><span class="message-body">Carregando os credenciamentos…</span></div></div>
@@ -484,5 +484,160 @@ document.addEventListener('click',e=>{if(e.target.closest('#simLimpar')){S.sEstr
 }catch(e){console.error(e);$('#carregando').hidden=true;$('#erro').hidden=false}})();
 </script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@govbr-ds/core@3.7.0/dist/core.min.js"></script>
+<script data-aps-govbr-selects>
+/* APS 360 — adaptação progressiva de selects dinâmicos ao BRSelect 3.7.0.
+ * Fonte: gov.br DS /components/select (uso, código e acessibilidade, coleta 21/11/2026).
+ * O select original continua sendo a fonte dos valores, eventos e FormData.
+ * Sem Core, o campo nativo permanece disponível. Nenhuma option é removida.
+ */
+(() => {
+  'use strict';
+  if (window.apsGovbrSelects) return;
+  const states = new WeakMap();
+  const roots = new WeakMap();
+  let nextId = 0;
+  let readySent = false;
+  const text = value => String(value ?? '');
+  const escape = value => text(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const normalize = value => text(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
+  const coreReady = () => !!window.core?.BRSelect;
+  const rules = '.aps-govbr-select{width:100%;max-width:100%;min-width:0}.aps-govbr-select .br-input{margin:0}.aps-govbr-select .br-input>input{font-size:var(--font-size-base,16px);min-width:0;text-overflow:ellipsis}.aps-govbr-select .br-list{max-height:320px;overflow-y:auto;z-index:var(--z-index-layer-3,300)}.aps-govbr-select .br-list .br-item{white-space:normal}.aps-govbr-select .br-radio label{font-weight:var(--font-weight-regular,400);overflow-wrap:anywhere}.aps-govbr-select-status{font-size:var(--font-size-scale-down-01,14px);color:var(--gray-60,#555);margin-top:var(--spacing-scale-half,4px)}';
+  function installStyle(root) {
+    const target = root.nodeType === 9 ? root.head : root;
+    if (!target || root.querySelector?.('style[data-aps-select-style]')) return;
+    const style = document.createElement('style');
+    style.dataset.apsSelectStyle = '';
+    style.textContent = rules;
+    target.append(style);
+  }
+  function queue(state) {
+    if (state.queued || state.building) return;
+    state.queued = true;
+    queueMicrotask(() => { state.queued = false; if (state.source.isConnected) render(state); });
+  }
+  function render(state, search = null, reopen = false) {
+    if (state.building) return;
+    const select = state.source;
+    const previous = state.host.querySelector('input[type=text]');
+    const focused = previous && (select.getRootNode().activeElement === previous || document.activeElement === previous);
+    const caret = focused ? previous.selectionStart : null;
+    const query = search === null ? '' : search;
+    const all = [...select.options].map((option, index) => ({option, index, label:option.label || option.textContent || '', key:normalize(option.label || option.textContent)}));
+    const usable = all.filter(o => !o.option.disabled && !o.option.hidden && !o.option.closest('optgroup[disabled]'));
+    const matches = query ? usable.filter(o => o.key.includes(normalize(query))) : usable;
+    const virtual = all.length > 200;
+    const displayed = virtual ? matches.slice(0, 60) : usable;
+    const selected = all.find(o => o.option.selected);
+    if (!query && selected && !selected.option.disabled && !displayed.includes(selected)) displayed.unshift(selected);
+    state.building = true;
+    // Cada instância mantém sua própria lista. Descartar seus listeners
+    // externos antes de reconstruir evita referências a opções antigas.
+    for (const entry of state.externalListeners || []) entry.target.removeEventListener(entry.type,entry.listener,entry.options);
+    state.externalListeners = [];
+    if (state.component) {
+      const previousHost = state.host;
+      if (state.onChange) previousHost.removeEventListener('onChange',state.onChange);
+      state.host = previousHost.cloneNode(false);
+      previousHost.replaceWith(state.host);
+    }
+    state.host.innerHTML = `<div class="br-input"><label for="${state.id}">${escape(state.label)}</label><input id="${state.id}" type="text" autocomplete="off" placeholder="Selecione"${select.disabled?' disabled':''}${state.description?` aria-describedby="${escape(state.description)}"`:''}/><button class="br-button" type="button" aria-label="Exibir lista: ${escape(state.label)}" tabindex="-1" data-trigger="data-trigger"${select.disabled?' disabled':''}><i class="fas fa-angle-down" aria-hidden="true"></i></button></div><div class="br-list" tabindex="0">${displayed.map(({option,index,label})=>`<div class="br-item${option.selected?' selected':''}" tabindex="-1"><div class="br-radio"><input id="${state.id}-o${index}" type="radio" name="${state.id}-options" form="${state.id}-internal-form" value="${escape(option.value)}"${option.selected?' checked':''}/><label for="${state.id}-o${index}">${escape(label)}</label></div></div>`).join('')}</div>${virtual?`<div class="aps-govbr-select-status" id="${state.id}-status" role="status">${matches.length>60?`Exibindo ${displayed.length} de ${matches.length} opções. Digite para refinar a busca.`:matches.length?`${matches.length} opções encontradas.`:'Nenhuma opção encontrada.'}</div>`:''}`;
+    const input = state.host.querySelector('input[type=text]');
+    if (virtual) input.setAttribute('aria-describedby', [state.description,`${state.id}-status`].filter(Boolean).join(' '));
+    // BRSelect 3.7.0 não oferece destroy público. Registrar apenas os
+    // listeners de document criados na construção síncrona desta instância
+    // permite removê-los na próxima reconstrução, usando a API DOM padrão.
+    const doc = select.ownerDocument;
+    const ownAdd = Object.getOwnPropertyDescriptor(doc,'addEventListener');
+    const add = doc.addEventListener;
+    Object.defineProperty(doc,'addEventListener',{configurable:true,writable:true,value:function(type,listener,options){state.externalListeners.push({target:this,type,listener,options});return add.call(this,type,listener,options)}});
+    try { state.component = new core.BRSelect('br-select', state.host); }
+    finally { if (ownAdd) Object.defineProperty(doc,'addEventListener',ownAdd); else delete doc.addEventListener; }
+    input.value = search === null ? selected?.label || '' : search;
+    state.host.onchange = null;
+    if (state.onChange) state.host.removeEventListener('onChange', state.onChange);
+    state.onChange = () => {
+      const checked = state.host.querySelector('input[type=radio]:checked');
+      if (!checked || select.disabled || select.value === checked.value) return;
+      state.committing = true;
+      select.value = checked.value;
+      state.committing = false;
+      select.dispatchEvent(new Event('change', {bubbles:true}));
+      queue(state);
+    };
+    state.host.addEventListener('onChange', state.onChange);
+    input.addEventListener('focus', () => { if (!state.searching) input.select(); });
+    if (virtual) {
+      input.addEventListener('input', () => { state.searching = true; render(state, input.value, true); state.searching = false; });
+      // O catálogo completo já foi filtrado com normalização de acentos.
+      // Não aplicar em seguida o filtro textual do Core ao recorte virtual.
+      input.addEventListener('keyup', event => { if (!['ArrowUp','ArrowDown','Enter',' ','Escape','Tab'].includes(event.key)) event.stopImmediatePropagation(); }, true);
+    }
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && virtual) { queue(state); }
+    });
+    state.building = false;
+    if (reopen) {
+      input.focus({preventScroll:true});
+      state.host.querySelector('[data-trigger]').click();
+      input.value = query;
+      if (caret !== null) input.setSelectionRange(Math.min(caret,query.length), Math.min(caret,query.length));
+    } else if (focused) input.focus({preventScroll:true});
+  }
+  function enhanceSelect(select) {
+    if (!coreReady() || states.has(select) || select.multiple || select.hidden || select.hasAttribute('data-aps-select-exclude') || select.closest('#modoApresentacao,.apresentacao,[data-aps-select-exclude]')) return;
+    if (!select.id) select.id = `aps-native-select-${++nextId}`;
+    const root = select.getRootNode();
+    installStyle(root);
+    const nativeLabel = [...root.querySelectorAll('label[for]')].find(label => label.htmlFor === select.id);
+    const wrappedLabel = select.closest('label')?.cloneNode(true);
+    wrappedLabel?.querySelectorAll('select').forEach(node => node.remove());
+    const label = nativeLabel?.textContent.trim() || wrappedLabel?.textContent.trim() || select.getAttribute('aria-label') || select.title || 'Selecione uma opção';
+    const host = document.createElement('div');
+    host.className = 'br-select aps-govbr-select';
+    host.dataset.apsSelectAdapter = select.id;
+    select.after(host);
+    const state = {source:select,host,id:`${select.id}-govbr`,label,description:select.getAttribute('aria-describedby') || '',nativeLabel};
+    states.set(select,state);
+    try { render(state); } catch (error) { host.remove(); states.delete(select); console.warn('Campo nativo preservado: componente select indisponível.',error); return; }
+    if (nativeLabel) nativeLabel.hidden = true;
+    select.hidden = true;
+    const proto = select.ownerDocument.defaultView.HTMLSelectElement.prototype;
+    for (const property of ['value','selectedIndex']) {
+      const descriptor = Object.getOwnPropertyDescriptor(proto,property);
+      if (!descriptor?.get || !descriptor?.set) continue;
+      Object.defineProperty(select,property,{configurable:true,get(){return descriptor.get.call(this)},set(value){descriptor.set.call(this,value);if(!state.committing)queue(state)}});
+    }
+    select.addEventListener('change',()=>queue(state));
+    new MutationObserver(()=>queue(state)).observe(select,{subtree:true,childList:true,attributes:true,attributeFilter:['disabled','selected','value','label','hidden']});
+  }
+  function enhance(root = document) {
+    if (!coreReady()) return false;
+    if (root.matches?.('select')) enhanceSelect(root);
+    root.querySelectorAll?.('select').forEach(enhanceSelect);
+    if (!roots.has(root)) {
+      const observer = new MutationObserver(changes => {
+        for (const change of changes) for (const node of change.addedNodes) {
+          if (node.nodeType === 1 && !node.closest?.('[data-aps-select-adapter]')) {
+            if (node.matches?.('select')) enhanceSelect(node);
+            node.querySelectorAll?.('select').forEach(enhanceSelect);
+          }
+        }
+      });
+      observer.observe(root,{subtree:true,childList:true});roots.set(root,observer);
+    }
+    return true;
+  }
+  window.apsGovbrSelects = Object.freeze({enhance,version:'3.7.0',getSource:id=>document.getElementById(id)});
+  function ready() {
+    if (!enhance(document)) return;
+    if (!readySent) {readySent=true;document.dispatchEvent(new CustomEvent('aps-govbr-selects-ready'));}
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',ready,{once:true});
+  else ready();
+  window.addEventListener('load',ready,{once:true});
+  document.querySelectorAll('script[src*="core"]').forEach(script=>script.addEventListener('load',ready,{once:true}));
+})();
+
+</script>
 </body>
 </html>

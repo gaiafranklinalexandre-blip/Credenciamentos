@@ -1,0 +1,46 @@
+[
+  {
+    "main": {
+      "selects": 6,
+      "sourceHidden": true,
+      "options": 28,
+      "core": true
+    }
+  },
+  {
+    "uf": "SP confirmado via BRSelect e URL"
+  },
+  {
+    "form": {
+      "entries": [
+        "parcela",
+        "uf",
+        "ibge",
+        "cnes",
+        "estrategia"
+      ],
+      "count": 5572,
+      "radios": 60
+    }
+  },
+  {
+    "catalogo": "busca integral com 5571 municipios e renderizacao virtual"
+  },
+  {
+    "modal": "abertura, composicao e Escape conferidos"
+  },
+  {
+    "larguras": [
+      320,
+      390,
+      768,
+      1024,
+      1280,
+      1440,
+      1920
+    ]
+  },
+  {
+    "errors": []
+  }
+]

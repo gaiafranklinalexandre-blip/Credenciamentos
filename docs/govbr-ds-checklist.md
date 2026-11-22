@@ -464,3 +464,7 @@ Verificado: seleção por mouse e por teclado (digitar para filtrar, setas e Ent
 Desvios conscientes: os filtros usam `<select>` nativo com o estilo de campo do DS (como no painel principal), porque as listas são preenchidas por script; o filtro de município continua um campo com lista própria (combobox); a ordenação das tabelas continua por clique no cabeçalho, sem acionamento por teclado [Pendente]; a cor vermelha do indicador "Represados Críticos" é semântica. Marca d'água "API KEY REQUIRED" no mapa vem do provedor dos tiles e já existia antes.
 
 Verificado (Playwright/Edge, dados reais da API): sem rolagem horizontal da página de 320 a 1440 px, 1 único `h1`, abas e troca de visão, abertura e uso do diálogo de filtros, chips de filtro, Modo Tático abre, contraste sem falhas, sem erros de script. Não verificado: leitor de tela e zoom real.
+
+## 15. Revisão de 22/11/2026
+
+Ver [registro da revisão](govbr-revisao-2026-11-22.md). BRSelect nos filtros gerais, aprimoramento progressivo, catálogo integral e FormData preservados. Simulador permanece com componentes próprios. Modo Tático preservado por hash de CSS/HTML/JS. Valores CNES continua interno/local; não enviar banco ou dados. O teste vigente do simulador agora restringe a contagem ao conteúdo da aba, pois há seis selects também nos filtros gerais.
