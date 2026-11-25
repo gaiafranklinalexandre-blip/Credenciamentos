@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Credenciamentos da APS</title>
-<!-- Protótipo local (não publicado). Design System gov.br 3.7.0, sem a logo gov.br. -->
+<!-- Painel em produção (credenciamentos.onrender.com). Design System gov.br 3.7.0, marca SUS, sem a logo gov.br. -->
 <link rel="icon" type="image/png" href="favicon.png?v=20261122">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/rawline">
@@ -23,91 +23,95 @@ html body input:focus:not(:focus-visible),html body select:focus:not(:focus-visi
 .br-header .header-logo img{height:40px;width:auto}
 .cred-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .cred-secao{margin-top:24px}
-.cred-titulo{font-size:var(--font-size-scale-up-02,20px);margin:0 0 12px}
-.cred-card{background:#fff;border:1px solid var(--gray-20,#ccc);border-radius:8px;padding:16px 20px;box-shadow:0 1px 6px rgba(0,0,0,.16)}
-.cred-peq{font-size:var(--font-size-scale-down-01,11.67px);color:var(--gray-60,#636363)}
+.cred-titulo{font-size:var(--font-size-scale-up-02,20.16px);margin:0 0 var(--spacing-scale-baseh,12px)}
+/* superfície de card (camada 1): tokens de superfície e elevação do DS */
+.cred-card{background:var(--pure-0,#fff);border:1px solid var(--gray-20,#ccc);border-radius:var(--surface-rounder-md,8px);padding:var(--spacing-scale-2x,16px) var(--spacing-scale-3x,24px);box-shadow:var(--surface-shadow-sm,0 1px 6px rgba(0,0,0,.16))}
+.cred-peq{font-size:var(--font-size-scale-down-01,11.66px);color:var(--gray-60,#636363)}
 /* destaque único */
-.cred-kpi{display:flex;flex-wrap:wrap;align-items:center;gap:16px 32px;border-left:6px solid var(--gray-40,#888)}
+.cred-kpi{display:flex;flex-wrap:wrap;align-items:center;gap:var(--spacing-scale-2x,16px) var(--spacing-scale-4x,32px);border-left:var(--surface-width-lg,4px) solid var(--gray-40,#888)}
 .cred-kpi .num{font-size:var(--font-size-scale-up-07,50.16px);line-height:1;font-weight:700;color:var(--gray-80,#333)}
-.cred-kpi .rot{font-size:var(--font-size-scale-up-02,20px);margin:0}
-.cred-kpi p{margin:4px 0 0}
+.cred-kpi .rot{font-size:var(--font-size-scale-up-02,20.16px);margin:0}
+.cred-kpi p{margin:var(--spacing-scale-half,4px) 0 0}
 /* consulta */
-.cred-consulta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 16px;align-items:start}
-.cred-campo{display:flex;flex-direction:column;gap:4px;position:relative}
+.cred-consulta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--spacing-scale-2x,16px);align-items:start}
+.cred-campo{display:flex;flex-direction:column;gap:var(--spacing-scale-half,4px);position:relative}
 .cred-campo label{font-weight:600}
-.cred-campo input,.cred-campo select{height:40px;border:1px solid var(--gray-40,#888);border-radius:4px;padding:0 12px;font:inherit;background:#fff;color:inherit;width:100%;box-sizing:border-box}
-.cred-sugestoes{position:absolute;top:100%;left:0;right:0;z-index:20;background:#fff;border:1px solid var(--gray-40,#888);border-radius:4px;box-shadow:0 1px 6px rgba(0,0,0,.16);margin:2px 0 0;padding:4px 0;list-style:none;max-height:280px;overflow:auto}
-.cred-sugestoes li{padding:10px 12px;cursor:pointer;min-height:40px;box-sizing:border-box}
+/* só o campo nativo direto (município e plano B sem Core); não atinge o BRSelect inserido pelo adaptador */
+.cred-campo>input,.cred-campo>select{height:40px;border:1px solid var(--gray-40,#888);border-radius:var(--surface-rounder-sm,4px);padding:0 var(--spacing-scale-2x,16px);font:inherit;background:var(--pure-0,#fff);color:inherit;width:100%;box-sizing:border-box}
+.cred-sugestoes{position:absolute;top:100%;left:0;right:0;z-index:var(--z-index-layer-2,2000);background:var(--pure-0,#fff);border:1px solid var(--gray-40,#888);border-radius:var(--surface-rounder-sm,4px);box-shadow:var(--surface-shadow-md,0 3px 6px rgba(0,0,0,.16));margin:var(--spacing-scale-half,4px) 0 0;padding:var(--spacing-scale-half,4px) 0;list-style:none;max-height:280px;overflow:auto}
+.cred-sugestoes li{padding:var(--spacing-scale-base,8px) var(--spacing-scale-2x,16px);cursor:pointer;min-height:40px;box-sizing:border-box}
 .cred-sugestoes li:hover{background:var(--gray-5,#f0f0f0)}
 .cred-sugestoes li[aria-selected=true]{background:var(--blue-warm-vivid-10,#d4e5ff);font-weight:600}
-.cred-sugestoes mark{background:var(--yellow-vivid-5,#fff5c2);color:var(--gray-80,#333)}
-.cred-acoes{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;align-items:center}
-.cred-mais{margin-top:12px}
-/* tabela */
-.cred-tabela{position:relative;overflow-x:auto;background:#fff;border:1px solid var(--gray-20,#ccc);border-radius:8px}
+/* marca-texto do DS (Tipografia): texto gray-80 sobre red-warm-vivid-10 */
+.cred-sugestoes mark{background:var(--red-warm-vivid-10,#fce1d4);color:var(--gray-80,#333)}
+.cred-acoes{display:flex;flex-wrap:wrap;gap:var(--spacing-scale-base,8px);margin-top:var(--spacing-scale-2x,16px);align-items:center}
+.cred-mais{margin-top:var(--spacing-scale-2x,16px)}
+/* tabela: .br-table (título na top-bar, caption para leitor de tela) + região com rolagem interna */
+.cred-tab{background:var(--pure-0,#fff);border:1px solid var(--gray-20,#ccc);border-radius:var(--surface-rounder-md,8px)}
+.cred-tab .table-header .top-bar{padding-left:var(--spacing-scale-2x,16px)}
+.cred-tabela{position:relative;overflow-x:auto;border-top:1px solid var(--gray-20,#ccc)}
 .cred-tabela table{width:100%;border-collapse:collapse;min-width:760px}
-.cred-tabela caption{text-align:left;padding:12px 16px;font-weight:600}
-.cred-tabela thead th{background:var(--blue-warm-vivid-10,#d4e5ff);text-align:left;padding:10px 12px;font-size:var(--font-size-scale-base,14px);vertical-align:bottom}
-.cred-tabela td,.cred-tabela tbody th{padding:10px 12px;border-top:1px solid var(--gray-10,#e6e6e6);vertical-align:top}
+.cred-tabela thead th{background:var(--blue-warm-vivid-10,#d4e5ff);text-align:left;padding:var(--spacing-scale-base,8px) var(--spacing-scale-2x,16px);font-size:var(--font-size-scale-base,14px);vertical-align:bottom}
+.cred-tabela td,.cred-tabela tbody th{padding:var(--spacing-scale-base,8px) var(--spacing-scale-2x,16px);border-top:1px solid var(--gray-10,#e6e6e6);vertical-align:top}
 .cred-tabela tbody th{text-align:left;font-weight:400;background:transparent}
 .cred-tabela td.num,.cred-tabela th.num{text-align:right;white-space:nowrap}
-.cred-tabela tbody tr:hover>*{background:var(--gray-2,#f8f8f8)}
-.cred-linha-tit{display:flex;gap:8px;align-items:flex-start}
+.cred-linha-tit{display:flex;gap:var(--spacing-scale-base,8px);align-items:flex-start}
 .cred-portaria{font-weight:700;font-size:var(--font-size-scale-up-01,16.8px)}
 .cred-estrategia{font-weight:700}
-.cred-expande{flex:0 0 auto;min-height:40px}
+.cred-expande{flex:0 0 auto}
 .cred-detalhe td{background:var(--gray-2,#f8f8f8)}
-.cred-rot{font-size:var(--font-size-scale-down-01,12.6px);text-transform:uppercase;letter-spacing:.04em;color:var(--gray-60,#555)}
-.cred-detalhe p{margin:6px 0}
-/* tags e farol: cor + ícone + texto */
-.cred-dica{border-bottom:1px dotted currentColor;cursor:help}.cred-tag[data-tip]{cursor:help}#dica{position:fixed;z-index:1000;max-width:280px;background:var(--gray-80,#333);color:#fff;font-size:var(--font-size-scale-down-01,12.6px);line-height:1.4;padding:8px 10px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.3)}#dica::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}.cred-tag{display:inline-flex;align-items:center;gap:6px;border-radius:100px;padding:3px 12px;font-size:var(--font-size-scale-base,14px);font-weight:700;border:1px solid;background:#fff;line-height:1.3}
-.cred-tag.verde{background:var(--green-cool-vivid-5,#e3f5e1);border-color:var(--green-cool-vivid-50,#168821)}.cred-tag.verde i{color:var(--green-cool-vivid-50,#168821)}
-.cred-tag.amarelo{background:var(--yellow-vivid-5,#fff5c2);border-color:var(--yellow-vivid-20,#ffcd07)}.cred-tag.amarelo i{color:var(--yellow-vivid-60,#946c00)}
-.cred-tag.vermelho{background:var(--red-vivid-10,#fde0db);border-color:var(--red-vivid-50,#e52207)}.cred-tag.vermelho i{color:var(--red-vivid-50,#e52207)}
-.cred-tag.azul{background:var(--blue-warm-vivid-10,#d4e5ff);border-color:var(--blue-warm-vivid-60,#155bcb)}.cred-tag.azul i{color:var(--blue-warm-vivid-60,#155bcb)}
-.cred-tag.cinza{background:var(--gray-5,#f0f0f0);border-color:var(--gray-40,#888)}.cred-tag.cinza i{color:var(--gray-60,#636363)}
-.cred-legenda{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 0}
-.cred-homol{display:block;margin-top:6px}
+.cred-rot{font-size:var(--font-size-scale-down-01,11.66px);text-transform:uppercase;letter-spacing:.04em;color:var(--gray-60,#555)}
+.cred-detalhe p{margin:var(--spacing-scale-half,4px) 0}
+/* dica própria (camada 4) e etiquetas br-tag do farol: cor + ícone + texto */
+.cred-dica{border-bottom:1px dotted currentColor;cursor:help}.br-tag[data-tip]{cursor:help}#dica{position:fixed;z-index:var(--z-index-layer-4,4000);max-width:280px;background:var(--gray-80,#333);color:var(--pure-0,#fff);font-size:var(--font-size-scale-down-01,11.66px);line-height:1.4;padding:var(--spacing-scale-base,8px);border-radius:var(--surface-rounder-sm,4px);box-shadow:var(--surface-shadow-xl,0 9px 6px rgba(0,0,0,.16))}#dica::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
+.br-tag.cred-st{margin:0;gap:var(--spacing-scale-half,4px);font-weight:var(--font-weight-semi-bold,600);text-align:left;line-height:var(--font-line-height-low,1.15);padding-top:var(--spacing-scale-half,4px);padding-bottom:var(--spacing-scale-half,4px)}
+.br-tag.cred-chip{margin:0;gap:var(--spacing-scale-half,4px);padding-right:var(--spacing-scale-half,4px)}
+.br-tag.cred-chip .br-button{--button-size:var(--spacing-scale-3x,24px)}
+.cred-legenda{display:flex;flex-wrap:wrap;gap:var(--spacing-scale-base,8px) var(--spacing-scale-2x,16px);margin:var(--spacing-scale-base,8px) 0 0}
+.cred-homol{display:block;margin-top:var(--spacing-scale-half,4px)}
 .cred-pct{display:block;font-size:var(--font-size-scale-base,14px);color:var(--gray-60,#636363)}
-.cred-vazio{margin-top:16px}
-.cred-caminho{font-size:var(--font-size-scale-base,14px);margin:0 0 12px}
-.cred-resumo p{margin:6px 0}
+.cred-bloco{display:block}
+.cred-vazio{margin-top:var(--spacing-scale-2x,16px)}
+.cred-caminho{display:flex;flex-wrap:wrap;align-items:center;gap:var(--spacing-scale-half,4px);font-size:var(--font-size-scale-base,14px);margin:0 0 var(--spacing-scale-baseh,12px)}
+.cred-resumo p{margin:var(--spacing-scale-half,4px) 0}
 .br-tab .tab-nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap}
 /* detalhes visuais por parcela */
-.cred-barra{height:12px;border-radius:8px;background:var(--gray-10,#e6e6e6);overflow:hidden}
-.cred-barra span{display:block;height:100%;background:var(--green-cool-vivid-50,#168821);border-radius:8px}
+.cred-barra{height:12px;border-radius:var(--surface-rounder-md,8px);background:var(--gray-10,#e6e6e6);overflow:hidden}
+.cred-barra span{display:block;height:100%;background:var(--green-cool-vivid-50,#168821);border-radius:var(--surface-rounder-md,8px)}
 @media(max-width:991px){.cred-kpi .num{font-size:var(--font-size-scale-up-06,41.8px)}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-.cred-estr-sit{display:flex;flex-wrap:wrap;gap:8px}
-.mx{background:#fff;border:1px solid var(--gray-20,#ccc);border-radius:4px;margin:8px 0;overflow:hidden}
-.mx-linha{display:grid;grid-template-columns:minmax(150px,2fr) minmax(90px,.8fr) repeat(var(--mx-n,3),minmax(130px,1.3fr)) minmax(120px,1fr);gap:0 16px;align-items:center;padding:10px 14px;border-top:1px solid var(--gray-20,#ccc)}
+.cred-estr-sit{display:flex;flex-wrap:wrap;gap:var(--spacing-scale-base,8px)}
+/* matriz por estratégia; elementos não interativos usam blue-warm-vivid-80 (a 70 é a cor de interação do DS) */
+.mx{background:var(--pure-0,#fff);border:1px solid var(--gray-20,#ccc);border-radius:var(--surface-rounder-sm,4px);margin:var(--spacing-scale-base,8px) 0;overflow:hidden}
+.mx-linha{display:grid;grid-template-columns:minmax(150px,2fr) minmax(90px,.8fr) repeat(var(--mx-n,3),minmax(130px,1.3fr)) minmax(120px,1fr);gap:0 var(--spacing-scale-2x,16px);align-items:center;padding:var(--spacing-scale-base,8px) var(--spacing-scale-2x,16px);border-top:1px solid var(--gray-20,#ccc)}
 .mx-cab{background:var(--blue-warm-vivid-10,#d4e5ff);border-top:0;align-items:end;font-weight:500}
 .mx-cab .mx-ch{display:flex;flex-direction:column}.mx-cab strong{font-weight:700;margin-bottom:2px}
-.mx-nome{display:flex;flex-direction:column;gap:6px;align-items:flex-start;font-weight:700;font-size:var(--font-size-scale-up-01,16.8px)}
+.mx-nome{display:flex;flex-direction:column;gap:var(--spacing-scale-half,4px);align-items:flex-start;font-weight:700;font-size:var(--font-size-scale-up-01,16.8px)}
 .mx-nome>span:first-child{overflow-wrap:anywhere}
 .mx-n{text-align:right;display:flex;flex-direction:column;align-items:flex-end}
 .mx-n strong{font-weight:400;color:var(--gray-80,#333)}.mx-c,.mx-esp,.mx-nome{text-align:left}
-.mx-num{font-size:var(--font-size-scale-base,14px)}.mx-num strong{font-size:var(--font-size-scale-up-02,21px)}
-.mx-c .cred-barra{height:6px;border-radius:3px;margin-top:4px}.mx-c .cred-barra span{border-radius:3px}
-.mx-cab .mx-ch{align-self:stretch;background:#fff;border:1px solid var(--blue-warm-vivid-70,#1351b4);border-radius:6px;padding:8px 10px}
-.mx-etapa{align-self:flex-start;display:inline-block;background:var(--blue-warm-vivid-70,#1351b4);color:#fff;font-weight:700;font-size:var(--font-size-scale-down-01,11.6px);border-radius:100em;padding:1px 10px;margin-bottom:6px;letter-spacing:.02em}
-.mx-linha>.mx-c{align-self:stretch;border:1px solid var(--gray-20,#ccc);border-radius:6px;padding:8px 10px;margin:-2px 0}
+.mx-num{font-size:var(--font-size-scale-base,14px)}.mx-num strong{font-size:var(--font-size-scale-up-02,20.16px)}
+.mx-c .cred-barra{height:6px;border-radius:var(--surface-rounder-sm,4px);margin-top:var(--spacing-scale-half,4px)}.mx-c .cred-barra span{border-radius:var(--surface-rounder-sm,4px)}
+.mx-cab .mx-ch{align-self:stretch;background:var(--pure-0,#fff);border:1px solid var(--blue-warm-vivid-80,#0c326f);border-radius:var(--surface-rounder-md,8px);padding:var(--spacing-scale-base,8px)}
+.mx-etapa{align-self:flex-start;display:inline-block;background:var(--blue-warm-vivid-80,#0c326f);color:var(--pure-0,#fff);font-weight:700;font-size:var(--font-size-scale-down-01,11.66px);border-radius:100em;padding:0 var(--spacing-scale-base,8px);margin-bottom:var(--spacing-scale-half,4px);letter-spacing:.02em}
+.mx-linha>.mx-c{align-self:stretch;border:1px solid var(--gray-20,#ccc);border-radius:var(--surface-rounder-md,8px);padding:var(--spacing-scale-base,8px);margin:-2px 0}
 .mx-linha>.mx-c.mx-vazio{background:var(--gray-2,#f8f8f8);display:flex;align-items:center}
-.mx-linha>.mx-res{align-self:stretch;background:var(--blue-warm-vivid-5,#edf5ff);border:1px solid var(--blue-warm-vivid-70,#1351b4);border-radius:6px;padding:8px 10px;margin:-2px 0;display:flex;flex-direction:column;justify-content:center}
-.mx-res strong{font-size:var(--font-size-scale-up-02,21px)}.mx-res .cred-peq{display:block}
+.mx-linha>.mx-res{align-self:stretch;background:var(--blue-warm-vivid-5,#edf5ff);border:1px solid var(--blue-warm-vivid-80,#0c326f);border-radius:var(--surface-rounder-md,8px);padding:var(--spacing-scale-base,8px);margin:-2px 0;display:flex;flex-direction:column;justify-content:center}
+.mx-res strong{font-size:var(--font-size-scale-up-02,20.16px)}.mx-res .cred-peq{display:block}
 .mx-cab .mx-rch{align-self:end}
-.mx-grupo{padding-bottom:0;font-weight:700;text-transform:none}.mx-grupo{padding-bottom:10px}.mx-grupo>div{font-size:var(--font-size-scale-base,14px)}.mx-cab:not(.mx-grupo){padding-top:0}.mx-cab:not(.mx-grupo){border-top:0}
-.cred-dt{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:help}.cred-dt .fa-clock{color:var(--blue-warm-vivid-70,#1351b4)}.cred-dt .fa-ban,.cred-dt .fa-minus-circle{color:var(--gray-60,#636363)}
+.tl-card>.br-tag{align-self:flex-start;width:fit-content;margin:2px 0 4px}
+.mx-grupo{padding-bottom:0;font-weight:700;text-transform:none}.mx-grupo{padding-bottom:var(--spacing-scale-base,8px)}.mx-grupo>div{font-size:var(--font-size-scale-base,14px)}.mx-cab:not(.mx-grupo){padding-top:0}.mx-cab:not(.mx-grupo){border-top:0}
+.cred-dt{display:inline-flex;align-items:center;gap:var(--spacing-scale-half,4px);white-space:nowrap;cursor:help}.cred-dt .fa-clock{color:var(--blue-warm-vivid-80,#0c326f)}.cred-dt .fa-ban,.cred-dt .fa-minus-circle{color:var(--gray-60,#636363)}
 .cred-vazio .message-title,.cred-vazio .message-body{display:block}
-.tl{list-style:none;margin:0;padding:8px 0 0;position:relative}
+.tl{list-style:none;margin:0;padding:var(--spacing-scale-base,8px) 0 0;position:relative}
 .tl::before{content:"";position:absolute;left:calc(112px + 7px);top:0;bottom:0;width:2px;background:var(--gray-20,#ccc)}
-.tl-ano{padding:16px 0 8px 0}.tl-ano h3{margin:0;display:inline-block;background:var(--blue-warm-vivid-70,#1351b4);color:#fff;border-radius:100px;padding:2px 16px;font-size:var(--font-size-scale-up-01,16.8px);position:relative;left:calc(112px - 16px)}
-.tl-item{display:grid;grid-template-columns:112px 16px minmax(0,1fr);gap:0 16px;align-items:start;padding:8px 0;position:relative}
-.tl-data{text-align:right;padding-top:12px;font-weight:600}
-.tl-ponto{width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid var(--blue-warm-vivid-70,#1351b4);margin-top:14px;position:relative;z-index:1;box-sizing:border-box}
-.tl-card{background:#fff;border:1px solid var(--gray-20,#ccc);border-radius:8px;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
-.tl-tit{font-size:var(--font-size-scale-up-02,21px)}
+.tl-ano{padding:var(--spacing-scale-2x,16px) 0 var(--spacing-scale-base,8px) 0}.tl-ano h3{margin:0;display:inline-block;background:var(--blue-warm-vivid-80,#0c326f);color:var(--pure-0,#fff);border-radius:100px;padding:2px var(--spacing-scale-2x,16px);font-size:var(--font-size-scale-up-01,16.8px);position:relative;left:calc(112px - 16px)}
+.tl-item{display:grid;grid-template-columns:112px 16px minmax(0,1fr);gap:0 var(--spacing-scale-2x,16px);align-items:start;padding:var(--spacing-scale-base,8px) 0;position:relative}
+.tl-data{text-align:right;padding-top:var(--spacing-scale-baseh,12px);font-weight:600}
+.tl-ponto{width:16px;height:16px;border-radius:50%;background:var(--pure-0,#fff);border:3px solid var(--blue-warm-vivid-80,#0c326f);margin-top:14px;position:relative;z-index:1;box-sizing:border-box}
+.tl-card{background:var(--pure-0,#fff);border:1px solid var(--gray-20,#ccc);border-radius:var(--surface-rounder-md,8px);padding:var(--spacing-scale-2x,16px);display:flex;flex-direction:column;gap:var(--spacing-scale-base,8px)}
+.tl-tit{font-size:var(--font-size-scale-up-02,20.16px)}
 .tl-meta{display:flex;flex-wrap:wrap;gap:8px 32px}.tl-meta>span{display:flex;flex-direction:column}
 @media(max-width:575px){.tl::before{left:7px}.tl-ano h3{left:0}.tl-item{grid-template-columns:16px minmax(0,1fr);gap:0 12px}.tl-data{grid-column:2;grid-row:1;text-align:left;padding-top:0}.tl-ponto{grid-column:1;grid-row:1;margin-top:2px}.tl-card{grid-column:2;grid-row:2}}
 #main>.container-lg{flex:1 1 100%;min-width:0}#main .row{flex:1 1 100%;margin:0;min-width:0}#main .col{min-width:0;padding-left:0;padding-right:0}#main-content{min-width:0}
@@ -123,7 +127,7 @@ html body input:focus:not(:focus-visible),html body select:focus:not(:focus-visi
 </head>
 <body>
 <div class="template-base">
-<nav class="br-skiplink" role="menubar"><a class="br-item" href="#main-content" role="menuitem" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/2)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a><a class="br-item" href="#footer" role="menuitem" accesskey="2">Ir para o rodapé <span aria-hidden="true">(2/2)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a></nav>
+<nav class="br-skiplink" aria-label="Atalhos"><a class="br-item" href="#main-content" accesskey="1">Ir para o conteúdo <span aria-hidden="true">(1/2)</span> <span aria-hidden="true" class="br-tag text ml-1">1</span></a><a class="br-item" href="#footer" accesskey="2">Ir para o rodapé <span aria-hidden="true">(2/2)</span> <span aria-hidden="true" class="br-tag text ml-1">2</span></a></nav>
 <header class="br-header mb-4" id="header">
   <div class="container-lg">
     <div class="header-top">
@@ -135,10 +139,10 @@ html body input:focus:not(:focus-visible),html body select:focus:not(:focus-visi
   </div>
 </header>
 
-<main id="main" class="d-flex flex-fill"><h1 class="cred-sr">Credenciamentos da Atenção Primária à Saúde</h1>
+<main id="main" class="d-flex flex-fill">
 <div class="container-lg d-flex"><div class="row"><div class="col pb-5"><div id="main-content" class="main-content" tabindex="-1">
   <nav id="caminho" class="cred-caminho" aria-label="Caminho" hidden></nav>
-  <div id="carregando" class="br-message info" role="status"><div class="icon"><i class="fas fa-info-circle fa-lg" aria-hidden="true"></i></div><div class="content"><span class="message-body">Carregando os credenciamentos…</span></div></div>
+  <div id="carregando" class="d-flex align-items-center py-3"><div class="br-loading medium" role="progressbar" aria-label="Carregando os credenciamentos"></div><span class="ml-2" aria-hidden="true">Carregando os credenciamentos…</span></div>
   <div id="erro" class="br-message danger" role="alert" hidden><div class="icon"><i class="fas fa-times-circle fa-lg" aria-hidden="true"></i></div><div class="content"><span class="message-title">Não foi possível carregar os dados</span><span class="message-body">Atualize a página em alguns instantes.</span><div class="cred-acoes"><button type="button" class="br-button secondary small" id="btnRecarregar">Tentar Novamente</button></div></div></div>
 
   <div id="app" hidden>
@@ -183,7 +187,7 @@ html body input:focus:not(:focus-visible),html body select:focus:not(:focus-visi
           <li class="tab-item" role="presentation"><button type="button" role="tab" id="tab-sim" data-tab="sim" aria-selected="false" tabindex="-1" aria-controls="painelTab"><span class="name">Simulador</span></button></li>
         </ul></nav>
       </div>
-      <div id="painelTab" role="tabpanel" aria-labelledby="tab-ativos" tabindex="-1" class="cred-secao" style="margin-top:16px">
+      <div id="painelTab" role="tabpanel" aria-labelledby="tab-ativos" tabindex="-1" class="cred-secao mt-3">
         <div id="resumoMun" class="cred-card cred-resumo" hidden></div>
         <div id="conteudoTab"></div>
         <p id="contagem" class="cred-peq" role="status"></p>
@@ -249,7 +253,10 @@ const dicaDe=t=>/dias? restantes?|Último dia/.test(t)?'O cadastro no CNES vale 
  :/Homologação encerra|Homologação em andamento/.test(t)?'Última parcela financeira em que as competências desta portaria podem ser homologadas.':/Homologação encerrou/.test(t)?'A última parcela financeira de homologação desta portaria já passou.'
  :'';
 const dica=(txt,tip)=>`<span class="cred-dica" tabindex="0" data-tip="${esc(tip)}">${txt}</span>`;
-const TAG=(c,i,t,tip)=>{tip=tip||dicaDe(t);return`<span class="cred-tag ${c}"${tip?` tabindex="0" data-tip="${esc(tip)}"`:''}><i class="fas ${i}" aria-hidden="true"></i>${esc(t)}</span>`};
+/* Etiquetas br-tag (S:components/tag): cor semântica + ícone + texto. O tabindex fica só nas que têm dica,
+   para a explicação continuar acessível por teclado enquanto o substituto do Tooltip não é decidido. */
+const COR_TAG={verde:'bg-success',amarelo:'bg-warning text-gray-90',vermelho:'bg-danger',azul:'bg-info',cinza:'bg-gray-60'};
+const TAG=(c,i,t,tip)=>{tip=tip||dicaDe(t);return`<span class="br-tag cred-st ${COR_TAG[c]||c}"${tip?` tabindex="0" data-tip="${esc(tip)}"`:''}><i class="fas ${i}" aria-hidden="true"></i><span>${esc(t)}</span></span>`};
 function situacaoGrupo(g){const s=sitBase(g);return(!esp(g.r)&&g.ativo&&g.cred>0&&g.saldo===0&&g.total>=g.cred)?Object.assign({},s,{ord:Math.max(s.ord,4)}):s}
 function sitBase(g){const r=g.r;
  if(esp(r))return g.ativo?{ord:3,dias:0,html:TAG('azul','fa-info-circle','Credenciamento recente'),det:'Direito ao credenciamento desde a publicação da portaria.'}:{ord:5,dias:0,html:TAG('verde','fa-check-circle','Credenciado'),det:''};
@@ -268,7 +275,8 @@ function agrupar(rows,chave){const m=new Map();for(const r of rows){const k=chav
 const pct=(a,b)=>b>0?(a/b*100).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'%':'—';
 
 /* ===== detalhes de cada linha (visual por parcela) ===== */
-const barra=(n,max,rot)=>{const p=max>0?Math.min(100,n/max*100):0;return`<div class="cred-barra" role="progressbar" aria-valuemin="0" aria-valuemax="${max}" aria-valuenow="${Math.min(n,max)}" aria-label="${esc(rot)}"><span style="width:${p}%"></span></div>`};
+/* barra decorativa: o texto "X de Y homologadas" ao lado já informa o valor */
+const barra=(n,max)=>{const p=max>0?Math.min(100,n/max*100):0;return`<div class="cred-barra" aria-hidden="true"><span style="width:${p}%"></span></div>`};
 function detalhePortaria(p){
  const gt=p.gs.find(g=>tres(g.r)),c=gt?comps(gt.r):null,n=c?c.length:0;
  const cab=c?c.map((x,i)=>`<div role="columnheader" class="mx-ch"><span class="mx-etapa">${i+1}ª${i===n-1?' (final)':''}</span><span class="cred-rot">${dica('Competência CNES','Mês em que o cadastro no CNES é contado (3 competências a partir do mês da portaria).')}</span><strong>${mesAno(x.mes,x.ano)}</strong><span class="cred-rot">${dica('Parcela financeira','Parcela em que a competência é homologada: dois meses depois.')}</span><strong>${mesAno(x.homol,x.aHomol)}</strong></div>`).join(''):'';
@@ -281,7 +289,7 @@ function detalhePortaria(p){
   if(t&&c)cel+=`<div role="cell" class="mx-res" data-label="Implantação"><span><strong>${pct(g.total,g.cred)}</strong> implantado</span><span class="cred-peq">Saldo: <b>${num(g.saldo)}</b></span></div>`;
   else cel=`<div role="cell" class="mx-esp" style="grid-column:3 / -1">${s.html}</div>`;
   return`<div role="row" class="mx-linha">${nome}${cred}${cel}</div>`}).join('');
- return`<div role="table" class="mx" aria-label="Estratégias da portaria" style="--mx-n:${n||3}"><div role="row" class="mx-linha mx-cab mx-grupo"><div style="grid-column:1 / 3"></div><div role="columnheader" style="grid-column:3 / span ${n||3}">${dica('Processo de homologação','Quantas das credenciadas foram homologadas em cada parcela financeira. Cada competência é homologada na parcela de dois meses depois.')}</div></div><div role="row" class="mx-linha mx-cab"><div role="columnheader">Estratégia</div><div role="columnheader" class="mx-n">Credenciadas</div>${cab}${c?`<div role="columnheader" class="mx-rch">${dica('Implantação','Percentual de implantação: homologadas ÷ credenciadas × 100. Saldo: credenciadas menos homologadas.')}</div>`:''}</div>${linhas}</div>`}
+ return`<div role="table" class="mx" aria-label="Estratégias da portaria" style="--mx-n:${n||3}"><div role="row" class="mx-linha mx-cab mx-grupo"><div role="cell" aria-colspan="2" style="grid-column:1 / 3"></div><div role="columnheader" aria-colspan="${n||3}" style="grid-column:3 / span ${n||3}">${dica('Processo de homologação','Quantas das credenciadas foram homologadas em cada parcela financeira. Cada competência é homologada na parcela de dois meses depois.')}</div></div><div role="row" class="mx-linha mx-cab"><div role="columnheader">Estratégia</div><div role="columnheader" class="mx-n">Credenciadas</div>${cab}${c?`<div role="columnheader" class="mx-rch">${dica('Implantação','Percentual de implantação: homologadas ÷ credenciadas × 100. Saldo: credenciadas menos homologadas.')}</div>`:''}</div>${linhas}</div>`}
 function porPortaria(grupos){const m=new Map();for(const g of grupos){const k=g.r.portaria;if(!m.has(k))m.set(k,[]);m.get(k).push(g)}
  return[...m.values()].map(gs=>{const t=gs.filter(g=>tres(g.r)),sit=(t.length?t:gs).map(g=>g.sit||situacaoGrupo(g)).sort((a,b)=>a.ord-b.ord||a.dias-b.dias)[0];
   return{r:gs[0].r,gs,sit,cred:gs.reduce((s,g)=>s+g.cred,0),credT:t.reduce((s,g)=>s+g.cred,0),total:t.reduce((s,g)=>s+g.total,0),saldo:t.reduce((s,g)=>s+g.saldo,0),temT:t.length>0,...datasPortaria(t),exc:gs.some(g=>g.excedente),mun:new Set(gs.flatMap(g=>g.l.map(x=>String(x.ibge)))).size}})}
@@ -292,7 +300,7 @@ function datasPortaria(t){const gt=t[0],c=gt?comps(gt.r):null,u=c?c[2]:null;
 const dt=(ic,sr,txt,tip)=>`<span class="cred-dt" tabindex="0" data-tip="${esc(tip)}"><i class="fas ${ic}" aria-hidden="true"></i><span class="cred-sr">${sr}: </span>${esc(txt)}</span>`;
 function cadCel(p){const fim=p.cadFim;if(!fim)return p.sit.html;
  if(HOJE>fim)return dt('fa-ban','Encerrado',fmtData(fim),'O prazo de cadastro no CNES já terminou. '+DICA_FAROL);
- return p.sit.html+`<span class="cred-peq" style="display:block">até ${fmtData(fim)}</span>`}
+ return p.sit.html+`<span class="cred-peq cred-bloco">até ${fmtData(fim)}</span>`}
 function homCel(p){if(!p.homMes)return '—';
  if(p.andam)return dt('fa-clock','Em andamento',p.homMes,'Homologação em andamento: a última parcela financeira é em '+p.homMes+'.');
  if(HOJE>p.homFim)return dt('fa-ban','Encerrada',p.homMes,'Homologação encerrada: a última parcela financeira foi em '+p.homMes+'.');
@@ -302,18 +310,21 @@ function tabelaGrupos(portarias,mun){
  const linhas=portarias.slice(0,S.limite||30).map((p,i)=>{const s=p.sit,r=p.r,dp=dataDaPortaria(r),n=p.gs.length;
   const homolCel=p.temT?`<div class="cred-cel-h"><strong>${num(p.total)}</strong> de ${num(p.credT)}<span class="cred-pct">${pct(p.total,p.credT)} implantado</span>${p.exc?TAG('amarelo','fa-exclamation-triangle','Conferir quantitativos'):''}</div>`:'<div><span class="cred-peq">Não se aplica (sem homologação)</span></div>';
   const rotulo=`Detalhes da Portaria nº ${num(r.portaria)}`;
-  return`<tr role="row"><th scope="row" role="rowheader" class="cred-c-titulo"><div class="cred-linha-tit"><button type="button" class="br-button tertiary cred-expande" aria-expanded="false" aria-controls="d${i}" data-d="${i}" aria-label="${esc(rotulo)}"><i class="fas fa-chevron-down" aria-hidden="true"></i><span class="cred-sr">Detalhes</span></button><div><span class="cred-portaria">Portaria nº ${num(r.portaria)}</span> <span class="cred-peq">${esc(fmtData(dp))}</span></div></div></th>
-   ${mun?'':`<td role="cell" class="num" data-label="Municípios">${num(p.mun)}</td>`}<td role="cell" class="num" data-label="Credenciadas">${num(p.cred)}</td>
-   <td role="cell" class="num" data-label="Homologadas">${homolCel}</td>
-   <td role="cell" class="num" data-label="Saldo">${p.temT?num(p.saldo):'—'}</td>
-   ${p.temT?`<td role="cell" data-label="Cadastro no CNES até">${cadCel(p)}</td><td role="cell" data-label="Homologação até">${homCel(p)}</td>`:`<td role="cell" colspan="2" data-label="Situação">${s.html}</td>`}</tr>
-   <tr role="row" class="cred-detalhe" id="d${i}" hidden><td role="cell" colspan="${colunas}">${detalhePortaria(p)}</td></tr>`}).join('');
- return`<div class="cred-tabela" role="region" aria-label="Tabela de credenciamentos e homologações" tabindex="0"><table role="table"><caption>${mun?'Credenciamentos e homologações do município':'Credenciamentos e homologações por portaria'}</caption><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Portaria</th>${mun?'':`<th scope="col" role="columnheader" class="num">${dica('Municípios','Municípios com credenciamento nesta portaria.')}</th>`}<th scope="col" role="columnheader" class="num">${dica('Credenciadas','Quantidade de equipes ou serviços credenciados.')}</th><th scope="col" role="columnheader" class="num">${dica('Homologadas','Cada competência é homologada na parcela de dois meses depois.')}</th><th scope="col" role="columnheader" class="num">${dica('Saldo','Credenciadas menos homologadas.')}</th><th scope="col" role="columnheader">${dica('Cadastro no CNES até',DICA_FAROL)}</th><th scope="col" role="columnheader">${dica('Homologação até','Última parcela financeira em que a portaria pode ser homologada. Relógio azul: em andamento. Cinza: encerrada.')}</th></tr></thead><tbody role="rowgroup">${linhas}</tbody></table></div>`}
+  return`<tr><th scope="row" class="cred-c-titulo"><div class="cred-linha-tit"><button type="button" class="br-button circle small cred-expande" aria-expanded="false" aria-controls="d${i}" data-d="${i}" aria-label="${esc(rotulo)}"><i class="fas fa-chevron-down" aria-hidden="true"></i></button><div><span class="cred-portaria">Portaria nº ${num(r.portaria)}</span> <span class="cred-peq">${esc(fmtData(dp))}</span></div></div></th>
+   ${mun?'':`<td class="num" data-label="Municípios">${num(p.mun)}</td>`}<td class="num" data-label="Credenciadas">${num(p.cred)}</td>
+   <td class="num" data-label="Homologadas">${homolCel}</td>
+   <td class="num" data-label="Saldo">${p.temT?num(p.saldo):'—'}</td>
+   ${p.temT?`<td data-label="Cadastro no CNES até">${cadCel(p)}</td><td data-label="Homologação até">${homCel(p)}</td>`:`<td colspan="2" data-label="Situação">${s.html}</td>`}</tr>
+   <tr class="cred-detalhe" id="d${i}" hidden><td colspan="${colunas}">${detalhePortaria(p)}</td></tr>`}).join('');
+ const titulo=mun?'Credenciamentos e homologações do município':'Credenciamentos e homologações por portaria';
+ /* S:components/table — .br-table com título na top-bar; caption mantida para leitor de tela (o Core a oculta visualmente) */
+ return`<div class="br-table cred-tab"><div class="table-header"><div class="top-bar"><div class="table-title" id="tTabela">${titulo}</div></div></div><div class="cred-tabela" role="region" aria-labelledby="tTabela" tabindex="0"><table><caption>${titulo}</caption><thead><tr><th scope="col">Portaria</th>${mun?'':`<th scope="col" class="num">${dica('Municípios','Municípios com credenciamento nesta portaria.')}</th>`}<th scope="col" class="num">${dica('Credenciadas','Quantidade de equipes ou serviços credenciados.')}</th><th scope="col" class="num">${dica('Homologadas','Cada competência é homologada na parcela de dois meses depois.')}</th><th scope="col" class="num">${dica('Saldo','Credenciadas menos homologadas.')}</th><th scope="col">${dica('Cadastro no CNES até',DICA_FAROL)}</th><th scope="col">${dica('Homologação até','Última parcela financeira em que a portaria pode ser homologada. Relógio azul: em andamento. Cinza: encerrada.')}</th></tr></thead><tbody>${linhas}</tbody></table></div></div>`}
 function tabelaPort(lista){
  let ano='',h='';
  for(const p of lista.slice(0,S.limite||30)){const d=parseData(p.data_portaria),a=d?String(d.getFullYear()):'Sem data';
   if(a!==ano){ano=a;h+=`<li class="tl-ano"><h3>${esc(a)}</h3></li>`}
-  h+=`<li class="tl-item"><span class="tl-data">${esc(fmtData(d))}</span><span class="tl-ponto" aria-hidden="true"></span><div class="tl-card"><strong class="tl-tit">Portaria nº ${num(p.n_portaria)}</strong><div class="tl-meta"><span><span class="cred-rot">Serviço ou equipe</span>${esc(p.equipe_servico||'—')}</span><span><span class="cred-rot">Tipo de ato</span>${esc(p.tipo_ato||'—')}</span></div>${p.link?`<a href="${esc(p.link)}" target="_blank" rel="noopener noreferrer">Ver no Diário Oficial<span class="cred-sr"> (abre em nova aba)</span></a>`:''}</div></li>`}
+  const rep=/republicad/i.test(p.tipo_ato||'')||/_rep\.html/i.test(p.link||''),tipo=String(p.tipo_ato||'').split(';').map(s=>s.trim()).filter(s=>s&&!/republicad/i.test(s)).join('; ');
+  h+=`<li class="tl-item"><span class="tl-data">${esc(fmtData(d))}</span><span class="tl-ponto" aria-hidden="true"></span><div class="tl-card"><strong class="tl-tit">Portaria nº ${num(p.n_portaria)}${rep?'*':''}</strong>${rep?' '+TAG('azul','fa-redo','Republicada','A portaria foi republicada no Diário Oficial. O link abre a versão republicada; a data que vale é a da publicação original.'):''}<div class="tl-meta"><span><span class="cred-rot">Serviço ou equipe</span>${esc(p.equipe_servico||'—')}</span><span><span class="cred-rot">Tipo de ato</span>${esc(tipo||'—')}</span></div>${p.link?`<a href="${esc(p.link)}" target="_blank" rel="noopener noreferrer">${rep?'Ver republicação':'Ver no Diário Oficial'}<i class="fas fa-external-link-alt ml-half" aria-hidden="true"></i><span class="cred-sr"> (abre em nova aba)</span></a>`:''}</div></li>`}
  return`<ol class="tl" aria-label="Portarias publicadas, da mais recente para a mais antiga">${h}</ol>`}
 
 function render(manter){
@@ -323,7 +334,7 @@ function render(manter){
  $('#kpiNum').textContent=num(ativos.reduce((s,r)=>s+Number(r.credenciado||0),0));
  $('#kpiTexto').textContent=ativos.length?'':'Nenhum credenciamento ativo para a seleção atual.';
  /* caminho e resumo do município */
- const cam=$('#caminho');if(mun){cam.hidden=false;cam.innerHTML=`<a href="#" id="voltaTodos">Todos os municípios</a> › ${esc(mun.uf)} › <strong aria-current="page">${esc(mun.nome)}</strong>`}else cam.hidden=true;
+ const cam=$('#caminho');if(mun){cam.hidden=false;cam.innerHTML=`<button type="button" class="br-button tertiary small" id="voltaTodos">Todos os municípios</button> <span aria-hidden="true">›</span> ${esc(mun.uf)} <span aria-hidden="true">›</span> <strong aria-current="page">${esc(mun.nome)}</strong>`}else cam.hidden=true;
  /* abas */
  document.querySelectorAll('#abas [role=tab]').forEach(b=>{const a=b.dataset.tab===S.tab;b.setAttribute('aria-selected',a);b.tabIndex=a?0:-1;b.closest('.tab-item').classList.toggle('active',a)});
  $('#painelTab').setAttribute('aria-labelledby','tab-'+S.tab);
@@ -339,7 +350,7 @@ function render(manter){
  /* resumo municipal */
  const rm=$('#resumoMun');
  if(mun&&S.tab!=='port'){const todos=f,atv=todos.filter(ativo),enc=todos.length-atv.length;rm.hidden=false;
-  rm.innerHTML=`<h2 class="cred-titulo" style="margin-bottom:6px">${esc(mun.nome)}/${esc(mun.uf)}</h2>`+(todos.length?`<p><strong>${num(atv.reduce((s,r)=>s+Number(r.credenciado||0),0))}</strong> credenciadas em credenciamentos ativos (${num(new Set(atv.map(r=>r.portaria)).size)} ${new Set(atv.map(r=>r.portaria)).size===1?'portaria':'portarias'}). ${enc?`Há ${num(todos.length-atv.length)} registros de credenciamentos encerrados.`:''}</p><p class="cred-peq">${esc(mun.rs)} · ${esc(mun.macro)} · Região ${esc(mun.regiao)}</p>`:`<p>Este município não tem credenciamentos registrados nas portarias consultadas.</p>`)}
+  rm.innerHTML=`<h2 class="cred-titulo mb-half">${esc(mun.nome)}/${esc(mun.uf)}</h2>`+(todos.length?`<p><strong>${num(atv.reduce((s,r)=>s+Number(r.credenciado||0),0))}</strong> credenciadas em credenciamentos ativos (${num(new Set(atv.map(r=>r.portaria)).size)} ${new Set(atv.map(r=>r.portaria)).size===1?'portaria':'portarias'}). ${enc?`Há ${num(todos.length-atv.length)} registros de credenciamentos encerrados.`:''}</p><p class="cred-peq">${esc(mun.rs)} · ${esc(mun.macro)} · Região ${esc(mun.regiao)}</p>`:`<p>Este município não tem credenciamentos registrados nas portarias consultadas.</p>`)}
  else rm.hidden=true;
  /* conteúdo */
  let html='',lista=[];
@@ -354,8 +365,9 @@ function render(manter){
  S.alvo=alvo;
  abertos.forEach(id=>{const d=document.getElementById(id);if(d){d.hidden=false;const b=document.querySelector(`[aria-controls="${id}"]`);if(b){b.setAttribute('aria-expanded','true');b.querySelector('i').className='fas fa-chevron-up'}}});
  /* chips */
- const chips=[];if(mun)chips.push(mun.nome+'/'+mun.uf);if(S.uf&&!mun)chips.push('UF '+S.uf);if(S.regiao)chips.push('Região '+S.regiao);if(S.macro)chips.push(S.macro);if(S.rs)chips.push(S.rs);if(S.portaria)chips.push('Portaria '+num(S.portaria));if(S.estr)chips.push(S.estr);
- $('#chips').innerHTML=chips.map(c=>`<span class="cred-tag azul"><i class="fas fa-sliders-h" aria-hidden="true"></i>${esc(c)}</span>`).join('');
+ /* chips = tags interativas dispensáveis (S:components/tag): cada uma remove o seu filtro */
+ const chips=[];if(mun)chips.push(['ibge',mun.nome+'/'+mun.uf]);if(S.uf&&!mun)chips.push(['uf','UF '+S.uf]);if(S.regiao)chips.push(['regiao','Região '+S.regiao]);if(S.macro)chips.push(['macro',S.macro]);if(S.rs)chips.push(['rs',S.rs]);if(S.portaria)chips.push(['portaria','Portaria '+num(S.portaria)]);if(S.estr)chips.push(['estr',S.estr]);
+ $('#chips').innerHTML=chips.map(([k,c])=>`<span class="br-tag interaction cred-chip"><i class="fas fa-sliders-h" aria-hidden="true"></i><span>${esc(c)}</span><button type="button" class="br-button inverted circle small" data-remover="${k}" aria-label="Remover filtro: ${esc(c)}"><i class="fas fa-times" aria-hidden="true"></i></button></span>`).join('');
  $('#rodape').textContent=ATUALIZ?'Última atualização: '+fmtData(ATUALIZ)+'.':'';
  sincronizarUrl();
 }
@@ -403,7 +415,11 @@ function marcar(i){const lis=[...$('#sugestoes').querySelectorAll('li[data-i]')]
 document.addEventListener('click',e=>{
  if(!e.target.closest('#sugestoes')&&e.target.id!=='fMun')fecharSug();
  const t=e.target.closest('button,a,li');if(!t)return;
- if(t.dataset.tab){S.tab=t.dataset.tab;S.limite=30;render();const b=document.getElementById('tab-'+S.tab);if(b)b.focus()}
+ if(t.dataset.remover){/* mesma cascata dos campos de filtro (eventos change abaixo) */
+  const limpa={ibge:['ibge'],uf:['uf','macro','rs'],regiao:['regiao','uf','macro','rs','ibge'],macro:['macro','rs','ibge'],rs:['rs','ibge'],portaria:['portaria','estr'],estr:['estr']}[t.dataset.remover]||[];
+  limpa.forEach(k=>S[k]='');if(limpa.includes('ibge'))$('#fMun').value='';atualizar();
+  const prox=document.querySelector('#chips [data-remover]');(prox||$('#fMun')).focus()}
+ else if(t.dataset.tab){S.tab=t.dataset.tab;S.limite=30;render();const b=document.getElementById('tab-'+S.tab);if(b)b.focus()}
  else if(t.dataset.d!==undefined){const d=document.getElementById('d'+t.dataset.d),o=d.hidden;d.hidden=!o;t.setAttribute('aria-expanded',o);t.querySelector('i').className='fas fa-chevron-'+(o?'up':'down')}
  else if(t.dataset.mun){e.preventDefault();const m=TERR.get(t.dataset.mun);if(m)escolher(m)}
  else if(t.id==='voltaTodos'){e.preventDefault();S.ibge='';$('#fMun').value='';atualizar();$('#kpiRot').scrollIntoView()}
@@ -442,7 +458,7 @@ function baixarCsv(){const cab=['uf','ibge','municipio','portaria','data_portari
 
 /* ===== simulador de prazo para cadastro no CNES (dados: simulador.json, gerado de simulador.xlsx) ===== */
 /* Componentes do gov.br DS 3.7.0: br-card, br-select (core.min.js), br-table, br-tag, br-message */
-const linkar=s=>esc(s).replace(/(https?:\/\/[^\s<]*[^\s<.,;)])/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1<span class="cred-sr"> (abre em nova aba)</span></a>').replace(/(^|[\s(])([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g,'$1<a href="mailto:$2">$2</a>');
+const linkar=s=>esc(s).replace(/(https?:\/\/[^\s<]*[^\s<.,;)])/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1<i class="fas fa-external-link-alt ml-half" aria-hidden="true"></i><span class="cred-sr"> (abre em nova aba)</span></a>').replace(/(^|[\s(])([\w.+-]+@[\w-]+(?:\.[\w-]+)+)/g,'$1<a href="mailto:$2">$2</a>');
 const tag=(cls,ic,txt)=>`<span class="br-tag ${cls}"><i class="fas ${ic}" aria-hidden="true"></i><span>${esc(txt)}</span></span>`;
 const msg=(tipo,icone,titulo,corpo)=>`<div class="br-message ${tipo}"><div class="icon"><i class="fas ${icone} fa-lg" aria-hidden="true"></i></div><div class="content">${titulo?`<span class="message-title">${esc(titulo)}</span>`:''}<span class="message-body">${corpo}</span></div></div>`;
 const simDS=()=>typeof core!=='undefined'&&!!core.BRSelect;
