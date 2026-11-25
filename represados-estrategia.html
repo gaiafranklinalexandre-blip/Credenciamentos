@@ -52,10 +52,12 @@
   .filtros-rodape{display:flex;justify-content:space-between;gap:16px;padding:16px 24px;border-top:1px solid #ccc}
   .br-input select{display:block;width:100%;height:40px;padding:0 40px 0 16px;border:1px solid #888;border-radius:6px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='9' viewBox='0 0 13 9' fill='none'%3E%3Cpath d='M1.5 1.8L6.5 7L11.5 1.8' stroke='%231351B4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 16px center;appearance:none;-webkit-appearance:none;font:inherit;color:#333;cursor:pointer}
   .br-input select:hover{border-color:#1351b4}
-  .br-input select:focus-visible{outline:3px solid #c2850c;outline-offset:2px}
+  .br-input select:focus-visible{outline:var(--surface-width-lg,4px) dashed var(--gold-vivid-40,#c2850c);outline-offset:var(--spacing-scale-half,4px)}
   .lista-sugestoes{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-radius:0 0 6px 6px;max-height:230px;overflow-y:auto;display:none;z-index:60;box-shadow:0 2px 4px #00000029}
-  .lista-sugestoes div{padding:8px 16px;font-size:.875rem;cursor:pointer}
-  .lista-sugestoes div:hover{background:#edf5ff}
+  .lista-sugestoes div{padding:8px 16px;font-size:.875rem;cursor:pointer;min-height:40px;box-sizing:border-box}
+  .lista-sugestoes div:hover{background:var(--blue-warm-vivid-5,#edf5ff)}
+  .lista-sugestoes [aria-selected=true]{background:var(--blue-warm-vivid-10,#d4e5ff);font-weight:600}
+  .lista-sugestoes .lista-vazia{color:var(--gray-60,#636363);cursor:default}
   /* Cards e indicadores (br-card) */
   .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:24px;margin-bottom:24px}
   .kpi-grid:empty{display:none}.kpi-grid>.kpi{height:100%}
@@ -88,13 +90,22 @@
   /* Combinações, tabelas e paginação */
   .chips-filtro{display:flex;flex-wrap:wrap;gap:8px}
   .combo-badges{display:flex;flex-wrap:wrap;gap:4px}
-  .paginacao{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px;font-size:.875rem;color:#636363;flex-wrap:wrap}
+  .paginacao{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px;font-size:.875rem;color:var(--gray-60,#636363)}
+  .paginacao .br-pagination ul{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px;list-style:none;margin:0;padding:0}
+  .paginacao button.page{background:transparent;border:0;font:inherit;cursor:pointer;min-width:32px;min-height:32px}
+  .paginacao .pagination-ellipsis{padding:0 4px}
   .br-table{overflow-x:auto}.br-table table{width:100%}
-  .br-table thead th{cursor:pointer;user-select:none;white-space:nowrap}
+  .br-table thead th{white-space:nowrap}
+  /* cabeçalho ordenável: botão com estado interativo; coluna ordenada em estado ativo (S:components/table) */
+  .ordem-botao{display:inline-flex;align-items:center;gap:4px;background:none;border:0;padding:0;font:inherit;font-weight:inherit;color:var(--blue-warm-vivid-70,#1351b4);cursor:pointer;min-height:24px;white-space:nowrap}
+  .ordem-botao:hover{text-decoration:underline}
+  th.ordenada .ordem-botao{color:var(--blue-warm-vivid-80,#0c326f);font-weight:700}
   .br-table td{white-space:nowrap}.br-table td.num,.br-table th.num{text-align:right}
   .br-table td.vazio{white-space:normal}
   .barra-mini{display:inline-block;height:8px;background:#1351b4;border-radius:4px;vertical-align:middle;margin-right:8px}
   .chart-wrap{position:relative}#chartTemporalWrap{height:280px}
+  .chart-dados{margin-top:16px}.chart-dados summary{cursor:pointer;color:var(--blue-warm-vivid-70,#1351b4);font-weight:600;min-height:40px;display:flex;align-items:center}
+  .chart-dados .br-table{overflow:auto;max-height:320px;margin-top:8px}.chart-dados th[scope=row]{font-weight:400;text-align:left}
   #mapa,#mapaCombinacoes{height:380px;background:#f8f8f8;border:1px solid #ccc}
   .loading{text-align:center;padding:40px;color:#636363}
   .spinner{display:inline-block;width:28px;height:28px;border:4px solid #d4e5ff;border-top-color:#1351b4;border-radius:50%;animation:spin .8s linear infinite}
@@ -226,12 +237,18 @@ to represent the company, product, or service to which they refer.**
 body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-line-height-medium,1.45);color:#333;background:#fff}button,input,select,textarea{font-family:inherit}p{line-height:1.55}button,a{touch-action:manipulation}button{cursor:pointer}a{color:#1351b4}a:hover{color:#0c326f}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #c2850c;outline-offset:4px}button:disabled{cursor:not-allowed}[hidden]{display:none!important}
 .fas,.far{display:inline-block;font-family:"Font Awesome 5 Free";font-style:normal;font-variant:normal;text-rendering:auto;line-height:1;font-weight:900;flex-shrink:0}.far{font-weight:400}.fa-bars:before{content:"\f0c9"}.fa-th-large:before{content:"\f009"}.fa-globe-americas:before{content:"\f57d"}.fa-lock:before{content:"\f023"}.fa-desktop:before{content:"\f108"}.fa-calendar-alt:before{content:"\f073"}.fa-money-bill-wave:before{content:"\f53a"}.fa-hospital:before{content:"\f0f8"}.fa-box:before{content:"\f466"}.fa-map-marked-alt:before{content:"\f5a0"}.fa-building:before{content:"\f1ad"}.fa-map:before{content:"\f279"}.fa-file-alt:before{content:"\f15c"}.fa-chart-bar:before{content:"\f080"}.fa-home:before{content:"\f015"}.fa-star:before{content:"\f005"}.fa-search:before{content:"\f002"}.fa-filter:before{content:"\f0b0"}.fa-times:before{content:"\f00d"}.fa-external-link-alt:before{content:"\f35d"}.fa-check-circle:before{content:"\f058"}.fa-coins:before{content:"\f51e"}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* APS 360 — ajustes de 25/11/2026 aos fundamentos Tipografia, Estados e Iconografia do gov.br DS 3.7.0.
+   Restritos a #painel e aos atalhos: o Modo Tático (#modoApresentacao) fica como está. */
+body{font-family:Rawline,Raleway,sans-serif}
+#painel :focus-visible:not([tabindex="-1"]):not(.btn-apresentacao),.br-skiplink :focus-visible{outline:var(--surface-width-lg,4px) dashed var(--gold-vivid-40,#c2850c);outline-offset:var(--spacing-scale-half,4px)}
+.fa-angle-down:before{content:"\f107"}.fa-angle-left:before{content:"\f104"}.fa-angle-right:before{content:"\f105"}
+.fa-sort:before{content:"\f0dc"}.fa-sort-up:before{content:"\f0de"}.fa-sort-down:before{content:"\f0dd"}
 
 </style>
 </head>
 <body>
 <div class="template-base">
-<nav class="br-skiplink" role="menubar"><a class="br-item" href="#main-content" role="menuitem">Ir para o conteúdo <span aria-hidden="true">(1/2)</span></a><a class="br-item" href="#footer" role="menuitem">Ir para o rodapé <span aria-hidden="true">(2/2)</span></a></nav>
+<nav class="br-skiplink" aria-label="Atalhos"><a class="br-item" href="#main-content">Ir para o conteúdo <span aria-hidden="true">(1/2)</span></a><a class="br-item" href="#footer">Ir para o rodapé <span aria-hidden="true">(2/2)</span></a></nav>
 
 <div id="acessoNegado">Indisponível</div>
 
@@ -287,8 +304,9 @@ body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-
               <p>Delimite estado e município.</p>
               <div class="f-grupo br-input"><label for="fUF">Estado</label><select id="fUF" onchange="onUFChange()"><option value="">Todos</option></select>
               </div>
-              <div class="f-grupo br-input"><label for="fMunicipio">Município</label><input id="fMunicipio" type="text" autocomplete="off" placeholder="Digite ou selecione" onfocus="mostrarSugestoes()" oninput="buscarSugestoes()">
-                <div id="listaSugestoes" class="lista-sugestoes"></div>
+              <div class="f-grupo br-input"><label for="fMunicipio">Município</label><input id="fMunicipio" type="text" autocomplete="off" placeholder="Digite ou selecione" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="listaSugestoes" onfocus="mostrarSugestoes()" oninput="buscarSugestoes()">
+                <div id="listaSugestoes" class="lista-sugestoes" role="listbox" aria-label="Municípios encontrados"></div>
+                <span id="statusSugestoes" class="sr-only" role="status"></span>
               </div>
             </fieldset>
 
@@ -366,7 +384,8 @@ body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-
 
         <div class="br-card mb-4">
           <div class="card-header"><h2 class="text-weight-semi-bold text-up-02 m-0">Solicitações ao longo do tempo</h2><p class="text-down-01 m-0 mt-1">Novas solicitações por mês, pela data do pedido</p></div>
-          <div class="card-content"><div class="chart-wrap" id="chartTemporalWrap"><canvas id="chartTemporal"></canvas></div></div>
+          <div class="card-content"><div class="chart-wrap" id="chartTemporalWrap"><canvas id="chartTemporal" role="img" aria-label="Gráfico de linha: novas solicitações por mês. Os mesmos números estão na tabela abaixo do gráfico."></canvas></div>
+            <details class="chart-dados"><summary>Ver os dados do gráfico em tabela</summary><div class="br-table" id="dadosTemporal" role="region" aria-label="Dados do gráfico Solicitações ao longo do tempo" tabindex="0"></div></details></div>
         </div>
 
         <div class="br-card mb-4">
@@ -378,7 +397,7 @@ body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-
       <!-- ABA: POR ESTRATÉGIA -->
       <div class="aba-painel" id="aba-estrategia" role="tabpanel" aria-labelledby="tab-estrategia" tabindex="-1">
         <div class="br-card mb-4">
-          <div class="card-header"><h2 class="text-weight-semi-bold text-up-02 m-0">Resumo por estratégia</h2><p class="text-down-01 m-0 mt-1">Clique numa coluna para ordenar</p></div>
+          <div class="card-header"><h2 class="text-weight-semi-bold text-up-02 m-0">Resumo por estratégia</h2><p class="text-down-01 m-0 mt-1">Selecione uma coluna para ordenar</p></div>
           <div class="card-content">
             <div class="br-input mb-3"><label for="buscaEstrategia">Buscar estratégia</label><input id="buscaEstrategia" type="search" placeholder="Digite para buscar" oninput="renderTabelaEstrategia()"></div>
             <div class="br-table" role="region" aria-label="Resumo por estratégia" tabindex="0">
@@ -400,7 +419,7 @@ body{font-family:Rawline,Arial,sans-serif;font-size:16px;line-height:var(--font-
       <!-- ABA: POR MUNICÍPIO -->
       <div class="aba-painel" id="aba-municipio" role="tabpanel" aria-labelledby="tab-municipio" tabindex="-1">
         <div class="br-card mb-4">
-          <div class="card-header"><h2 class="text-weight-semi-bold text-up-02 m-0">Resumo por município</h2><p class="text-down-01 m-0 mt-1">Clique numa coluna para ordenar</p></div>
+          <div class="card-header"><h2 class="text-weight-semi-bold text-up-02 m-0">Resumo por município</h2><p class="text-down-01 m-0 mt-1">Selecione uma coluna para ordenar</p></div>
           <div class="card-content">
             <div class="br-input mb-3"><label for="buscaMunicipio">Buscar município</label><input id="buscaMunicipio" type="search" placeholder="Digite para buscar" oninput="renderTabelaMunicipio()"></div>
             <div class="br-table" role="region" aria-label="Resumo por município" tabindex="0">
@@ -772,36 +791,87 @@ function onUFChange() {
   onFiltroChange();
 }
 
-function mostrarSugestoes() {
+// Lista de municípios no padrão combobox (WAI-ARIA 1.2), operável por teclado:
+// setas escolhem, Enter confirma, Esc ou sair do campo fecham (gov.br DS: Input/Autocomplete e Table/Acessibilidade).
+let munSug = [], munAtivo = -1;
+const escMun = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function desenharSugestoes(lista, vazio) {
   const el = document.getElementById('listaSugestoes');
-  el.innerHTML = municipiosDisponiveis.length
-    ? municipiosDisponiveis.map(m => `<div onclick="selecionarMunicipio('${m.replace(/'/g, "\\'")}')">${m}</div>`).join('')
-    : '<div style="color:#999;cursor:default;">Nenhum município disponível</div>';
+  const input = document.getElementById('fMunicipio');
+  munSug = lista; munAtivo = -1;
+  input.removeAttribute('aria-activedescendant');
+  el.innerHTML = lista.length
+    ? lista.map((m, i) => `<div role="option" id="sugMun${i}" data-i="${i}" aria-selected="false">${escMun(m)}</div>`).join('')
+    : `<div role="option" class="lista-vazia" aria-disabled="true" aria-selected="false">${vazio}</div>`;
   el.style.display = 'block';
+  input.setAttribute('aria-expanded', 'true');
+  document.getElementById('statusSugestoes').textContent = lista.length
+    ? `${lista.length} ${lista.length === 1 ? 'município encontrado' : 'municípios encontrados'}. Use as setas para escolher.`
+    : `${vazio}.`;
+}
+
+function fecharSugestoes() {
+  const input = document.getElementById('fMunicipio');
+  const el = document.getElementById('listaSugestoes');
+  if (!input || !el) return;
+  el.style.display = 'none';
+  input.setAttribute('aria-expanded', 'false');
+  input.removeAttribute('aria-activedescendant');
+  document.getElementById('statusSugestoes').textContent = '';
+  munAtivo = -1;
+}
+
+function mostrarSugestoes() {
+  desenharSugestoes(municipiosDisponiveis, 'Nenhum município disponível');
 }
 
 function buscarSugestoes() {
   const termo = document.getElementById('fMunicipio').value.toLowerCase().trim();
   if (!termo) return mostrarSugestoes();
-  const el = document.getElementById('listaSugestoes');
-  const achados = municipiosDisponiveis.filter(m => m.toLowerCase().includes(termo));
-  el.innerHTML = achados.length
-    ? achados.map(m => `<div onclick="selecionarMunicipio('${m.replace(/'/g, "\\'")}')">${m}</div>`).join('')
-    : '<div style="color:#999;cursor:default;">Nenhum município encontrado</div>';
-  el.style.display = 'block';
+  desenharSugestoes(municipiosDisponiveis.filter(m => m.toLowerCase().includes(termo)), 'Nenhum município encontrado');
 }
 
 function selecionarMunicipio(m) {
   document.getElementById('fMunicipio').value = m;
-  document.getElementById('listaSugestoes').style.display = 'none';
+  fecharSugestoes();
   onFiltroChange();
 }
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('.f-grupo')) {
-    const el = document.getElementById('listaSugestoes');
-    if (el) el.style.display = 'none';
+function marcarSugestao(i) {
+  const opcoes = [...document.querySelectorAll('#listaSugestoes [data-i]')];
+  opcoes.forEach(o => o.setAttribute('aria-selected', 'false'));
+  munAtivo = i;
+  if (i >= 0 && opcoes[i]) {
+    opcoes[i].setAttribute('aria-selected', 'true');
+    document.getElementById('fMunicipio').setAttribute('aria-activedescendant', opcoes[i].id);
+    opcoes[i].scrollIntoView({ block: 'nearest' });
   }
+}
+
+(() => {
+  const input = document.getElementById('fMunicipio');
+  const el = document.getElementById('listaSugestoes');
+  if (!input || !el) return;
+  el.addEventListener('mousedown', e => e.preventDefault());
+  el.addEventListener('click', e => {
+    const op = e.target.closest('[data-i]');
+    if (op) selecionarMunicipio(munSug[+op.dataset.i]);
+  });
+  input.addEventListener('keydown', e => {
+    const aberta = el.style.display === 'block';
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (!aberta) buscarSugestoes(); marcarSugestao(Math.min(munSug.length - 1, munAtivo + 1)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); marcarSugestao(Math.max(0, munAtivo - 1)); }
+    else if (e.key === 'Enter' && aberta && munAtivo >= 0) { e.preventDefault(); selecionarMunicipio(munSug[munAtivo]); }
+    else if (e.key === 'Escape' && aberta) { e.preventDefault(); e.stopPropagation(); fecharSugestoes(); }
+  });
+  input.closest('.f-grupo').addEventListener('focusout', e => {
+    if (!e.currentTarget.contains(e.relatedTarget)) fecharSugestoes();
+  });
+})();
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#fMunicipio, #listaSugestoes')) fecharSugestoes();
 });
 
 function onFiltroChange() {
@@ -1314,6 +1384,11 @@ function renderChartTemporal() {
       }
     }
   });
+  // Alternativa textual (gov.br DS, padrão Gráfico): os mesmos números em tabela
+  const dadosEl = document.getElementById('dadosTemporal');
+  if (dadosEl) dadosEl.innerHTML = labels.length
+    ? `<table><caption>Novas solicitações por mês</caption><thead><tr><th scope="col">Mês</th><th scope="col" class="num">Solicitações</th></tr></thead><tbody>${labels.map((l, i) => `<tr><th scope="row">${l}</th><td class="num">${valores[i].toLocaleString('pt-BR')}</td></tr>`).join('')}</tbody></table>`
+    : '<p class="m-0">Sem dados para os filtros aplicados.</p>';
 }
 
 function renderMapa() {
@@ -1329,14 +1404,29 @@ function renderMapa() {
   desenharPontos(_mapaInst, Object.values(porMunicipio), 'represados');
 }
 
+// Ordenação acessível (gov.br DS, Table > Acessibilidade): botão no cabeçalho, aria-sort e ícones sort/sort-up/sort-down.
+function atualizarIconesOrdem(tabelaId, config) {
+  document.querySelectorAll(`#${tabelaId} thead th[data-k]`).forEach(th => {
+    const ativa = th.dataset.k === config.k;
+    th.setAttribute('aria-sort', ativa ? (config.dir === 1 ? 'ascending' : 'descending') : 'none');
+    th.classList.toggle('ordenada', ativa);
+    const ic = th.querySelector('.ordem-icone');
+    if (ic) ic.className = 'fas ordem-icone ' + (ativa ? (config.dir === 1 ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort');
+  });
+}
+
 function ordenarClique(tabelaId, config, renderFn) {
-  document.querySelectorAll(`#${tabelaId} thead th`).forEach(th => {
-    th.onclick = () => {
+  document.querySelectorAll(`#${tabelaId} thead th[data-k]`).forEach(th => {
+    const rotulo = th.textContent.trim();
+    th.innerHTML = `<button type="button" class="ordem-botao">${rotulo}<i class="fas fa-sort ordem-icone" aria-hidden="true"></i></button>`;
+    th.querySelector('button').addEventListener('click', () => {
       const k = th.dataset.k;
       if (config.k === k) config.dir *= -1; else { config.k = k; config.dir = -1; }
+      atualizarIconesOrdem(tabelaId, config);
       renderFn();
-    };
+    });
   });
+  atualizarIconesOrdem(tabelaId, config);
 }
 
 function renderTabelaEstrategia() {
@@ -1524,6 +1614,14 @@ function toggleChipCombinacao(estrategia) {
 function irParaPaginaCombinacao(pagina) {
   paginaCombinacao = pagina;
   renderCombinacoes();
+  // o botão acionado é recriado: devolver o foco à página atual
+  const atual = document.querySelector('#paginacaoCombinacoes .page.active');
+  if (atual) atual.focus();
+}
+
+// Páginas exibidas na paginação: primeira, última e vizinhas da atual (reticências nos saltos)
+function paginasVisiveis(atual, total) {
+  return [...new Set([1, total, atual - 1, atual, atual + 1])].filter(p => p >= 1 && p <= total).sort((a, b) => a - b);
 }
 
 function renderCombinacoes() {
@@ -1553,10 +1651,21 @@ function renderCombinacoes() {
   const paginaAtual = combos.slice(inicio, inicio + TAMANHO_PAGINA_COMBINACAO);
 
   if (paginacaoEl) {
+    // gov.br DS Pagination (tipo contextual): setas e identificadores numéricos, página atual com aria-current
+    let anterior = 0;
+    const itens = paginasVisiveis(paginaCombinacao, totalPaginas).map(p => {
+      const salto = p - anterior > 1 ? '<li><span class="pagination-ellipsis" aria-hidden="true">…</span></li>' : '';
+      anterior = p;
+      const atual = p === paginaCombinacao;
+      return `${salto}<li><button type="button" class="page${atual ? ' active' : ''}" aria-label="Página ${p}"${atual ? ' aria-current="page"' : ''} onclick="irParaPaginaCombinacao(${p})">${p}</button></li>`;
+    }).join('');
     paginacaoEl.innerHTML = `
-      <button type="button" class="br-button secondary small" onclick="irParaPaginaCombinacao(${paginaCombinacao - 1})" ${paginaCombinacao <= 1 ? 'disabled' : ''}>Anterior</button>
-      <span>Página ${paginaCombinacao} de ${totalPaginas} — ${combos.length.toLocaleString('pt-BR')} combinações</span>
-      <button type="button" class="br-button secondary small" onclick="irParaPaginaCombinacao(${paginaCombinacao + 1})" ${paginaCombinacao >= totalPaginas ? 'disabled' : ''}>Próxima</button>
+      <nav class="br-pagination" aria-label="Paginação das combinações"><ul>
+        <li><button class="br-button circle" type="button" aria-label="Página anterior" onclick="irParaPaginaCombinacao(${paginaCombinacao - 1})" ${paginaCombinacao <= 1 ? 'disabled' : ''}><i class="fas fa-angle-left" aria-hidden="true"></i></button></li>
+        ${itens}
+        <li><button class="br-button circle" type="button" aria-label="Página seguinte" onclick="irParaPaginaCombinacao(${paginaCombinacao + 1})" ${paginaCombinacao >= totalPaginas ? 'disabled' : ''}><i class="fas fa-angle-right" aria-hidden="true"></i></button></li>
+      </ul></nav>
+      <p class="paginacao-info m-0">Página ${paginaCombinacao} de ${totalPaginas} — ${combos.length.toLocaleString('pt-BR')} combinações</p>
     `;
   }
 
