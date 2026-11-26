@@ -89,7 +89,7 @@ $db_host = 'localhost';     // Verificar com suporte Hostinger
 $db_user = 'root';          // Seu usuário MySQL
 $db_pass = '';              // Sua senha MySQL
 $db_name = 'credenciamentos_aps';  // Nome do banco
-$api_key = 'painel_cred_2026_key'; // Chave de autenticação
+$api_key = getenv('CREDENCIAMENTOS_API_KEY') ?: ''; // Chave de autenticação
 ```
 
 ---

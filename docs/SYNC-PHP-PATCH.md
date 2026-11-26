@@ -41,7 +41,7 @@ elseif ($action === 'sync_represados') {
     $headers = getallheaders();
     $api_key_header = $headers['X-Api-Key'] ?? '';
 
-    if ($api_key_header !== 'painel_cred_2026_key') {
+    if ($api_key_header === '' || !hash_equals(getenv('CREDENCIAMENTOS_API_KEY') ?: '', $api_key_header)) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized']);
         exit;

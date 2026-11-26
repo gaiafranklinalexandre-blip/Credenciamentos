@@ -18,10 +18,11 @@ import requests
 
 CSV_PATH = "base_filtro.csv"
 API_URL = "https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php"
-API_KEY = "painel_cred_2026_key"
+from credenciamentos_config import obter_headers_api
 
 
 def main():
+    headers_api = obter_headers_api()
     print(f"Lendo {CSV_PATH} ...")
     with open(CSV_PATH, encoding="cp1252", newline="") as f:
         leitor = csv.DictReader(f, delimiter=";")
@@ -52,7 +53,7 @@ def main():
     resp = requests.post(
         API_URL,
         params={"action": "sync_municipios_filtro"},
-        headers={"X-Api-Key": API_KEY},
+        headers=headers_api,
         json={"records": registros},
         timeout=60,
     )

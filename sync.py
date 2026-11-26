@@ -8,7 +8,7 @@ EXCEL_PATH          = os.path.join(os.path.dirname(__file__), 'base_credenciamen
 PORTARIAS_EXCEL     = os.path.join(os.path.dirname(__file__), 'Portarias_APS_Database.xlsx')
 REPRESADOS_EXCEL    = os.path.join(os.path.dirname(__file__), 'REPRESADO_2.xlsx')
 API_URL = 'https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php'
-API_KEY = 'painel_cred_2026_key'
+from credenciamentos_config import obter_headers_api
 
 def parse_date(val):
     if isinstance(val, datetime):
@@ -79,6 +79,7 @@ def load_excel():
     return records
 
 def sync(records):
+    headers_api = obter_headers_api()
     print('Enviando para o servidor...')
     # Envia em lotes de 1000 para não estourar o limite
     batch_size = 1000
@@ -89,7 +90,7 @@ def sync(records):
     resp = requests.post(
         f'{API_URL}?action=sync',
         json={'records': first_batch},
-        headers={'X-Api-Key': API_KEY},
+        headers=headers_api,
         timeout=120
     )
     resp.raise_for_status()
@@ -103,7 +104,7 @@ def sync(records):
         resp = requests.post(
             f'{API_URL}?action=append',
             json={'records': batch},
-            headers={'X-Api-Key': API_KEY},
+            headers=headers_api,
             timeout=120
         )
         resp.raise_for_status()
@@ -145,11 +146,12 @@ def load_portarias():
     return records
 
 def sync_portarias(records):
+    headers_api = obter_headers_api()
     print('Enviando portarias para o servidor...')
     resp = requests.post(
         f'{API_URL}?action=sync_portarias',
         json={'records': records},
-        headers={'X-Api-Key': API_KEY},
+        headers=headers_api,
         timeout=120
     )
     resp.raise_for_status()
@@ -228,11 +230,12 @@ def sync_represados(records):
         print('Nenhum represado para sincronizar.')
         return
 
+    headers_api = obter_headers_api()
     print('Enviando represados para o servidor...')
     resp = requests.post(
         f'{API_URL}?action=sync_represados',
         json={'records': records},
-        headers={'X-Api-Key': API_KEY},
+        headers=headers_api,
         timeout=120
     )
     resp.raise_for_status()
@@ -240,6 +243,7 @@ def sync_represados(records):
     print(f'Represados sincronizados: {result.get("inserted", 0)} registros.')
 
 if __name__ == '__main__':
+    obter_headers_api()
     records = load_excel()
     sync(records)
     portarias = load_portarias()

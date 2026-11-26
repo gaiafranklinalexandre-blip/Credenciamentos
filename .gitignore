@@ -19,3 +19,16 @@ desktop.ini
 # Cache Python.
 __pycache__/
 *.pyc
+
+# Arquivos privados: nunca distribuir pelo frontend estatico.
+/sync.php
+/.env
+/.env.*
+/.github_token
+/.claude/settings.local.json
+/docs/ACESSOS*.md
+/docs/*local.md
+/docs/*LOCAL.md
+/docs/validacoes-locais/
+*.db
+*.db-journal

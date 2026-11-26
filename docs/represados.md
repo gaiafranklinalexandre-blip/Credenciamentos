@@ -183,7 +183,7 @@ $ python sync.py
 
 **`sync_represados(records)`**
 - POST para `API_URL?action=sync_represados`
-- Envia com header `X-Api-Key: painel_cred_2026_key`
+- Envia com header `X-Api-Key` com o valor de `CREDENCIAMENTOS_API_KEY`
 - Log do número de registros inseridos
 
 ### sync.php — Handlers
@@ -207,7 +207,7 @@ CREATE TABLE IF NOT EXISTS represados (
 ```
 
 **`?action=sync_represados` (POST)**
-- Requer autenticação: `X-Api-Key: painel_cred_2026_key`
+- Requer autenticação: `X-Api-Key` com o valor de `CREDENCIAMENTOS_API_KEY`
 - Trunca tabela, insere novos dados
 - Retorna `{"success": true, "inserted": N}`
 

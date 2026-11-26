@@ -29,7 +29,7 @@ import requests
 
 APS_XLSX = r"C:\Users\franklin.santos\OneDrive - Ministério da Saúde\Área de Trabalho\APS 360\APS.xlsx"
 API_URL = "https://darkgoldenrod-pelican-495804.hostingersite.com/sync.php"
-API_KEY = "painel_cred_2026_key"
+from credenciamentos_config import obter_headers_api
 
 
 def soma_colunas(aba, colunas):
@@ -41,6 +41,7 @@ def soma_colunas(aba, colunas):
 
 
 def main():
+    headers_api = obter_headers_api()
     print(f"Lendo {APS_XLSX} ...")
 
     pagos = {}
@@ -97,7 +98,7 @@ def main():
     resp = requests.post(
         API_URL,
         params={"action": "sync_pagos_estrategia"},
-        headers={"X-Api-Key": API_KEY},
+        headers=headers_api,
         json={"records": registros},
         timeout=60,
     )
