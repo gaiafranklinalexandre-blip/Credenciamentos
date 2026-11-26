@@ -484,6 +484,7 @@ function simHtml(){
 function simIniciar(){
  if(!simDS())return;
  document.querySelectorAll('#conteudoTab .br-select').forEach(el=>{const c=new core.BRSelect('br-select',el);
+  el.querySelector('.br-input[role="combobox"]')?.setAttribute('aria-label',el.querySelector('label').textContent.trim());
   el.addEventListener('onChange',()=>{const r=el.querySelector('input[type=radio]:checked');if(el.dataset.sim==='sEstr')S.sEstr=r?r.value:'';else S.sMes=r?r.value:'';simAtualizar();sincronizarUrl()})})}
 function simAtualizar(){
  const e=SIM&&SIM.estrategias.find(x=>x.nome===S.sEstr),m=S.sMes!==''&&SIM?Number(S.sMes):null,res=document.getElementById('simRes'),st=document.getElementById('simStatus');
@@ -582,6 +583,7 @@ document.addEventListener('click',e=>{if(e.target.closest('#simLimpar')){S.sEstr
     Object.defineProperty(doc,'addEventListener',{configurable:true,writable:true,value:function(type,listener,options){state.externalListeners.push({target:this,type,listener,options});return add.call(this,type,listener,options)}});
     try { state.component = new core.BRSelect('br-select', state.host); }
     finally { if (ownAdd) Object.defineProperty(doc,'addEventListener',ownAdd); else delete doc.addEventListener; }
+    state.host.querySelector('.br-input[role="combobox"]')?.setAttribute('aria-label',state.label);
     input.value = search === null ? selected?.label || '' : search;
     state.host.onchange = null;
     if (state.onChange) state.host.removeEventListener('onChange', state.onChange);
