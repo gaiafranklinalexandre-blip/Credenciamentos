@@ -123,6 +123,12 @@ html body input:focus:not(:focus-visible),html body select:focus:not(:focus-visi
 .sim .br-table td{vertical-align:top}.sim .br-message+.br-message{margin-top:var(--spacing-scale-2x,16px)}
 .sim .card-header h2{margin:0}@media(max-width:991px){.sim .col-lg-7{margin-top:var(--spacing-scale-3x,24px)}}
 .cred-vazio .br-button{white-space:normal;height:auto;min-height:var(--spacing-scale-5x,40px);text-align:left;max-width:100%}
+/* Barra de rolagem no padrão gov.br DS (cinza, 8px), igual em todos os sites APS 360 */
+html{scrollbar-color:var(--gray-30,#adadad) var(--gray-10,#e6e6e6)}
+*::-webkit-scrollbar{width:8px;height:8px}
+*::-webkit-scrollbar-track{background:var(--gray-10,#e6e6e6)}
+*::-webkit-scrollbar-thumb{background:var(--gray-30,#adadad);border-radius:4px}
+*::-webkit-scrollbar-thumb:hover{background:var(--gray-40,#888)}
 </style>
 </head>
 <body>
