@@ -9,12 +9,13 @@ correção da macrorregião e as demais alterações locais não entraram nele.
 
 Conferidos no Render os três clientes Python, o módulo comum e os três
 documentos que continham a chave: correspondem ao commit e não contêm os
-valores sensíveis identificados. O PHP foi excluído do Git, mas **o recurso
-`/sync.php` ainda responde HTTP 200 com 9.071 bytes no Render**, inclusive após
-o deploy dos arquivos novos. Portanto, a retirada pública **não está concluída**.
-Não confundir exclusão no Git com eliminação de cópia que o serviço ainda serve.
-Uma nova publicação comum não foi suficiente; a renovação/limpeza administrativa
-precisa ser conferida no serviço, com acesso ao Render ainda não conectado.
+valores sensíveis identificados. O deploy comum inicialmente manteve o recurso
+`/sync.php` acessível com 9.071 bytes. O usuário executou a renovação com limpeza
+do cache no painel Render e confirmou a conclusão. Na conferência posterior,
+**`/sync.php` retornou HTTP 404**, tanto no endereço direto quanto com parâmetro
+de verificação. **A retirada do PHP privado nesse endereço público está
+concluída.** A operação administrativa foi realizada pelo usuário; não foi
+necessário instalar ou conectar o plugin Render.
 
 O painel permanece respondendo HTTP 200. Seu HTML e os JSON territoriais e do
 simulador foram preservados. Os GETs da Hostinger retornam 16.553 registros e
@@ -48,8 +49,8 @@ coordenada na Hostinger. Não reutilizar credenciais da API de Notas Técnicas.
   com o runtime do servidor, pois não há PHP disponível no ambiente local.
 - `sync.php` foi removido do índice do Git com `git rm --cached -- sync.php`.
   O arquivo local foi preservado e passou a ser ignorado. A exclusão foi
-  incluída no commit publicado, mas o recurso público continua acessível
-  conforme a verificação registrada acima.
+  incluída no commit publicado, e o recurso público passou a retornar 404 após
+  a renovação manual no Render. A cópia local continua preservada.
 - `.gitignore` protege PHP privado, `.env*`, tokens, documentos de acesso e
   relatórios locais. Não persistir valores de credenciais nesses relatórios.
 
